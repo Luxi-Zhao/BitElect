@@ -20,8 +20,9 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 
 import java.io.IOException;
 
-import static com.google.android.gms.vision.barcode.Barcode.QR_CODE;
-
+/**
+ * Credits to http://www.devexchanges.info/2016/10/reading-barcodeqr-code-using-mobile.html
+ */
 public class QRCodeActivity extends AppCompatActivity {
     private static final String TAG = QRCodeActivity.class.getSimpleName();
 
@@ -58,6 +59,7 @@ public class QRCodeActivity extends AppCompatActivity {
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
                     try {
+                        Log.v(TAG, "surface view is ready!");
                         cs.start(surfaceHolder);
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -133,5 +135,15 @@ public class QRCodeActivity extends AppCompatActivity {
         super.onDestroy();
         cs.release();
         bd.release();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 }
