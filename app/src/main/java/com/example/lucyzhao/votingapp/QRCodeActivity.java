@@ -11,6 +11,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
@@ -30,6 +31,7 @@ public class QRCodeActivity extends AppCompatActivity {
 
     SurfaceView surfaceView;
     TextView barcodeText;
+    LineIndicatorOverlay lineIndicator;
     SurfaceHolder surfaceHolder;
     CameraSource cs;
     BarcodeDetector bd;
@@ -41,6 +43,7 @@ public class QRCodeActivity extends AppCompatActivity {
 
         surfaceView = findViewById(R.id.surface_view);
         barcodeText = findViewById(R.id.barcode_txt);
+        lineIndicator = findViewById(R.id.line_indicator);
 
         bd = new BarcodeDetector.Builder(this)
                 .setBarcodeFormats(Barcode.QR_CODE)
@@ -61,6 +64,12 @@ public class QRCodeActivity extends AppCompatActivity {
                     try {
                         Log.v(TAG, "surface view is ready!");
                         cs.start(surfaceHolder);
+                        QRCodeOverlay overlay = findViewById(R.id.overlay);
+                        int length = overlay.getMargin() * 2;
+                        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(length, length);
+                        lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+
+                        lineIndicator.setLayoutParams(lp);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
