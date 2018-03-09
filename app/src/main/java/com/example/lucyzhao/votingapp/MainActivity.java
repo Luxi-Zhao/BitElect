@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1100;
     private static final int TAKE_PICTURE = 23;
     TextView myTextView;
-    ImageView myImageView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +40,16 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         myTextView = findViewById(R.id.qr_code_txt);
-        myImageView = findViewById(R.id.qr_code_img);
+
+        Intent intent = this.getIntent();
+        String qr_result = intent.getStringExtra(Utils.QR_RESULT);
+        if(qr_result != null) {
+            Log.v(TAG, "result if qr scanning is:" + qr_result);
+            myTextView.setText(qr_result);
+        }
+        else {
+            Log.v(TAG, "qr scanning returned null!");
+        }
     }
 
     public void vote(View view) {
@@ -52,7 +61,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void scanQRCode() {
-        requestCameraPermission();
+        //requestCameraPermission();
+        Intent intent = new Intent(this, QRCodeActivity.class);
+        startActivity(intent);
     }
 
     /**
@@ -115,7 +126,6 @@ public class MainActivity extends AppCompatActivity {
 
     private void scanPicture(@NonNull Bitmap myBitmap) {
 
-        myImageView.setImageBitmap(myBitmap);
 
         BarcodeDetector detector =
                 new BarcodeDetector.Builder(getApplicationContext())

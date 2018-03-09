@@ -13,7 +13,7 @@ import android.view.View;
  * Created by LucyZhao on 2018/3/6.
  */
 
-public class LineIndicatorOverlay extends View {
+public class MovingLine extends View {
     private float left, top, right, bottom;
     private float linePos = 0;
     private Paint paint;
@@ -25,15 +25,15 @@ public class LineIndicatorOverlay extends View {
 
     private static final int DELAY = 10;
 
-    public LineIndicatorOverlay(Context context) {
+    public MovingLine(Context context) {
         super(context);
     }
 
-    public LineIndicatorOverlay(Context context, @Nullable AttributeSet attrs) {
+    public MovingLine(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public LineIndicatorOverlay(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public MovingLine(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
