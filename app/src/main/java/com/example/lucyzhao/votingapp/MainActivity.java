@@ -44,7 +44,6 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private static final int TAKE_PICTURE = 23;
     TextView myTextView;
 
 
@@ -57,11 +56,10 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = this.getIntent();
         String qr_result = intent.getStringExtra(Utils.QR_RESULT);
-        if(qr_result != null) {
+        if (qr_result != null) {
             Log.v(TAG, "result if qr scanning is:" + qr_result);
             myTextView.setText(qr_result);
-        }
-        else {
+        } else {
             Log.v(TAG, "qr scanning returned null!");
         }
     }
@@ -75,34 +73,16 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void scanPassport(View view) {
-        //startActivity(new Intent(this, NFCActivity.class));
-        new PassportInfoFragment().show(getFragmentManager(),"enterPassportInfo");
+        new PassportInfoFragment().show(getFragmentManager(), "enterPassportInfo");
     }
 
     private void scanQRCode() {
-        //requestCameraPermission();
         Intent intent = new Intent(this, QRCodeActivity.class);
         startActivity(intent);
     }
 
-//    /**
-//     * set the input fragment's switching behavior
-//     * @param fragment
-//     */
-//    private void createFragment(Fragment fragment) {
-//        fragment.setEnterTransition(new Slide(Gravity.END));
-//        fragment.setExitTransition(new Slide(Gravity.START));
-//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-//
-//        // Replace whatever is in the fragment_container view with this fragment,
-//        // and add the transaction to the back stack if needed
-//        transaction.replace(R.id.activity_main, fragment);
-//        transaction.commit();
-//    }
 
-    public static class PassportInfoFragment extends DialogFragment implements View.OnClickListener{
-//        private DatePicker birthDate;
-//        private DatePicker expiryDate;
+    public static class PassportInfoFragment extends DialogFragment implements View.OnClickListener {
         private EditText birthDate;
         private EditText expiryDate;
         private EditText docNum;
@@ -110,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState){
+                                 Bundle savedInstanceState) {
             View fragment = inflater.inflate(R.layout.fragment_passport_info, container, false);
             birthDate = fragment.findViewById(R.id.birthdate_edit_text);
             expiryDate = fragment.findViewById(R.id.expirydate_edit_text);
@@ -123,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
                     String birthDateStr = birthDate.getText().toString();
                     String expiryDateStr = expiryDate.getText().toString();
                     String docNumStr = docNum.getText().toString().toUpperCase();
-                    if(birthDateStr.length() != 6 || expiryDateStr.length() != 6 || docNumStr.isEmpty()) {
+                    if (birthDateStr.length() != 6 || expiryDateStr.length() != 6 || docNumStr.isEmpty()) {
                         Toast.makeText(getContext(), "Incorrect Info", Toast.LENGTH_SHORT).show();
                         return;
                     }
@@ -135,22 +115,12 @@ public class MainActivity extends AppCompatActivity {
                     editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
                     editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
                     editor.apply(); //asynchronously save to pref
-                    Log.v(TAG,"saved to pref");
+                    Log.v(TAG, "saved to pref");
                     dismiss();
                 }
             });
 
             return fragment;
-        }
-
-        //todo check for NULL
-        private String getDateStrFromPicker(DatePicker dp) {
-            SimpleDateFormat format = new SimpleDateFormat("yyMMdd");
-
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(dp.getYear(), dp.getMonth(), dp.getDayOfMonth());
-            Date date = calendar.getTime();
-            return format.format(date);
         }
 
         @Override
