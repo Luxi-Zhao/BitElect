@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="wrap_content"
+    android:padding="20dp"
+    android:orientation="vertical">
+
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Passport Number"
+        android:id="@+id/passport_num_edit_text"/>
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/birthdate_edit_text"
+        android:hint="Birth Date: yymmdd"
+        android:inputType="date"
+        />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/expirydate_edit_text"
+        android:hint="Expiry Date: yymmdd"
+        android:inputType="date"/>
+
+    <!--<DatePicker-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/birthdate_picker"-->
+        <!--android:datePickerMode="spinner"/>-->
+
+    <!--<DatePicker-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:id="@+id/expirydate_picker"-->
+        <!--android:datePickerMode="spinner"/>-->
+
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/save_info_ok_btn"
+        android:text="OK"/>
+
+
+
+
+
+
+</LinearLayout>
