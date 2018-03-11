@@ -64,21 +64,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void vote(View view) {
-        Toast.makeText(this, "you voted", Toast.LENGTH_SHORT).show();
-    }
 
-    public void scan(View view) {
-        scanQRCode();
+    public void scanQRCode(View view) {
+        Intent intent = new Intent(this, QRCodeActivity.class);
+        startActivity(intent);
     }
 
     public void scanPassport(View view) {
         new PassportInfoFragment().show(getFragmentManager(), "enterPassportInfo");
     }
 
-    private void scanQRCode() {
-        Intent intent = new Intent(this, QRCodeActivity.class);
-        startActivity(intent);
+    public void vote(View view) {
+        startActivity(new Intent(this, VotingActivity.class));
     }
 
 

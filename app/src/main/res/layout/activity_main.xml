@@ -2,39 +2,38 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:id="@+id/activity_main"
     tools:context="com.example.lucyzhao.votingapp.MainActivity">
 
-
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="vote"
-        android:id="@+id/vote_btn"
-        android:onClick="vote"/>
-
-    <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="scan QR code"
         android:id="@+id/scan_qr_btn"
-        android:onClick="scan"/>
-
-    <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="scan passport"
+        android:onClick="scanQRCode"
+        android:text="scan QR code" />
+
+    <Button
         android:id="@+id/scan_passport"
-        android:onClick="scanPassport"/>
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="scanPassport"
+        android:text="scan passport" />
 
     <TextView
+        android:id="@+id/qr_code_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/qr_code_txt"
-        android:text="qr code result"/>
+        android:text="qr code result" />
+
+    <Button
+        android:id="@+id/vote_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="vote"
+        android:text="vote" />
 
 
 </LinearLayout>

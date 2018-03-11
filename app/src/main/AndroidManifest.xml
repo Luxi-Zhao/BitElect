@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.NFC" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <uses-feature
         android:name="android.hardware.nfc"
@@ -23,18 +24,23 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QRCodeActivity"></activity>
-        <activity android:name=".NFCActivity" android:launchMode="singleTop">
+        <activity android:name=".QRCodeActivity" />
+        <activity
+            android:name=".NFCActivity"
+            android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
             </intent-filter>
-            <meta-data android:name="android.nfc.action.TECH_DISCOVERED"
+
+            <meta-data
+                android:name="android.nfc.action.TECH_DISCOVERED"
                 android:resource="@xml/nfc_tech_list" />
 
             <intent-filter>
-                <action android:name="android.nfc.action.TAG_DISCOVERED"/>
+                <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
+        <activity android:name=".VotingActivity"></activity>
     </application>
 
 </manifest>

@@ -84,7 +84,7 @@ public class QRCodeOverlay extends View {
         canvas.clipRect(clip, Region.Op.DIFFERENCE);
 
         int linelen = margin / 5;
-        canvas.drawColor(Color.parseColor("#9600020D"));
+        canvas.drawColor(Color.parseColor("#801e1404"));
         canvas.drawRect(boundary, boundaryPaint);
         canvas.drawLine(bLeft, bTop, bLeft + linelen, bTop, decoPaint);
         canvas.drawLine(bRight - linelen, bTop, bRight, bTop, decoPaint);
