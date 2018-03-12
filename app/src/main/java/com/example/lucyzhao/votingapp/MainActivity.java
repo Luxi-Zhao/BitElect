@@ -1,40 +1,22 @@
 package com.example.lucyzhao.votingapp;
 
-import android.Manifest;
 import android.app.Activity;
-import com.example.lucyzhao.votingapp.Utils;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
-import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.os.Build;
-import android.provider.MediaStore;
-import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.transition.Slide;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -43,14 +25,6 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.vision.Frame;
-import com.google.android.gms.vision.barcode.Barcode;
-import com.google.android.gms.vision.barcode.BarcodeDetector;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 
 import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
@@ -60,37 +34,14 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int QR_ACTIVITY_REQ_CODE = 111;
 
-    TextView myTextView;
     AlertDialog.Builder builder;
     private VoteInfo voteInfo = new VoteInfo();
-
-    private class VoteInfo {
-        String nfcID = "", qrCode = "", candidateID = "";
-
-        void setNfcID(String nfcID) {
-            this.nfcID = nfcID;
-        }
-
-        void setQrCode(String qrCode) {
-            this.qrCode = qrCode;
-        }
-
-        void setCandidateID(String candidateID) {
-            this.candidateID = candidateID;
-        }
-
-        boolean checkAllFieldsExist() {
-            return !nfcID.equals("") && !qrCode.equals("") && !candidateID.equals("");
-        }
-    }
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        myTextView = findViewById(R.id.qr_code_txt);
         builder = new AlertDialog.Builder(this);
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -104,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
 //        String qr_result = intent.getStringExtra(Utils.QR_RESULT);
 //        if (qr_result != null) {
 //            Log.v(TAG, "result of qr scanning is:" + qr_result);
-//            myTextView.setText(qr_result);
 //            voteInfo.setQrCode(qr_result);
 //        } else {
 //            Log.v(TAG, "qr scanning returned null!");
@@ -122,7 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-
     public void scanQRCode(View view) {
         Intent intent = new Intent(this, QRCodeActivity.class);
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
@@ -131,14 +80,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
-            case (QR_ACTIVITY_REQ_CODE) : {
+        switch (requestCode) {
+            case (QR_ACTIVITY_REQ_CODE): {
                 if (resultCode == Activity.RESULT_OK) {
                     // check QR Code scanning result
                     String qr_result = data.getStringExtra(Utils.QR_RESULT);
                     if (qr_result != null) {
                         Log.v(TAG, "result of qr scanning is:" + qr_result);
-                        myTextView.setText(qr_result);
+
                         voteInfo.setQrCode(qr_result);
                     } else {
                         Log.v(TAG, "qr scanning returned null!");
@@ -147,18 +96,6 @@ public class MainActivity extends AppCompatActivity {
                 break;
             }
 
-//            case (NFC_ACTIVITY_REQ_CODE) : {
-//                if (resultCode == Activity.RESULT_OK) {
-//                    String nfc_result = data.getStringExtra(Utils.NFC_RESULT);
-//                    if (nfc_result != null) {
-//                        Log.v(TAG, "result of nfc scanning is:" + nfc_result);
-//                        voteInfo.setNfcID(nfc_result);
-//                    } else {
-//                        Log.v(TAG, "nfc scanning returned null!");
-//                    }
-//                }
-//                break;
-//            }
         }
     }
 
@@ -175,7 +112,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         // Check which radio button was clicked
-        switch(id) {
+        switch (id) {
             case R.id.radio_clinton:
                 candidate = "1";
 
@@ -192,18 +129,18 @@ public class MainActivity extends AppCompatActivity {
         voteInfo.setCandidateID(candidate);
         RadioButton selectedCand = findViewById(id);
         String candidateName = candidate;
-        if(selectedCand != null) {
+        if (selectedCand != null) {
             candidateName = selectedCand.getText().toString();
         }
 
-        builder.setMessage("Are you sure you want to choose " + candidateName +"?");
+        builder.setMessage("Are you sure you want to choose " + candidateName + "?");
         AlertDialog dialog = builder.create();
         dialog.show();
     }
 
     private void submitVote() {
 
-        if(!voteInfo.checkAllFieldsExist()) {
+        if (!voteInfo.checkAllFieldsExist()) {
             Toast.makeText(getApplicationContext(), "please complete all steps", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -225,14 +162,13 @@ public class MainActivity extends AppCompatActivity {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-               //todo
+                //todo
             }
         });
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
     }
-
 
     public static class PassportInfoFragment extends DialogFragment implements View.OnClickListener {
         private EditText birthDate;
@@ -281,7 +217,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private class VoteInfo {
+        String nfcID = "", qrCode = "", candidateID = "";
 
+        void setNfcID(String nfcID) {
+            this.nfcID = nfcID;
+        }
+
+        void setQrCode(String qrCode) {
+            this.qrCode = qrCode;
+        }
+
+        void setCandidateID(String candidateID) {
+            this.candidateID = candidateID;
+        }
+
+        boolean checkAllFieldsExist() {
+            return !nfcID.equals("") && !qrCode.equals("") && !candidateID.equals("");
+        }
+    }
 
 
 }

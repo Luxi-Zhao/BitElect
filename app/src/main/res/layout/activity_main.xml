@@ -8,35 +8,61 @@
     android:orientation="vertical"
     tools:context="com.example.lucyzhao.votingapp.MainActivity">
 
-    <Button
-        android:id="@+id/scan_qr_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="scanQRCode"
-        android:text="scan QR code" />
-
-    <TextView
-        android:id="@+id/qr_code_txt"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="qr code result" />
 
     <Button
         android:id="@+id/scan_passport"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MainActivityButtons"
         android:onClick="enterPassportInfo"
+        android:background="@drawable/border"
         android:text="enter passport info" />
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_more_vert_black_24dp"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="                  Scan your passport"
-        style="@style/ItemTagText"/>
+        android:layout_gravity="center_horizontal"
+        android:padding="10dp"
+        android:text="Scan your passport"
+        />
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_more_vert_black_24dp"/>
+
+    <Button
+        android:id="@+id/scan_qr_btn"
+        style="@style/MainActivityButtons"
+        android:onClick="scanQRCode"
+        android:background="@drawable/border"
+        android:text="scan QR code" />
+
+    <View
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_more_vert_black_24dp"/>
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:text="Choose a candidate"
+        />
 
     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/border"
+        style="@style/MainActivityButtons"
         android:id="@+id/radio_group"
         android:orientation="vertical">
         <RadioButton android:id="@+id/radio_clinton"
@@ -58,11 +84,16 @@
     </RadioGroup>
 
 
+    <View
+        android:layout_width="20dp"
+        android:layout_height="25dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@drawable/ic_more_vert_black_24dp"/>
     <Button
         android:id="@+id/vote_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        style="@style/MainActivityButtons"
         android:onClick="vote"
+        android:background="@drawable/border"
         android:text="vote" />
 
 
