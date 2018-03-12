@@ -2,6 +2,7 @@ package com.example.lucyzhao.votingapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.support.v4.app.ActivityCompat;
@@ -89,9 +90,14 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void release() {
                 Log.v(TAG, "in release");
-                Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+                Intent intent = new Intent();
                 intent.putExtra(Utils.QR_RESULT, qrResult);
-                startActivity(intent);
+                //startActivity(intent);
+
+                //todo send result.cancelled as well
+                setResult(Activity.RESULT_OK, intent);
+                finish();
             }
 
             @Override

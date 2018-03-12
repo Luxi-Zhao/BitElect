@@ -1,5 +1,6 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -48,6 +50,10 @@ public class NFCActivity extends AppCompatActivity {
     private InfoAdapter infoAdapter;
     private List<BioInfo> infoList = new ArrayList<>();
 
+    private TextView nfcResultTxt;
+    private Button goVoteBtn;
+    private String nfcResult = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,6 +68,9 @@ public class NFCActivity extends AppCompatActivity {
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
         readPassport(getIntent());
 
+        nfcResultTxt = findViewById(R.id.nfc_result_txt);
+        goVoteBtn = findViewById(R.id.go_vote_btn);
+        goVoteBtn.setVisibility(View.INVISIBLE);
     }
 
     @Override
@@ -127,8 +136,6 @@ public class NFCActivity extends AppCompatActivity {
             IsoDep isoTag = IsoDep.get(params[0]);
             CardService cardService = CardService.getInstance(isoTag);
             try {
-                //todo add ui for this
-                //BACKey bacKey = new BACKey("E28426441", "970109", "240821");
                 BACKey bacKey = new BACKey(docNum, birthDate, expiryDate);
                 PassportService passportService = new PassportService(cardService, 256, 224, false, true);
                 passportService.open();
@@ -154,16 +161,21 @@ public class NFCActivity extends AppCompatActivity {
 
         protected void onPostExecute(MRZInfo mrzInfo) {
             if (mrzInfo == null) {
-                Toast.makeText(getApplicationContext(), "Authentication Failed", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "Authentication Failed", Toast.LENGTH_SHORT).show();
+                nfcResultTxt.setText("Authentication Failed");
                 return;
             }
 
+            String lastName = mrzInfo.getPrimaryIdentifier().replaceAll("\\W", "");
+            String firstName = mrzInfo.getSecondaryIdentifier().replaceAll("\\W", "");
+            String nationality = mrzInfo.getNationality();
+            String personalNumber = mrzInfo.getPersonalNumber();
+            String docNumber = mrzInfo.getDocumentNumber();
+
+            // update info list UI
             infoList.removeAll(infoList);
-            infoList.add(new BioInfo("Name",
-                    mrzInfo.getPrimaryIdentifier().replaceAll("\\W", "")
-                            + ", "
-                            + mrzInfo.getSecondaryIdentifier().replaceAll("\\W", "")));
-            infoList.add(new BioInfo("Nationality", mrzInfo.getNationality()));
+            infoList.add(new BioInfo("Name", lastName + ", " + firstName));
+            infoList.add(new BioInfo("Nationality", nationality));
 
             SimpleDateFormat fromFormat = new SimpleDateFormat("yyMMdd");
             SimpleDateFormat toFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.CANADA);
@@ -176,11 +188,32 @@ public class NFCActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            infoList.add(new BioInfo("Personal Number", mrzInfo.getPersonalNumber()));
-            infoList.add(new BioInfo("Document Number", mrzInfo.getDocumentNumber()));
+            infoList.add(new BioInfo("Personal Number", personalNumber));
+            infoList.add(new BioInfo("Document Number", docNumber));
             infoAdapter.notifyDataSetChanged();
 
+            enableVoting(personalNumber);
         }
+
+        private void enableVoting(String personalNumber) {
+            //todo add eligibility checks
+            // if the person is eligible ...
+            goVoteBtn.setVisibility(View.VISIBLE);
+            nfcResult = personalNumber;
+        }
+
+    }
+
+    /**
+     * Send scanned result back to MainActivity
+     * @param view
+     */
+    public void goVote(View view) {
+        Log.v(TAG, "nfc shouldn't be empty, nfc result is: " + nfcResult);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.putExtra(Utils.NFC_RESULT, nfcResult);
+        startActivity(intent);
+        finish();
     }
 
     private class BioInfo {

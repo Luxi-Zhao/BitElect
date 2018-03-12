@@ -15,18 +15,48 @@
         android:onClick="scanQRCode"
         android:text="scan QR code" />
 
-    <Button
-        android:id="@+id/scan_passport"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="scanPassport"
-        android:text="scan passport" />
-
     <TextView
         android:id="@+id/qr_code_txt"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="qr code result" />
+
+    <Button
+        android:id="@+id/scan_passport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="enterPassportInfo"
+        android:text="enter passport info" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="                  Scan your passport"
+        style="@style/ItemTagText"/>
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/radio_group"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_clinton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Peter Deutsch"
+            />
+        <RadioButton android:id="@+id/radio_trump"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jagjot Jhajji"
+            />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/radio_someoneelse"
+            android:text="Luxi Zhao"/>
+    </RadioGroup>
+
 
     <Button
         android:id="@+id/vote_btn"
