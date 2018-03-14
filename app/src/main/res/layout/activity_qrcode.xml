@@ -22,11 +22,4 @@
         android:layout_centerInParent="true"
         android:id="@+id/line_indicator"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="nothing yet"
-        android:id="@+id/barcode_txt"
-        android:textColor="#fff"/>
-
 </RelativeLayout>

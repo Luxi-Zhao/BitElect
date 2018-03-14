@@ -6,6 +6,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -14,9 +15,6 @@ import android.view.View;
  */
 
 public class QRCodeOverlay extends View {
-    private int mViewWidth;
-    private int mViewHeight;
-
     private Rect clip;
     private Rect boundary;
     private int left, top, right, bottom;
@@ -56,22 +54,21 @@ public class QRCodeOverlay extends View {
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
-        mViewWidth = w;
-        mViewHeight = h;
         boundaryPaint = new Paint();
         decoPaint = new Paint();
         clip = new Rect();
         boundary = new Rect();
-        boundaryPaint.setColor(Color.WHITE);
-        boundaryPaint.setStrokeWidth(2);
+
         decoPaint.setColor(Color.GREEN);
         decoPaint.setStrokeWidth(4);
+        boundaryPaint.setColor(Color.WHITE);
+        boundaryPaint.setStrokeWidth(2);
 
-        margin = mViewWidth / 3;  //margin from middle to edge
-        left = (mViewWidth / 2) - margin;
-        top = (mViewHeight / 2) - margin;
-        right = (mViewWidth / 2) + margin;
-        bottom = (mViewHeight / 2) + margin;
+        margin = w / 3;  //distance from center to edge
+        left = (w / 2) - margin;
+        top = (h / 2) - margin;
+        right = (w / 2) + margin;
+        bottom = (h / 2) + margin;
     }
 
     @Override
@@ -84,7 +81,7 @@ public class QRCodeOverlay extends View {
         canvas.clipRect(clip, Region.Op.DIFFERENCE);
 
         int linelen = margin / 5;
-        canvas.drawColor(Color.parseColor("#801e1404"));
+        canvas.drawColor(ContextCompat.getColor(getContext(), R.color.colorQROverlay));
         canvas.drawRect(boundary, boundaryPaint);
         canvas.drawLine(bLeft, bTop, bLeft + linelen, bTop, decoPaint);
         canvas.drawLine(bRight - linelen, bTop, bRight, bTop, decoPaint);

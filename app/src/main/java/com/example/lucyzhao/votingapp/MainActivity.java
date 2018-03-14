@@ -33,44 +33,37 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int QR_ACTIVITY_REQ_CODE = 111;
+    private static final String VOTING_URL = "http://192.168.4.1/?";
 
-    AlertDialog.Builder builder;
-    private VoteInfo voteInfo = new VoteInfo();
+    AlertDialog.Builder votingAlertBuilder;
+    private Vote myVote = Vote.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        builder = new AlertDialog.Builder(this);
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+        votingAlertBuilder = new AlertDialog.Builder(this);
+        votingAlertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
-                // User clicked OK button
                 submitVote();
             }
         });
 
-//        // check QR Code scanning result
-        Intent intent = this.getIntent();
-//        String qr_result = intent.getStringExtra(Utils.QR_RESULT);
-//        if (qr_result != null) {
-//            Log.v(TAG, "result of qr scanning is:" + qr_result);
-//            voteInfo.setQrCode(qr_result);
-//        } else {
-//            Log.v(TAG, "qr scanning returned null!");
-//        }
-
         // check NFC scanning result
+        Intent intent = this.getIntent();
         String nfc_result = intent.getStringExtra(Utils.NFC_RESULT);
         if (nfc_result != null) {
             Log.v(TAG, "result of nfc scanning is:" + nfc_result);
-            voteInfo.setNfcID(nfc_result);
+            myVote.setNfcID(nfc_result);
         } else {
             Log.v(TAG, "nfc scanning returned null!");
         }
-
-
     }
+
+    //////////////////////////////////////////////////////////////
+    ////////////////////////////QR CODE///////////////////////////
+    //////////////////////////////////////////////////////////////
 
     public void scanQRCode(View view) {
         Intent intent = new Intent(this, QRCodeActivity.class);
@@ -87,8 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     String qr_result = data.getStringExtra(Utils.QR_RESULT);
                     if (qr_result != null) {
                         Log.v(TAG, "result of qr scanning is:" + qr_result);
-
-                        voteInfo.setQrCode(qr_result);
+                        myVote.setQrCode(qr_result);
                     } else {
                         Log.v(TAG, "qr scanning returned null!");
                     }
@@ -99,57 +91,59 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void enterPassportInfo(View view) {
-        new PassportInfoFragment().show(getFragmentManager(), "enterPassportInfo");
-    }
 
-    public void vote(View view) {
-        String candidate = "";
-        //startActivity(new Intent(this, VotingActivity.class));
-        // Is the button now checked?
+    //////////////////////////////////////////////////////////////
+    ////////////////////////////VOTING////////////////////////////
+    //////////////////////////////////////////////////////////////
+
+    private String getSelectedCandidateID() {
+        String candidateID = "";
         RadioGroup rg = findViewById(R.id.radio_group);
         int id = rg.getCheckedRadioButtonId();
-
-
         // Check which radio button was clicked
         switch (id) {
             case R.id.radio_clinton:
-                candidate = "1";
+                candidateID = "1";
 
                 break;
             case R.id.radio_trump:
-                candidate = "2";
+                candidateID = "2";
                 break;
 
             case R.id.radio_someoneelse:
-                candidate = "3";
+                candidateID = "3";
                 break;
         }
+        return candidateID;
+    }
 
-        voteInfo.setCandidateID(candidate);
+    private String getSelectedCandidateName() {
+        RadioGroup rg = findViewById(R.id.radio_group);
+        int id = rg.getCheckedRadioButtonId();
         RadioButton selectedCand = findViewById(id);
-        String candidateName = candidate;
-        if (selectedCand != null) {
-            candidateName = selectedCand.getText().toString();
-        }
+        return selectedCand.getText().toString();
+    }
 
-        builder.setMessage("Are you sure you want to choose " + candidateName + "?");
-        AlertDialog dialog = builder.create();
+    public void vote(View view) {
+        String candidateID = getSelectedCandidateID();
+        myVote.setCandidateID(candidateID);
+
+        votingAlertBuilder.setMessage("Are you sure you want to choose " + getSelectedCandidateName() + "?");
+        AlertDialog dialog = votingAlertBuilder.create();
         dialog.show();
     }
 
     private void submitVote() {
-
-        if (!voteInfo.checkAllFieldsExist()) {
+        if (!myVote.checkAllFieldsExist()) {
             Toast.makeText(getApplicationContext(), "please complete all steps", Toast.LENGTH_SHORT).show();
             return;
         }
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
-        String url = "http://192.168.4.1/?" + COMM_QR_CODE + "=" + voteInfo.qrCode + "&"
-                + COMM_NFC_ID + "=" + voteInfo.nfcID + "&"
-                + COMM_CANDIDATE_ID + "=" + voteInfo.candidateID;
+        String url = VOTING_URL + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
+                + COMM_NFC_ID + "=" + myVote.getNfcID() + "&"
+                + COMM_CANDIDATE_ID + "=" + myVote.getCandidateID();
         Log.v(TAG, "url is: " + url);
 
         // Request a string response from the provided URL.
@@ -170,7 +164,56 @@ public class MainActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
-    public static class PassportInfoFragment extends DialogFragment implements View.OnClickListener {
+    private static class Vote {
+        private static Vote vote;
+
+        static Vote getInstance() {
+            if (vote == null) {
+                vote = new Vote();
+            }
+            return vote;
+        }
+
+        String nfcID = "", qrCode = "", candidateID = "";
+
+        void setNfcID(String nfcID) {
+            this.nfcID = nfcID;
+        }
+
+        void setQrCode(String qrCode) {
+            this.qrCode = qrCode;
+        }
+
+        void setCandidateID(String candidateID) {
+            this.candidateID = candidateID;
+        }
+
+        String getNfcID() {
+            return nfcID;
+        }
+
+        String getQrCode() {
+            return qrCode;
+        }
+
+        String getCandidateID() {
+            return candidateID;
+        }
+
+        boolean checkAllFieldsExist() {
+            return !nfcID.equals("") && !qrCode.equals("") && !candidateID.equals("");
+        }
+    }
+
+    //////////////////////////////////////////////////////////////
+    ////////////////////////////PASSPORT//////////////////////////
+    //////////////////////////////////////////////////////////////
+
+    public void enterPassportInfo(View view) {
+        new PassportInfoPromptFragment().show(getFragmentManager(), "enterPassportInfo");
+    }
+
+    public static class PassportInfoPromptFragment extends DialogFragment implements View.OnClickListener {
         private EditText birthDate;
         private EditText expiryDate;
         private EditText docNum;
@@ -214,26 +257,6 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             dismiss();
-        }
-    }
-
-    private class VoteInfo {
-        String nfcID = "", qrCode = "", candidateID = "";
-
-        void setNfcID(String nfcID) {
-            this.nfcID = nfcID;
-        }
-
-        void setQrCode(String qrCode) {
-            this.qrCode = qrCode;
-        }
-
-        void setCandidateID(String candidateID) {
-            this.candidateID = candidateID;
-        }
-
-        boolean checkAllFieldsExist() {
-            return !nfcID.equals("") && !qrCode.equals("") && !candidateID.equals("");
         }
     }
 

@@ -31,7 +31,6 @@ public class QRCodeActivity extends AppCompatActivity {
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1100;
 
     SurfaceView surfaceView;
-    TextView barcodeText;
     MovingLine lineIndicator;
     SurfaceHolder surfaceHolder;
     CameraSource cs;
@@ -43,7 +42,6 @@ public class QRCodeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_qrcode);
 
         surfaceView = findViewById(R.id.surface_view);
-        barcodeText = findViewById(R.id.barcode_txt);
         lineIndicator = findViewById(R.id.line_indicator);
 
         bd = new BarcodeDetector.Builder(this)
@@ -90,10 +88,9 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void release() {
                 Log.v(TAG, "in release");
-                //Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+
                 Intent intent = new Intent();
                 intent.putExtra(Utils.QR_RESULT, qrResult);
-                //startActivity(intent);
 
                 //todo send result.cancelled as well
                 setResult(Activity.RESULT_OK, intent);
@@ -102,8 +99,10 @@ public class QRCodeActivity extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
+                //todo add delay
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
                 if(barcodes.size() > 0) {
+                    Log.v(TAG, "received result");
                     qrResult = barcodes.valueAt(0).rawValue;
                     bd.release();
                 }
@@ -129,6 +128,26 @@ public class QRCodeActivity extends AppCompatActivity {
         }
     }
 
+    @SuppressLint("MissingPermission")
+    private void startScanning() {
+        try {
+            Log.v(TAG, "surface view is ready!");
+            cs.start(surfaceHolder);
+
+            setUpOverlay();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void setUpOverlay() {
+        QRCodeOverlay overlay = findViewById(R.id.overlay);
+        int length = overlay.getMargin() * 2;
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(length, length);
+        lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
+        lineIndicator.setLayoutParams(lp);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -146,19 +165,4 @@ public class QRCodeActivity extends AppCompatActivity {
         super.onPause();
     }
 
-    @SuppressLint("MissingPermission")
-    private void startScanning() {
-        try {
-            Log.v(TAG, "surface view is ready!");
-            cs.start(surfaceHolder);
-            QRCodeOverlay overlay = findViewById(R.id.overlay);
-            int length = overlay.getMargin() * 2;
-            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(length, length);
-            lp.addRule(RelativeLayout.CENTER_IN_PARENT, RelativeLayout.TRUE);
-
-            lineIndicator.setLayoutParams(lp);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 }

@@ -1,6 +1,5 @@
 package com.example.lucyzhao.votingapp;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -10,9 +9,8 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
 import android.os.AsyncTask;
-
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -22,7 +20,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 
 import net.sf.scuba.smartcards.CardService;
 import net.sf.scuba.smartcards.CardServiceException;
@@ -45,32 +42,40 @@ import java.util.Locale;
 
 public class NFCActivity extends AppCompatActivity {
     private static final String TAG = NFCActivity.class.getSimpleName();
+    // NFC
     private static final String ISODEP_TECH_STRING = "android.nfc.tech.IsoDep";
     private NfcAdapter nfcAdapter;
-    private InfoAdapter infoAdapter;
-    private List<BioInfo> infoList = new ArrayList<>();
-
-    private TextView nfcResultTxt;
-    private Button goVoteBtn;
     private String nfcResult = "";
 
+    // UI
+    private InfoAdapter infoAdapter;
+    private List<BioInfo> infoList = new ArrayList<>();
+    private TextView nfcResultTxt;
+    private Button goVoteBtn;
+
+
+    //////////////////////////////////////////////////////////////
+    ///////////////////////////CALLBACKS//////////////////////////
+    //////////////////////////////////////////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nfc);
 
+        // UI
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this);
         infoAdapter = new InfoAdapter(infoList);
         RecyclerView infoRecycler = findViewById(R.id.info_recylerview);
         infoRecycler.setLayoutManager(layoutManager);
         infoRecycler.setAdapter(infoAdapter);
 
-        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
-        readPassport(getIntent());
-
         nfcResultTxt = findViewById(R.id.nfc_result_txt);
         goVoteBtn = findViewById(R.id.go_vote_btn);
         goVoteBtn.setVisibility(View.INVISIBLE);
+
+        // read NFC
+        nfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        readPassport(getIntent());
     }
 
     @Override
@@ -101,6 +106,10 @@ public class NFCActivity extends AppCompatActivity {
         Log.v(TAG, "in on new intent");
         readPassport(intent);
     }
+
+    //////////////////////////////////////////////////////////////
+    ////////////////////////////PASSPORT//////////////////////////
+    //////////////////////////////////////////////////////////////
 
     private void readPassport(Intent intent) {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
@@ -161,7 +170,6 @@ public class NFCActivity extends AppCompatActivity {
 
         protected void onPostExecute(MRZInfo mrzInfo) {
             if (mrzInfo == null) {
-                //Toast.makeText(getApplicationContext(), "Authentication Failed", Toast.LENGTH_SHORT).show();
                 nfcResultTxt.setText("Authentication Failed");
                 return;
             }
@@ -192,20 +200,24 @@ public class NFCActivity extends AppCompatActivity {
             infoList.add(new BioInfo("Document Number", docNumber));
             infoAdapter.notifyDataSetChanged();
 
-            enableVoting(personalNumber);
+            enableVoting(String.valueOf(Math.abs(docNumber.hashCode())));
         }
 
-        private void enableVoting(String personalNumber) {
+        private void enableVoting(String nfcResultStr) {
             //todo add eligibility checks
             // if the person is eligible ...
             goVoteBtn.setVisibility(View.VISIBLE);
-            nfcResult = personalNumber;
+            nfcResult = nfcResultStr;
         }
 
     }
 
+    //////////////////////////////////////////////////////////////
+    ////////////////////////////UI////////////////////////////////
+    //////////////////////////////////////////////////////////////
     /**
      * Send scanned result back to MainActivity
+     *
      * @param view
      */
     public void goVote(View view) {

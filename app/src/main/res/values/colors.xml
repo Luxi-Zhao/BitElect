@@ -3,4 +3,5 @@
     <color name="colorPrimary">#0777bd</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#bb0614</color>
+    <color name="colorQROverlay">#801e1404</color>
 </resources>
