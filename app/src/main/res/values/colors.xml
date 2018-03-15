@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!--<color name="colorPrimary">#0777bd</color>-->
-    <color name="colorPrimary">#ffb300</color>
-    <color name="colorPrimaryDark">#cd8704</color>
-    <color name="colorBackground">#202a73</color>
-    <color name="colorAccent">#bb0614</color>
+    <color name="colorPrimary">#eaaa00</color>
+    <color name="colorPrimaryDark">#002855</color>
+    <color name="colorBackground">#002855</color>
+    <color name="colorAccent">#87001b</color>
+
     <color name="colorQROverlay">#801e1404</color>
     <!--<color name="colorBtnShade1">#1f096690</color>-->
     <!--<color name="colorBtnShade2">#1f3e90b4</color>-->
@@ -18,7 +19,7 @@
     <color name="colorBtnShade3">#33755114</color>
     <color name="colorBtnShade4">#1fe1cc81</color>
     <color name="colorBtnShade5">#33826f10</color>
-    <color name="colorBtnCompleted">#009688</color>
+    <color name="colorBtnCompleted">#1b5100</color>
 
     <array name="btnColors">
         <item>@color/colorBtnShade1</item>

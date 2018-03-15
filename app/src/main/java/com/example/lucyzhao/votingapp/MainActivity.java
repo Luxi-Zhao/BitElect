@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -28,6 +29,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
@@ -37,15 +41,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int QR_ACTIVITY_REQ_CODE = 111;
     private static final String VOTING_URL = "http://192.168.4.1/?";
 
-    private static final int STROKE_WIDTH = 5;
-    private PulsingButton enterPassportInfoBtn;
-    private PulsingButton promptPassportScanBtn;
-    private PulsingButton scanQRBtn;
-    private RadioGroup radioGroup;
-    private PulsingButton voteBtn;
 
     AlertDialog.Builder votingAlertBuilder;
     private Vote myVote = Vote.getInstance();
+    private static String candidateName;
+    private UITaskManager taskManager;
+    private static int tasksCompleted = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +55,6 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "in onCreate");
 
         // UI elements
-        enterPassportInfoBtn = findViewById(R.id.enter_passport_info_btn);
-        promptPassportScanBtn = findViewById(R.id.scan_passport_prompt_btn);
-        scanQRBtn = findViewById(R.id.scan_qr_btn);
-        radioGroup = findViewById(R.id.radio_group);
-        voteBtn = findViewById(R.id.vote_btn);
-
         votingAlertBuilder = new AlertDialog.Builder(this);
         votingAlertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
@@ -67,14 +62,16 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        setRadioGroupEnabled(false);
-
-        // handle UI appropriately when all data is collected
-        // todo this is buggy
-        if(myVote.checkAllFieldsExist()) {
-            setVotingTaskCompleted();
+        taskManager = new UITaskManager();
+        // handle UI appropriately when only some data is collected
+        Log.v(TAG, "tasks completed is: " + tasksCompleted);
+        taskManager.onTaskCompleted(tasksCompleted);
+        // ignore any nfc feedback if passport is already scanned
+        // TODO UI is correct, but vote info is lost!!!
+        if(tasksCompleted > 2) {
             return;
         }
+
 
         // check NFC scanning result
         String nfc_result = getIntent().getStringExtra(Utils.NFC_RESULT);
@@ -84,10 +81,20 @@ public class MainActivity extends AppCompatActivity {
             setPassportScanTaskCompleted(nfc_result);
         } else {
             Log.v(TAG, "nfc scanning not performed");
-            enterPassportInfoBtn.enablePulsingButton();
+            taskManager.startTasks();
         }
 
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        taskManager.onTaskCompleted(tasksCompleted);
+    }
+
+    //////////////////////////////////////////////////////////////
+    //////////////////UI TASK FLOW MANAGEMENT/////////////////////
+    //////////////////////////////////////////////////////////////
 
     private void setEnterPassportInfoTaskCompleted(String docNumStr, String birthDateStr, String expiryDateStr) {
         SharedPreferences sharedPref = this
@@ -99,62 +106,77 @@ public class MainActivity extends AppCompatActivity {
         editor.apply(); //asynchronously save to pref
         Log.v(TAG, "saved to pref");
 
-        enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.enablePulsingButton();
+        taskManager.onTaskCompleted(1);
     }
+
 
     private void setPassportScanTaskCompleted(String nfc_result) {
         myVote.setNfcID(nfc_result);
-
-        View vLine = findViewById(R.id.line_1);
-        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
-
-        enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.setCompleted();
-
-        scanQRBtn.enablePulsingButton();
+        taskManager.onTaskCompleted(2);
     }
+
 
     private void setQRTaskCompleted(String qr_result) {
         myVote.setQrCode(qr_result);
-
-        View vLine = findViewById(R.id.line_2);
-        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
-
-        enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.setCompleted();
-        scanQRBtn.setCompleted();
-
-        setRadioGroupEnabled(true);
+        taskManager.onTaskCompleted(3);
     }
 
-    private void setCandSelTaskCompleted() {
-        GradientDrawable bg = (GradientDrawable) radioGroup.getBackground().getCurrent();
-        bg.setColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
-        bg.setStroke(STROKE_WIDTH, ContextCompat.getColor(this, R.color.colorBtnCompleted));
-        View vLine = findViewById(R.id.line_3);
-        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
 
-        enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.setCompleted();
-        scanQRBtn.setCompleted();
-
-        voteBtn.enablePulsingButton();
+    private void setCandSelTaskCompleted(String candID, String candName) {
+        myVote.setCandidateID(candID);
+        this.candidateName = candName;
+        taskManager.onTaskCompleted(4);
     }
 
     private void setVotingTaskCompleted() {
-        View vLine = findViewById(R.id.line_4);
-        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
-        enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.setCompleted();
-        scanQRBtn.setCompleted();
-        voteBtn.setCompleted();
+        taskManager.onTaskCompleted(5);
     }
 
-    private void setRadioGroupEnabled(boolean enabled) {
-        for (int i = 0; i < radioGroup.getChildCount(); i++)
-        {
-            radioGroup.getChildAt(i).setEnabled(enabled);
+    /**
+     * Get number for children from linear layout
+     * Initially, all elements are disabled except for the first one
+     * When each task is completed, enable the next element and disable all previous elements
+     */
+    private class UITaskManager {
+        private List<PulsingButton> allBtns;
+        private List<View> allLines;
+
+        // must be called in onCreate()
+        UITaskManager() {
+            allBtns = new ArrayList<>();
+            allLines = new ArrayList<>();
+            LinearLayout ll = findViewById(R.id.task_layout);
+            //not sure tho
+            for(int i = 0; i < ll.getChildCount(); i++) {
+                View view = ll.getChildAt(i);
+                if(i % 2 == 0)
+                    allBtns.add((PulsingButton) view);
+                else {
+                    allLines.add(view);
+                }
+            }
+        }
+
+        void startTasks(){
+            allBtns.get(0).enablePulsingButton();
+        }
+
+        void onTaskCompleted(int taskNum) {
+            if(taskNum == 0) return;
+            for(int i = 0; i < taskNum; i++) {
+                allBtns.get(i).setCompleted();
+            }
+
+            for(int i = 0; i < taskNum - 1; i++) {
+               allLines.get(i)
+                .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorBtnCompleted));
+            }
+
+            if(taskNum < allBtns.size()) {
+                allBtns.get(taskNum).enablePulsingButton();
+            }
+
+            tasksCompleted = taskNum;
         }
     }
 
@@ -195,47 +217,12 @@ public class MainActivity extends AppCompatActivity {
     ////////////////////////////VOTING////////////////////////////
     //////////////////////////////////////////////////////////////
 
-    private String getSelectedCandidateID() {
-        String candidateID = "";
-        int id = radioGroup.getCheckedRadioButtonId();
-        // Check which radio button was clicked
-        switch (id) {
-            case R.id.radio_clinton:
-                candidateID = "1";
-
-                break;
-            case R.id.radio_trump:
-                candidateID = "2";
-                break;
-
-            case R.id.radio_someoneelse:
-                candidateID = "3";
-                break;
-        }
-        return candidateID;
-    }
-
-    private String getSelectedCandidateName() {
-        RadioGroup rg = findViewById(R.id.radio_group);
-        int id = rg.getCheckedRadioButtonId();
-        RadioButton selectedCand = findViewById(id);
-
-        // if no item is chosen, this field would be null
-        if (selectedCand == null)
-            return "";
-        else
-            return selectedCand.getText().toString();
-    }
-
-    public void onCandidateChosen(View view) {
-        setCandSelTaskCompleted();
+    public void selectCandidate(View view) {
+        new CandidateSelFragment().show(getFragmentManager(), "selectCandidate");
     }
 
     public void vote(View view) {
-        String candidateID = getSelectedCandidateID();
-        myVote.setCandidateID(candidateID);
-
-        votingAlertBuilder.setMessage("Are you sure you want to choose " + getSelectedCandidateName() + "?");
+        votingAlertBuilder.setMessage("Are you sure you want to choose " + this.candidateName + "?");
         AlertDialog dialog = votingAlertBuilder.create();
         dialog.show();
     }
@@ -313,6 +300,64 @@ public class MainActivity extends AppCompatActivity {
         boolean checkAllFieldsExist() {
             return !nfcID.equals("") && !qrCode.equals("") && !candidateID.equals("");
         }
+    }
+
+    public static class CandidateSelFragment extends DialogFragment {
+        private RadioGroup radioGroup;
+        private Button okBtn;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final View fragment = inflater.inflate(R.layout.fragment_candidate_sel, container, false);
+            radioGroup = fragment.findViewById(R.id.radio_group);
+            okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
+            okBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String candID = getSelectedCandidateID();
+                    String candName = getSelectedCandidateName(fragment);
+
+                    ((MainActivity) getActivity())
+                            .setCandSelTaskCompleted(candID, candName);
+                    dismiss();
+                }
+            });
+
+            return fragment;
+        }
+
+        private String getSelectedCandidateID() {
+            String candidateID = "";
+            int id = radioGroup.getCheckedRadioButtonId();
+            // Check which radio button was clicked
+            switch (id) {
+                case R.id.radio_clinton:
+                    candidateID = "1";
+
+                    break;
+                case R.id.radio_trump:
+                    candidateID = "2";
+                    break;
+
+                case R.id.radio_someoneelse:
+                    candidateID = "3";
+                    break;
+            }
+            return candidateID;
+        }
+
+        private String getSelectedCandidateName(View fragment) {
+            int id = radioGroup.getCheckedRadioButtonId();
+            RadioButton selectedCand = fragment.findViewById(id);
+
+            // if no item is chosen, this field would be null
+            if (selectedCand == null)
+                return "";
+            else
+                return selectedCand.getText().toString();
+        }
+
     }
 
     //////////////////////////////////////////////////////////////

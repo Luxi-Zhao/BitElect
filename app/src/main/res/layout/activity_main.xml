@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
@@ -11,100 +10,114 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="30dp"
         android:background="@color/colorBackground"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="30dp">
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="40sp"
-                android:textColor="#ff8a65"
-                android:text="it's time to"/>
+                android:text="it's time to"
+                android:textColor="#fefefe"
+                android:textSize="40sp" />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="VOTE"
                 android:textColor="#ffffff"
-                android:textSize="70sp"/>
+                android:textSize="70sp" />
         </LinearLayout>
 
-        <com.example.lucyzhao.votingapp.PulsingButton
-            android:id="@+id/enter_passport_info_btn"
-            style="@style/MainActivityButtons"
-            android:onClick="enterPassportInfo"
-            android:text="enter passport info" />
-
-
-        <View
-            style="@style/MainActivityVerticalLine"
-            android:id="@+id/line_1"/>
-
-        <com.example.lucyzhao.votingapp.PulsingButton
-            android:id="@+id/scan_passport_prompt_btn"
-            style="@style/MainActivityButtons"
-            android:text="Scan your passport"
-            android:onClick="scanPassportPrompt"
-            />
-
-        <View
-            style="@style/MainActivityVerticalLine"
-            android:id="@+id/line_2"/>
-
-        <com.example.lucyzhao.votingapp.PulsingButton
-            android:id="@+id/scan_qr_btn"
-            style="@style/MainActivityButtons"
-            android:onClick="scanQRCode"
-            android:text="scan QR code" />
-
-        <View
-            style="@style/MainActivityVerticalLine"
-            android:id="@+id/line_3"/>
-
-
-
-        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        <LinearLayout
+            android:id="@+id/task_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            style="@style/MainActivityButtons"
-            android:id="@+id/radio_group"
-            android:clickable="false"
             android:orientation="vertical">
-            <RadioButton android:id="@+id/radio_clinton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onCandidateChosen"
-                android:text="Peter Deutsch"
-                />
-            <RadioButton android:id="@+id/radio_trump"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:onClick="onCandidateChosen"
-                android:text="Jagjot Jhajji"
-                />
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/radio_someoneelse"
-                android:onClick="onCandidateChosen"
-                android:text="Luxi Zhao"/>
-        </RadioGroup>
 
 
-        <View
-            style="@style/MainActivityVerticalLine"
-            android:id="@+id/line_4"/>
+            <com.example.lucyzhao.votingapp.PulsingButton
+                android:id="@+id/task1btn"
+                style="@style/MainActivityButtons"
+                android:onClick="enterPassportInfo"
+                android:text="enter passport info" />
 
-        <com.example.lucyzhao.votingapp.PulsingButton
-            android:id="@+id/vote_btn"
-            style="@style/MainActivityButtons"
-            android:onClick="vote"
-            android:text="vote" />
+            <View
+                android:id="@+id/line_1"
+                style="@style/MainActivityVerticalLine" />
+
+            <com.example.lucyzhao.votingapp.PulsingButton
+                android:id="@+id/task2btn"
+                style="@style/MainActivityButtons"
+                android:onClick="scanPassportPrompt"
+                android:text="Scan your passport" />
+
+            <View
+                android:id="@+id/line_2"
+                style="@style/MainActivityVerticalLine" />
+
+            <com.example.lucyzhao.votingapp.PulsingButton
+                android:id="@+id/task3btn"
+                style="@style/MainActivityButtons"
+                android:onClick="scanQRCode"
+                android:text="scan QR code" />
+
+            <View
+                android:id="@+id/line_3"
+                style="@style/MainActivityVerticalLine" />
+
+            <com.example.lucyzhao.votingapp.PulsingButton
+                android:id="@+id/task4btn"
+                style="@style/MainActivityButtons"
+                android:onClick="selectCandidate"
+                android:text="select a candidate" />
+
+            <!--<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--style="@style/MainActivityButtons"-->
+            <!--android:id="@+id/radio_group"-->
+            <!--android:clickable="false"-->
+            <!--android:orientation="vertical">-->
+            <!--<RadioButton android:id="@+id/radio_clinton"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onCandidateChosen"-->
+            <!--android:text="Peter Deutsch"-->
+            <!--/>-->
+            <!--<RadioButton android:id="@+id/radio_trump"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:onClick="onCandidateChosen"-->
+            <!--android:text="Jagjot Jhajji"-->
+            <!--/>-->
+
+            <!--<RadioButton-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:id="@+id/radio_someoneelse"-->
+            <!--android:onClick="onCandidateChosen"-->
+            <!--android:text="Luxi Zhao"/>-->
+            <!--</RadioGroup>-->
+
+
+            <View
+                android:id="@+id/line_4"
+                style="@style/MainActivityVerticalLine" />
+
+            <com.example.lucyzhao.votingapp.PulsingButton
+                android:id="@+id/task5btn"
+                style="@style/MainActivityButtons"
+                android:onClick="vote"
+                android:text="vote" />
+        </LinearLayout>
+
     </LinearLayout>
 
 

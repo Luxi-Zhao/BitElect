@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content" android:layout_height="wrap_content"
+    android:padding="10dp"
+    android:orientation="vertical">
+
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/radio_group"
+        android:clickable="false"
+        android:orientation="vertical">
+        <RadioButton android:id="@+id/radio_clinton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Peter Deutsch"
+        />
+        <RadioButton android:id="@+id/radio_trump"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Jagjot Jhajji"
+        />
+
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/radio_someoneelse"
+            android:text="Luxi Zhao"/>
+    </RadioGroup>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/candidate_sel_ok_btn"
+        android:text="ok"/>
+</LinearLayout>
