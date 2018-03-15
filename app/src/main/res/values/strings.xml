@@ -4,4 +4,6 @@
     <string name="shared_pref_doc_num">passportNumber</string>
     <string name="shared_pref_birthdate">passportBirthdate</string>
     <string name="shared_pref_expirydate">passportExpirydate</string>
+
+    <string name="scan_passport_prompt">Stick you passport to the back of your phone please</string>
 </resources>

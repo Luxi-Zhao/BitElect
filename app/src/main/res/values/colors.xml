@@ -4,4 +4,18 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#bb0614</color>
     <color name="colorQROverlay">#801e1404</color>
+    <color name="colorBtnShade1">#1f096690</color>
+    <color name="colorBtnShade2">#1f3e90b4</color>
+    <color name="colorBtnShade3">#1f79bcdb</color>
+    <color name="colorBtnShade4">#1fb3f3fc</color>
+    <color name="colorBtnShade5">#1f54adb3</color>
+    <color name="colorBtnCompleted">#66bb6a</color>
+
+    <array name="btnColors">
+        <item>@color/colorBtnShade1</item>
+        <item>@color/colorBtnShade2</item>
+        <item>@color/colorBtnShade3</item>
+        <item>@color/colorBtnShade4</item>
+        <item>@color/colorBtnShade5</item>
+    </array>
 </resources>

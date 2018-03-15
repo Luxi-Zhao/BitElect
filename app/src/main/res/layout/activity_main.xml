@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
@@ -8,93 +8,84 @@
     android:orientation="vertical"
     tools:context="com.example.lucyzhao.votingapp.MainActivity">
 
-
-    <Button
-        android:id="@+id/scan_passport"
-        style="@style/MainActivityButtons"
-        android:onClick="enterPassportInfo"
-        android:background="@drawable/border"
-        android:text="enter passport info" />
-
-    <View
-        android:layout_width="20dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/ic_more_vert_black_24dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:padding="10dp"
-        android:text="Scan your passport"
-        />
-
-    <View
-        android:layout_width="20dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/ic_more_vert_black_24dp"/>
-
-    <Button
-        android:id="@+id/scan_qr_btn"
-        style="@style/MainActivityButtons"
-        android:onClick="scanQRCode"
-        android:background="@drawable/border"
-        android:text="scan QR code" />
-
-    <View
-        android:layout_width="20dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/ic_more_vert_black_24dp"/>
-
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:text="Choose a candidate"
-        />
-
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/border"
-        style="@style/MainActivityButtons"
-        android:id="@+id/radio_group"
+        android:layout_marginTop="30dp"
         android:orientation="vertical">
-        <RadioButton android:id="@+id/radio_clinton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Peter Deutsch"
+        <com.example.lucyzhao.votingapp.PulsatingButton
+            android:id="@+id/enter_passport_info_btn"
+            style="@style/MainActivityButtons"
+            android:onClick="enterPassportInfo"
+            android:text="enter passport info" />
+
+
+        <View
+            style="@style/MainActivityVerticalLine"
+            android:id="@+id/line_1"/>
+
+        <com.example.lucyzhao.votingapp.PulsatingButton
+            android:id="@+id/scan_passport_prompt_btn"
+            style="@style/MainActivityButtons"
+            android:text="Scan your passport"
+            android:onClick="scanPassportPrompt"
             />
-        <RadioButton android:id="@+id/radio_trump"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Jagjot Jhajji"
-            />
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/radio_someoneelse"
-            android:text="Luxi Zhao"/>
-    </RadioGroup>
+        <View
+            style="@style/MainActivityVerticalLine"
+            android:id="@+id/line_2"/>
 
+        <com.example.lucyzhao.votingapp.PulsatingButton
+            android:id="@+id/scan_qr_btn"
+            style="@style/MainActivityButtons"
+            android:onClick="scanQRCode"
+            android:text="scan QR code" />
 
-    <View
-        android:layout_width="20dp"
-        android:layout_height="25dp"
-        android:layout_gravity="center_horizontal"
-        android:background="@drawable/ic_more_vert_black_24dp"/>
-    <Button
-        android:id="@+id/vote_btn"
-        style="@style/MainActivityButtons"
-        android:onClick="vote"
-        android:background="@drawable/border"
-        android:text="vote" />
+        <View
+            style="@style/MainActivityVerticalLine"
+            android:id="@+id/line_3"/>
 
 
-</LinearLayout>
+
+        <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_gravity="center_horizontal"
+            style="@style/MainActivityButtons"
+            android:id="@+id/radio_group"
+            android:orientation="vertical">
+            <RadioButton android:id="@+id/radio_clinton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onCandidateChosen"
+                android:text="Peter Deutsch"
+                />
+            <RadioButton android:id="@+id/radio_trump"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onCandidateChosen"
+                android:text="Jagjot Jhajji"
+                />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/radio_someoneelse"
+                android:onClick="onCandidateChosen"
+                android:text="Luxi Zhao"/>
+        </RadioGroup>
+
+
+        <View
+            style="@style/MainActivityVerticalLine"
+            android:id="@+id/line_4"/>
+
+        <com.example.lucyzhao.votingapp.PulsatingButton
+            android:id="@+id/vote_btn"
+            style="@style/MainActivityButtons"
+            android:onClick="vote"
+            android:text="vote" />
+    </LinearLayout>
+
+
+
+
+</ScrollView>

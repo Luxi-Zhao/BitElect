@@ -88,13 +88,6 @@ public class QRCodeActivity extends AppCompatActivity {
             @Override
             public void release() {
                 Log.v(TAG, "in release");
-
-                Intent intent = new Intent();
-                intent.putExtra(Utils.QR_RESULT, qrResult);
-
-                //todo send result.cancelled as well
-                setResult(Activity.RESULT_OK, intent);
-                finish();
             }
 
             @Override
@@ -104,7 +97,13 @@ public class QRCodeActivity extends AppCompatActivity {
                 if(barcodes.size() > 0) {
                     Log.v(TAG, "received result");
                     qrResult = barcodes.valueAt(0).rawValue;
-                    bd.release();
+
+                    Intent intent = new Intent();
+                    intent.putExtra(Utils.QR_RESULT, qrResult);
+
+                    //todo send result.cancelled as well
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
                 }
             }
         });

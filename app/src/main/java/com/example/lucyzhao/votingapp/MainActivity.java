@@ -7,7 +7,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +38,13 @@ public class MainActivity extends AppCompatActivity {
     private static final int QR_ACTIVITY_REQ_CODE = 111;
     private static final String VOTING_URL = "http://192.168.4.1/?";
 
+    private static final int STROKE_WIDTH = 5;
+    private PulsatingButton enterPassportInfoBtn;
+    private PulsatingButton promptPassportScanBtn;
+    private PulsatingButton scanQRBtn;
+    private RadioGroup radioGroup;
+    private PulsatingButton voteBtn;
+
     AlertDialog.Builder votingAlertBuilder;
     private Vote myVote = Vote.getInstance();
 
@@ -42,6 +52,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        // UI elements
+        enterPassportInfoBtn = findViewById(R.id.enter_passport_info_btn);
+        promptPassportScanBtn = findViewById(R.id.scan_passport_prompt_btn);
+        scanQRBtn = findViewById(R.id.scan_qr_btn);
+        radioGroup = findViewById(R.id.radio_group);
+        voteBtn = findViewById(R.id.vote_btn);
 
         votingAlertBuilder = new AlertDialog.Builder(this);
         votingAlertBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -51,15 +67,74 @@ public class MainActivity extends AppCompatActivity {
         });
 
         // check NFC scanning result
-        Intent intent = this.getIntent();
-        String nfc_result = intent.getStringExtra(Utils.NFC_RESULT);
+        String nfc_result = getIntent().getStringExtra(Utils.NFC_RESULT);
         if (nfc_result != null) {
             Log.v(TAG, "result of nfc scanning is:" + nfc_result);
-            myVote.setNfcID(nfc_result);
+            //myVote.setNfcID(nfc_result);
+            setPassportScanTaskCompleted(nfc_result);
         } else {
-            Log.v(TAG, "nfc scanning returned null!");
+            Log.v(TAG, "nfc scanning not performed");
+            enterPassportInfoBtn.startAnimation();
         }
+
     }
+
+    private void setEnterPassportInfoTaskCompleted(String docNumStr, String birthDateStr, String expiryDateStr) {
+        SharedPreferences sharedPref = this
+                .getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.shared_pref_doc_num), docNumStr);
+        editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
+        editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
+        editor.apply(); //asynchronously save to pref
+        Log.v(TAG, "saved to pref");
+
+        enterPassportInfoBtn.setCompleted();
+        promptPassportScanBtn.startAnimation();
+    }
+
+    private void setPassportScanTaskCompleted(String nfc_result) {
+        myVote.setNfcID(nfc_result);
+
+        View vLine = findViewById(R.id.line_1);
+        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
+
+        enterPassportInfoBtn.setCompleted();
+        promptPassportScanBtn.setCompleted();
+        scanQRBtn.startAnimation();
+    }
+
+    private void setQRTaskCompleted(String qr_result) {
+        myVote.setQrCode(qr_result);
+
+        View vLine = findViewById(R.id.line_2);
+        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
+
+        enterPassportInfoBtn.setCompleted();
+        promptPassportScanBtn.setCompleted();
+        scanQRBtn.setCompleted();
+    }
+
+    private void setCandSelTaskCompleted() {
+        GradientDrawable bg = (GradientDrawable) radioGroup.getBackground().getCurrent();
+        bg.setStroke(STROKE_WIDTH, ContextCompat.getColor(this, R.color.colorBtnCompleted));
+        View vLine = findViewById(R.id.line_3);
+        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
+
+        enterPassportInfoBtn.setCompleted();
+        promptPassportScanBtn.setCompleted();
+        scanQRBtn.setCompleted();
+        voteBtn.startAnimation();
+    }
+
+    private void setVotingTaskCompleted() {
+        enterPassportInfoBtn.setCompleted();
+        promptPassportScanBtn.setCompleted();
+        scanQRBtn.setCompleted();
+        voteBtn.setCompleted();
+    }
+
+
 
     //////////////////////////////////////////////////////////////
     ////////////////////////////QR CODE///////////////////////////
@@ -80,7 +155,8 @@ public class MainActivity extends AppCompatActivity {
                     String qr_result = data.getStringExtra(Utils.QR_RESULT);
                     if (qr_result != null) {
                         Log.v(TAG, "result of qr scanning is:" + qr_result);
-                        myVote.setQrCode(qr_result);
+                        //myVote.setQrCode(qr_result);
+                        setQRTaskCompleted(qr_result);
                     } else {
                         Log.v(TAG, "qr scanning returned null!");
                     }
@@ -92,14 +168,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+
+
+
+
     //////////////////////////////////////////////////////////////
     ////////////////////////////VOTING////////////////////////////
     //////////////////////////////////////////////////////////////
 
     private String getSelectedCandidateID() {
         String candidateID = "";
-        RadioGroup rg = findViewById(R.id.radio_group);
-        int id = rg.getCheckedRadioButtonId();
+        int id = radioGroup.getCheckedRadioButtonId();
         // Check which radio button was clicked
         switch (id) {
             case R.id.radio_clinton:
@@ -121,7 +200,16 @@ public class MainActivity extends AppCompatActivity {
         RadioGroup rg = findViewById(R.id.radio_group);
         int id = rg.getCheckedRadioButtonId();
         RadioButton selectedCand = findViewById(id);
-        return selectedCand.getText().toString();
+
+        // if no item is chosen, this field would be null
+        if(selectedCand == null)
+            return "";
+        else
+            return selectedCand.getText().toString();
+    }
+
+    public void onCandidateChosen(View view) {
+        setCandSelTaskCompleted();
     }
 
     public void vote(View view) {
@@ -162,6 +250,9 @@ public class MainActivity extends AppCompatActivity {
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+
+        // UI
+        setVotingTaskCompleted();
     }
 
     private static class Vote {
@@ -213,6 +304,12 @@ public class MainActivity extends AppCompatActivity {
         new PassportInfoPromptFragment().show(getFragmentManager(), "enterPassportInfo");
     }
 
+    public void scanPassportPrompt(View view) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+        builder.setMessage(R.string.scan_passport_prompt);
+        builder.create().show();
+    }
+
     public static class PassportInfoPromptFragment extends DialogFragment implements View.OnClickListener {
         private EditText birthDate;
         private EditText expiryDate;
@@ -239,14 +336,8 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
-                    SharedPreferences sharedPref = getActivity()
-                            .getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPref.edit();
-                    editor.putString(getString(R.string.shared_pref_doc_num), docNumStr);
-                    editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
-                    editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
-                    editor.apply(); //asynchronously save to pref
-                    Log.v(TAG, "saved to pref");
+                    ((MainActivity)getActivity())
+                            .setEnterPassportInfoTaskCompleted(docNumStr, birthDateStr, expiryDateStr);
                     dismiss();
                 }
             });
