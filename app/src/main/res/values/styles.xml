@@ -38,7 +38,7 @@
     </style>
 
     <style name="MainActivityText" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">#33312e</item>
+        <item name="android:textColor">#ffffff</item>
         <item name="android:textSize">15sp</item>
         <item name="android:padding">10dp</item>
         <item name="android:layout_margin">10dp</item>

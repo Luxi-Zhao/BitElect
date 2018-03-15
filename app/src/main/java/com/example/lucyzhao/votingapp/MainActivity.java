@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
@@ -39,11 +38,11 @@ public class MainActivity extends AppCompatActivity {
     private static final String VOTING_URL = "http://192.168.4.1/?";
 
     private static final int STROKE_WIDTH = 5;
-    private PulsatingButton enterPassportInfoBtn;
-    private PulsatingButton promptPassportScanBtn;
-    private PulsatingButton scanQRBtn;
+    private PulsingButton enterPassportInfoBtn;
+    private PulsingButton promptPassportScanBtn;
+    private PulsingButton scanQRBtn;
     private RadioGroup radioGroup;
-    private PulsatingButton voteBtn;
+    private PulsingButton voteBtn;
 
     AlertDialog.Builder votingAlertBuilder;
     private Vote myVote = Vote.getInstance();
@@ -52,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.v(TAG, "in onCreate");
+
         // UI elements
         enterPassportInfoBtn = findViewById(R.id.enter_passport_info_btn);
         promptPassportScanBtn = findViewById(R.id.scan_passport_prompt_btn);
@@ -66,6 +67,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        setRadioGroupEnabled(false);
+
+        // handle UI appropriately when all data is collected
+        // todo this is buggy
+        if(myVote.checkAllFieldsExist()) {
+            setVotingTaskCompleted();
+            return;
+        }
+
         // check NFC scanning result
         String nfc_result = getIntent().getStringExtra(Utils.NFC_RESULT);
         if (nfc_result != null) {
@@ -74,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             setPassportScanTaskCompleted(nfc_result);
         } else {
             Log.v(TAG, "nfc scanning not performed");
-            enterPassportInfoBtn.startAnimation();
+            enterPassportInfoBtn.enablePulsingButton();
         }
 
     }
@@ -90,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "saved to pref");
 
         enterPassportInfoBtn.setCompleted();
-        promptPassportScanBtn.startAnimation();
+        promptPassportScanBtn.enablePulsingButton();
     }
 
     private void setPassportScanTaskCompleted(String nfc_result) {
@@ -101,7 +111,8 @@ public class MainActivity extends AppCompatActivity {
 
         enterPassportInfoBtn.setCompleted();
         promptPassportScanBtn.setCompleted();
-        scanQRBtn.startAnimation();
+
+        scanQRBtn.enablePulsingButton();
     }
 
     private void setQRTaskCompleted(String qr_result) {
@@ -113,10 +124,13 @@ public class MainActivity extends AppCompatActivity {
         enterPassportInfoBtn.setCompleted();
         promptPassportScanBtn.setCompleted();
         scanQRBtn.setCompleted();
+
+        setRadioGroupEnabled(true);
     }
 
     private void setCandSelTaskCompleted() {
         GradientDrawable bg = (GradientDrawable) radioGroup.getBackground().getCurrent();
+        bg.setColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
         bg.setStroke(STROKE_WIDTH, ContextCompat.getColor(this, R.color.colorBtnCompleted));
         View vLine = findViewById(R.id.line_3);
         vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
@@ -124,16 +138,25 @@ public class MainActivity extends AppCompatActivity {
         enterPassportInfoBtn.setCompleted();
         promptPassportScanBtn.setCompleted();
         scanQRBtn.setCompleted();
-        voteBtn.startAnimation();
+
+        voteBtn.enablePulsingButton();
     }
 
     private void setVotingTaskCompleted() {
+        View vLine = findViewById(R.id.line_4);
+        vLine.setBackgroundColor(ContextCompat.getColor(this, R.color.colorBtnCompleted));
         enterPassportInfoBtn.setCompleted();
         promptPassportScanBtn.setCompleted();
         scanQRBtn.setCompleted();
         voteBtn.setCompleted();
     }
 
+    private void setRadioGroupEnabled(boolean enabled) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++)
+        {
+            radioGroup.getChildAt(i).setEnabled(enabled);
+        }
+    }
 
 
     //////////////////////////////////////////////////////////////
@@ -168,10 +191,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
-
-
-
     //////////////////////////////////////////////////////////////
     ////////////////////////////VOTING////////////////////////////
     //////////////////////////////////////////////////////////////
@@ -202,7 +221,7 @@ public class MainActivity extends AppCompatActivity {
         RadioButton selectedCand = findViewById(id);
 
         // if no item is chosen, this field would be null
-        if(selectedCand == null)
+        if (selectedCand == null)
             return "";
         else
             return selectedCand.getText().toString();
@@ -336,7 +355,7 @@ public class MainActivity extends AppCompatActivity {
                         return;
                     }
 
-                    ((MainActivity)getActivity())
+                    ((MainActivity) getActivity())
                             .setEnterPassportInfoTaskCompleted(docNumStr, birthDateStr, expiryDateStr);
                     dismiss();
                 }

@@ -4,16 +4,37 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical"
     tools:context="com.example.lucyzhao.votingapp.MainActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
+        android:padding="30dp"
+        android:background="@color/colorBackground"
         android:orientation="vertical">
-        <com.example.lucyzhao.votingapp.PulsatingButton
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="40sp"
+                android:textColor="#ff8a65"
+                android:text="it's time to"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="VOTE"
+                android:textColor="#ffffff"
+                android:textSize="70sp"/>
+        </LinearLayout>
+
+        <com.example.lucyzhao.votingapp.PulsingButton
             android:id="@+id/enter_passport_info_btn"
             style="@style/MainActivityButtons"
             android:onClick="enterPassportInfo"
@@ -24,7 +45,7 @@
             style="@style/MainActivityVerticalLine"
             android:id="@+id/line_1"/>
 
-        <com.example.lucyzhao.votingapp.PulsatingButton
+        <com.example.lucyzhao.votingapp.PulsingButton
             android:id="@+id/scan_passport_prompt_btn"
             style="@style/MainActivityButtons"
             android:text="Scan your passport"
@@ -35,7 +56,7 @@
             style="@style/MainActivityVerticalLine"
             android:id="@+id/line_2"/>
 
-        <com.example.lucyzhao.votingapp.PulsatingButton
+        <com.example.lucyzhao.votingapp.PulsingButton
             android:id="@+id/scan_qr_btn"
             style="@style/MainActivityButtons"
             android:onClick="scanQRCode"
@@ -51,6 +72,7 @@
             android:layout_gravity="center_horizontal"
             style="@style/MainActivityButtons"
             android:id="@+id/radio_group"
+            android:clickable="false"
             android:orientation="vertical">
             <RadioButton android:id="@+id/radio_clinton"
                 android:layout_width="wrap_content"
@@ -78,14 +100,12 @@
             style="@style/MainActivityVerticalLine"
             android:id="@+id/line_4"/>
 
-        <com.example.lucyzhao.votingapp.PulsatingButton
+        <com.example.lucyzhao.votingapp.PulsingButton
             android:id="@+id/vote_btn"
             style="@style/MainActivityButtons"
             android:onClick="vote"
             android:text="vote" />
     </LinearLayout>
-
-
 
 
 </ScrollView>

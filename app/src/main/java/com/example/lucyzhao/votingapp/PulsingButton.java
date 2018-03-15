@@ -16,8 +16,8 @@ import java.util.List;
  * Created by LucyZhao on 2018/3/14.
  */
 
-public class PulsatingButton extends android.support.v7.widget.AppCompatButton {
-    private static final String TAG = PulsatingButton.class.getSimpleName();
+public class PulsingButton extends android.support.v7.widget.AppCompatButton {
+    private static final String TAG = PulsingButton.class.getSimpleName();
     private static final int DELAY = 10;
     private static final int SPD = 1;
     GradientDrawable btnBackground;
@@ -31,21 +31,25 @@ public class PulsatingButton extends android.support.v7.widget.AppCompatButton {
 
     private boolean animationOn = false;
 
-    public PulsatingButton(Context context) {
+    public PulsingButton(Context context) {
         super(context);
     }
 
-    public PulsatingButton(Context context, AttributeSet attrs) {
+    public PulsingButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public PulsatingButton(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PulsingButton(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         init();
     }
 
     private void init() {
+        // buttons are initially in unusable state
+        setEnabled(false);
+        stopAnimation();
+
         btnBackground = (GradientDrawable) getBackground().getCurrent();
         radius = btnBackground.getCornerRadius();
 
@@ -110,12 +114,18 @@ public class PulsatingButton extends android.support.v7.widget.AppCompatButton {
         animationOn = false;
     }
 
+    public void enablePulsingButton() {
+        startAnimation();
+        setEnabled(true);
+    }
+
     public void setCompleted() {
         stopAnimation();
         setEnabled(false);
         int color = ContextCompat.getColor(getContext(), R.color.colorBtnCompleted);
         btnBackground.setColor(color);
         btnBackground.setStroke(5, color);
+        setTextColor(Color.WHITE);
     }
 
     public void setUncompleted() {
