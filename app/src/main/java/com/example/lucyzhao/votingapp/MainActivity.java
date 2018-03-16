@@ -41,12 +41,15 @@ public class MainActivity extends AppCompatActivity {
     private static final int QR_ACTIVITY_REQ_CODE = 111;
     private static final String VOTING_URL = "http://192.168.4.1/?";
 
-
+    // UI element
     AlertDialog.Builder votingAlertBuilder;
+
+    // UI task tracking that tracks how many tasks the user has completed
     private Vote myVote = Vote.getInstance();
     private static String candidateName;
-    private UITaskManager taskManager;
     private static int tasksCompleted = 0;
+    private UITaskManager taskManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "tasks completed is: " + tasksCompleted);
         taskManager.onTaskCompleted(tasksCompleted);
         // ignore any nfc feedback if passport is already scanned
-        // TODO UI is correct, but vote info is lost!!!
         if(tasksCompleted > 2) {
             return;
         }
@@ -122,9 +124,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    private void setCandSelTaskCompleted(String candID, String candName) {
+    protected void setCandSelTaskCompleted(String candID, String candName) {
         myVote.setCandidateID(candID);
-        this.candidateName = candName;
+        candidateName = candName;
         taskManager.onTaskCompleted(4);
     }
 
@@ -133,7 +135,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Get number for children from linear layout
+     * Updates the UI according to how many tasks the user has completed
+     *
+     * Get children views from linear layout
      * Initially, all elements are disabled except for the first one
      * When each task is completed, enable the next element and disable all previous elements
      */
@@ -222,7 +226,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void vote(View view) {
-        votingAlertBuilder.setMessage("Are you sure you want to choose " + this.candidateName + "?");
+        votingAlertBuilder.setMessage("Are you sure you want to choose " + candidateName + "?");
         AlertDialog dialog = votingAlertBuilder.create();
         dialog.show();
     }
@@ -302,63 +306,63 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public static class CandidateSelFragment extends DialogFragment {
-        private RadioGroup radioGroup;
-        private Button okBtn;
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            final View fragment = inflater.inflate(R.layout.fragment_candidate_sel, container, false);
-            radioGroup = fragment.findViewById(R.id.radio_group);
-            okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
-            okBtn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    String candID = getSelectedCandidateID();
-                    String candName = getSelectedCandidateName(fragment);
-
-                    ((MainActivity) getActivity())
-                            .setCandSelTaskCompleted(candID, candName);
-                    dismiss();
-                }
-            });
-
-            return fragment;
-        }
-
-        private String getSelectedCandidateID() {
-            String candidateID = "";
-            int id = radioGroup.getCheckedRadioButtonId();
-            // Check which radio button was clicked
-            switch (id) {
-                case R.id.radio_clinton:
-                    candidateID = "1";
-
-                    break;
-                case R.id.radio_trump:
-                    candidateID = "2";
-                    break;
-
-                case R.id.radio_someoneelse:
-                    candidateID = "3";
-                    break;
-            }
-            return candidateID;
-        }
-
-        private String getSelectedCandidateName(View fragment) {
-            int id = radioGroup.getCheckedRadioButtonId();
-            RadioButton selectedCand = fragment.findViewById(id);
-
-            // if no item is chosen, this field would be null
-            if (selectedCand == null)
-                return "";
-            else
-                return selectedCand.getText().toString();
-        }
-
-    }
+//    public static class CandidateSelFragment extends DialogFragment {
+//        private RadioGroup radioGroup;
+//        private Button okBtn;
+//
+//        @Override
+//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+//                                 Bundle savedInstanceState) {
+//            final View fragment = inflater.inflate(R.layout.fragment_candidate_sel, container, false);
+//            radioGroup = fragment.findViewById(R.id.radio_group);
+//            okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
+//            okBtn.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    String candID = getSelectedCandidateID();
+//                    String candName = getSelectedCandidateName(fragment);
+//
+//                    ((MainActivity) getActivity())
+//                            .setCandSelTaskCompleted(candID, candName);
+//                    dismiss();
+//                }
+//            });
+//
+//            return fragment;
+//        }
+//
+//        private String getSelectedCandidateID() {
+//            String candidateID = "";
+//            int id = radioGroup.getCheckedRadioButtonId();
+//            // Check which radio button was clicked
+//            switch (id) {
+//                case R.id.radio_clinton:
+//                    candidateID = "1";
+//
+//                    break;
+//                case R.id.radio_trump:
+//                    candidateID = "2";
+//                    break;
+//
+//                case R.id.radio_someoneelse:
+//                    candidateID = "3";
+//                    break;
+//            }
+//            return candidateID;
+//        }
+//
+//        private String getSelectedCandidateName(View fragment) {
+//            int id = radioGroup.getCheckedRadioButtonId();
+//            RadioButton selectedCand = fragment.findViewById(id);
+//
+//            // if no item is chosen, this field would be null
+//            if (selectedCand == null)
+//                return "";
+//            else
+//                return selectedCand.getText().toString();
+//        }
+//
+//    }
 
     //////////////////////////////////////////////////////////////
     ////////////////////////////PASSPORT//////////////////////////
