@@ -36,6 +36,12 @@
         style="@style/ItemTagText"
         android:id="@+id/nfc_result_txt"/>
 
+    <ImageView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:id="@+id/testNFCImage"
+        android:contentDescription="to be removed"/>
+
 
     <Button
         android:id="@+id/go_vote_btn"

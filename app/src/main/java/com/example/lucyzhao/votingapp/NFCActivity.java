@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.IsoDep;
@@ -18,6 +19,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +29,10 @@ import net.sf.scuba.smartcards.CardServiceException;
 import org.jmrtd.BACKey;
 import org.jmrtd.PassportService;
 import org.jmrtd.lds.icao.DG1File;
+import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.lds.icao.MRZInfo;
+import org.jmrtd.lds.iso19794.FaceImageInfo;
+import org.jmrtd.lds.iso19794.FaceInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +57,7 @@ public class NFCActivity extends AppCompatActivity {
     private List<BioInfo> infoList = new ArrayList<>();
     private TextView nfcResultTxt;
     private Button goVoteBtn;
+    private ImageView testNFCImg;
 
 
     //////////////////////////////////////////////////////////////
@@ -72,6 +78,7 @@ public class NFCActivity extends AppCompatActivity {
         nfcResultTxt = findViewById(R.id.nfc_result_txt);
         goVoteBtn = findViewById(R.id.go_vote_btn);
         goVoteBtn.setVisibility(View.INVISIBLE);
+        testNFCImg = findViewById(R.id.testNFCImage);
 
         // read NFC
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -123,7 +130,9 @@ public class NFCActivity extends AppCompatActivity {
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             List<String> techArr = Arrays.asList(tag.getTechList());
             if (techArr.contains(ISODEP_TECH_STRING)) {
-                new ReadPassportTask(birthDate, expDate, docNum).execute(tag);
+                //new ReadPassportTask(birthDate, expDate, docNum).execute(tag);
+                Log.v(TAG, "executing read image task...");
+                new ReadPassportImgTask(birthDate, expDate, docNum).execute(tag);
             } else {
                 Toast.makeText(this, "please scan a passport", Toast.LENGTH_SHORT).show();
             }
@@ -154,6 +163,21 @@ public class NFCActivity extends AppCompatActivity {
                 InputStream dg1Is = passportService.getInputStream(PassportService.EF_DG1);
                 DG1File dg1File = new DG1File(dg1Is);
                 dg1Is.close();
+
+//                InputStream dg2Is = passportService.getInputStream(PassportService.EF_DG2);
+//                DG2File dg2File = new DG2File(dg2Is);
+//
+//                List<FaceImageInfo> allFaceImageInfos = new ArrayList<>();
+//                List<FaceInfo> faceInfos = dg2File.getFaceInfos();
+//                for (FaceInfo faceInfo : faceInfos) {
+//                    allFaceImageInfos.addAll(faceInfo.getFaceImageInfos());
+//                }
+//
+//                if (!allFaceImageInfos.isEmpty()) {
+//                    FaceImageInfo faceImageInfo = allFaceImageInfos.get(0);
+//                    InputStream imgIs = faceImageInfo.getImageInputStream();
+//                    Log.v(TAG, imgIs.toString());
+//                }
                 return dg1File.getMRZInfo();
             } catch (CardServiceException e) {
                 e.printStackTrace();
@@ -210,6 +234,66 @@ public class NFCActivity extends AppCompatActivity {
             nfcResult = nfcResultStr;
         }
 
+    }
+
+
+    private class ReadPassportImgTask extends AsyncTask<Tag, Integer, Bitmap> {
+        private String birthDate, expiryDate, docNum;
+
+        ReadPassportImgTask(String birthdate, String expirydate, String docnum) {
+            this.birthDate = birthdate;
+            this.expiryDate = expirydate;
+            this.docNum = docnum;
+        }
+
+        @Override
+        protected Bitmap doInBackground(Tag... params) {
+            IsoDep isoTag = IsoDep.get(params[0]);
+            CardService cardService = CardService.getInstance(isoTag);
+            try {
+                BACKey bacKey = new BACKey(docNum, birthDate, expiryDate);
+                PassportService passportService = new PassportService(cardService, 256, 224, false, true);
+                passportService.open();
+                passportService.sendSelectApplet(false);
+                passportService.doBAC(bacKey);
+
+                InputStream dg2Is = passportService.getInputStream(PassportService.EF_DG2);
+                DG2File dg2File = new DG2File(dg2Is);
+
+                List<FaceImageInfo> allFaceImageInfos = new ArrayList<>();
+                List<FaceInfo> faceInfos = dg2File.getFaceInfos();
+                for (FaceInfo faceInfo : faceInfos) {
+                    allFaceImageInfos.addAll(faceInfo.getFaceImageInfos());
+                }
+
+                if (!allFaceImageInfos.isEmpty()) {
+                    FaceImageInfo faceImageInfo = allFaceImageInfos.get(0);
+                    InputStream imgIs = faceImageInfo.getImageInputStream();
+                    Log.v(TAG, imgIs.toString());
+                    Bitmap b = ImgDecoder.decodeImage(getApplicationContext(), faceImageInfo.getMimeType(), imgIs);
+                    return b;
+                }
+                return null;
+            } catch (CardServiceException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Integer... progress) {
+
+        }
+
+        protected void onPostExecute(Bitmap b) {
+            if (b == null) {
+                Log.v(TAG, "bitmap is null!!!!!!!");
+                return;
+            }
+            testNFCImg.setImageBitmap(b);
+        }
     }
 
     //////////////////////////////////////////////////////////////
