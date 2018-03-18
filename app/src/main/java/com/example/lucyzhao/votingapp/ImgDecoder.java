@@ -17,7 +17,9 @@ import java.io.InputStream;
 import jj2000.j2k.decoder.Decoder;
 import jj2000.j2k.util.ParameterList;
 
-
+/**
+ * Credits to https://github.com/tananaev/passport-reader
+ */
 public class ImgDecoder {
     private static final String TAG = ImgDecoder.class.getSimpleName();
     private static final String IMAGE_CACHE_DIR = "/cachedImg.jp2";
@@ -75,7 +77,7 @@ public class ImgDecoder {
      * The decoder reads in a .jp2 file pointed to by fileInPath and outputs
      * a .ppm file pointed to by fileOutPath
      * @param fileInPath points to .jp2 file to be decoded
-     * @param fileOutPath points to .ppm file 
+     * @param fileOutPath points to .ppm file
      */
     private static void decodeJp2File(String fileInPath, String fileOutPath) {
         ParameterList pl = new ParameterList();
