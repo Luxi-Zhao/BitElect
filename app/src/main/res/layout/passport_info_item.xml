@@ -13,8 +13,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/info_value"
+        android:layout_centerVertical="true"
         android:layout_toEndOf="@+id/info_tag"
         android:text="info value"
         style="@style/ItemValueText"/>
+
+    <ImageView
+        android:layout_width="20dp"
+        android:layout_height="20dp"
+        android:layout_toEndOf="@+id/info_value"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="5dp"
+        android:id="@+id/info_checkmark"/>
 
 </RelativeLayout>
