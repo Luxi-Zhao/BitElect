@@ -36,6 +36,4 @@ dependencies {
     // UI
     compile 'com.android.support:recyclerview-v7:26.1.0'
     implementation files('libs/javacv.jar')
-    implementation files('libs/opencv.jar')
-    implementation files('libs/opencv-android-arm.jar')
 }
