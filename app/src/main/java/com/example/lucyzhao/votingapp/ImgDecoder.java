@@ -34,7 +34,9 @@ public class ImgDecoder {
             writeInputStreamToFile(jp2Path, inputStream);
             decodeJp2File(jp2Path, ppmPath);
             Log.v(TAG, "reading img");
-            return readImageFromPPM(ppmPath);
+            Bitmap b = readImageFromPPM(ppmPath);
+            Utils.saveImg(Integer.toString(Utils.NUM_IMG_FILES), b, context);
+            return b;
 
         } else if (mimeType.equalsIgnoreCase("image/x-wsq")) {
             return null;

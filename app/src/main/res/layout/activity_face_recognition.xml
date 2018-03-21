@@ -10,17 +10,26 @@
     <SurfaceView
         android:id="@+id/face_surface_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="300dp" />
 
 
     <LinearLayout
         android:layout_width="match_parent"
+        android:layout_below="@+id/face_surface_view"
         android:layout_height="match_parent">
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="showPic"
+            android:id="@+id/showPicBtn"
             android:onClick="showPics"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/recog_btn"
+            android:text="recognize"
+            android:onClick="recognizePics"/>
 
         <ImageView
             android:layout_width="100dp"
@@ -32,6 +41,34 @@
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:id="@+id/test_face_img1"/>
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+
+            android:id="@+id/test_face_img2"/>
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/test_face_img3"/>
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+
+            android:id="@+id/test_face_img4"/>
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/test_face_img5"/>
+
 
     </LinearLayout>
 

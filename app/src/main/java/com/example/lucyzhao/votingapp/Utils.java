@@ -32,6 +32,8 @@ public class Utils {
 
     public static final int ALLOWABLE_AGE = 18;
 
+    public static final int NUM_IMG_FILES = 4;
+
     public static boolean checkNationalityEligiblity(String nationality) {
         return nationality.equals(ALLOWABLE_NATIONALITY);
     }
@@ -59,21 +61,24 @@ public class Utils {
 
     /**
      *
-     * @param path in the form of "face1.png"
+     * @param num in the form of 1,2,3
      * @param bitmap
      * @param context
      * @throws IOException
      */
-    public static void saveImg(String path, Bitmap bitmap, Context context) throws IOException {
-        Log.v(TAG, "saving image....");
+    public static void saveImg(String num, Bitmap bitmap, Context context) throws IOException {
 
-        java.io.FileOutputStream out = context.openFileOutput(path, Context.MODE_PRIVATE);
+        String filename = "1-face_" + num + ".png";
+        Log.v(TAG, "saving image..." + filename);
+        java.io.FileOutputStream out = context.openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
     }
 
-    public static Bitmap retrieveImg(String name, Context context) {
+    public static Bitmap retrieveImg(String num, Context context) {
         //return BitmapFactory.decodeFile(path);
-        Bitmap b = BitmapFactory.decodeFile(context.getFilesDir().getAbsolutePath() + "/" + name);
+        String filename = "/1-face_" + num + ".png";
+        Log.v(TAG, "image " + filename + " retrieved!");
+        Bitmap b = BitmapFactory.decodeFile(context.getFilesDir().getAbsolutePath() + filename);
         if(b == null) {
             Log.v(TAG, "retrieved b is null!");
         }

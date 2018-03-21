@@ -29,6 +29,10 @@ public class CustomFaceDetector extends Detector<Face> {
     private Context context;
     public Bitmap publicBitmap;
     private int imgNum = 0;
+    private int timeout = 20;
+
+    private int firstWidth;
+    private int firstHeight;
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
         this.detector = detector;
@@ -56,8 +60,8 @@ public class CustomFaceDetector extends Detector<Face> {
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
-        if(detectedFaces.size() > 0 && imgNum < 10) {
-            Face face = detectedFaces.get(0);
+        if(detectedFaces.size() > 0 && imgNum < 4 && timeout <= 0) {
+            Face face = detectedFaces.get(detectedFaces.keyAt(0));
             Log.v(TAG, "face detected");
 
             int width = frame.getMetadata().getWidth();
@@ -72,28 +76,46 @@ public class CustomFaceDetector extends Detector<Face> {
 
             YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 10, baos);
+            yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 20, baos);
             byte[] imgBytes = baos.toByteArray();
             Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
 
-            //rotate
+            dumpData(face, frame, bitmap);
+            //crop out face
+            float facex = face.getPosition().x >= 0 ? face.getPosition().x : 0;
+            float facey = face.getPosition().y >= 0 ? face.getPosition().y : 0;
+            float facew = face.getWidth() + facex < width ? face.getWidth() : width - facex;
+            float faceh = face.getHeight() + facey < height ? face.getHeight() : height - facey;
+
+
+            bitmap = Bitmap.createBitmap(bitmap, (int)facex, (int)facey, (int)facew, (int)faceh);
+            //Log.v(TAG, "cropped bitmap x " + facex + " y " + facey + " w " + facew + " h " + faceh);
+
+            //rotate & set width, height to the first img detected
+            if(imgNum == 0) {
+                firstWidth = bitmap.getWidth();
+                firstHeight = bitmap.getHeight();
+            }
             Matrix matrix = new Matrix();
             matrix.postRotate(rotDegree);
             Bitmap rotatedB = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+//            Bitmap rotatedB = Bitmap.createBitmap(bitmap,
+//                    0, 0, firstWidth, firstHeight, matrix, true);
 
-            //publicBitmap = rotatedB;
-
+            Log.v(TAG, "rotated get width:" + rotatedB.getWidth() + " rotated get height" + rotatedB.getHeight());
+            Log.v(TAG, "rotated get size" + rotatedB.getByteCount());
             try {
-                Log.v(TAG, "imgNum is: " + imgNum);
-                Utils.saveImg("face" + imgNum + ".png", rotatedB, context);
+                Log.v(TAG, "saved ");
+                Utils.saveImg(Integer.toString(imgNum), rotatedB, context);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
             imgNum++;
-            dumpData(face, frame, bitmap);
+
         }
+        timeout--;
         return detectedFaces;
     }
 

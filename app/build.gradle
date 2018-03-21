@@ -9,6 +9,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -19,7 +20,7 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:26.1.0'
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.google.android.gms:play-services-vision:11.8.0'
@@ -30,10 +31,11 @@ dependencies {
     compile 'org.jmrtd:jmrtd:0.6.5'
     compile 'net.sf.scuba:scuba-sc-android:0.0.16'
     compile 'edu.ucar:jj2000:5.2'
-
     // Network
     compile 'com.android.volley:volley:1.1.0'
-
     // UI
     compile 'com.android.support:recyclerview-v7:26.1.0'
+    implementation files('libs/javacv.jar')
+    implementation files('libs/opencv.jar')
+    implementation files('libs/opencv-android-arm.jar')
 }
