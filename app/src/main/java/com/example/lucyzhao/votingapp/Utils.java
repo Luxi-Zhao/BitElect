@@ -1,5 +1,11 @@
 package com.example.lucyzhao.votingapp;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Log;
+
+import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -8,6 +14,7 @@ import java.util.Date;
  */
 
 public class Utils {
+    private static final String TAG = Utils.class.getSimpleName();
     public static final String QR_RESULT = "qr_result";
     public static final String NFC_RESULT = "nfc_result";
 
@@ -49,5 +56,29 @@ public class Utils {
 
         return age >= ALLOWABLE_AGE;
     }
+
+    /**
+     *
+     * @param path in the form of "face1.png"
+     * @param bitmap
+     * @param context
+     * @throws IOException
+     */
+    public static void saveImg(String path, Bitmap bitmap, Context context) throws IOException {
+        Log.v(TAG, "saving image....");
+
+        java.io.FileOutputStream out = context.openFileOutput(path, Context.MODE_PRIVATE);
+        bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
+    }
+
+    public static Bitmap retrieveImg(String name, Context context) {
+        //return BitmapFactory.decodeFile(path);
+        Bitmap b = BitmapFactory.decodeFile(context.getFilesDir().getAbsolutePath() + "/" + name);
+        if(b == null) {
+            Log.v(TAG, "retrieved b is null!");
+        }
+        return b;
+    }
+
 
 }
