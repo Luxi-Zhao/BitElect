@@ -2,12 +2,15 @@ package com.example.lucyzhao.votingapp;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -16,6 +19,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -52,8 +56,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     ImageView testImg1;
     ImageView testImg2;
     ImageView testImg3;
-    ImageView testImg4;
-    ImageView testImg5;
+    TextView resultTxt;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,13 +65,11 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         clearFiles();
         showFiles();
 
-
         testImg = findViewById(R.id.test_face_img);
         testImg1 = findViewById(R.id.test_face_img1);
         testImg2 = findViewById(R.id.test_face_img2);
         testImg3 = findViewById(R.id.test_face_img3);
-        testImg4 = findViewById(R.id.test_face_img4);
-        testImg5 = findViewById(R.id.test_face_img5);
+        resultTxt = findViewById(R.id.face_recog_result_txt);
 
         surfaceView = findViewById(R.id.face_surface_view);
         saveDrawableFacesToInternalStorage();
@@ -81,6 +82,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         //determines when the detector receives a result
         faceDetector.setProcessor(new Detector.Processor<Face>() {
+            boolean performRecog = true;
+
             @Override
             public void release() {
                 Log.v(TAG, "in release");
@@ -91,18 +94,21 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
                 final SparseArray<Face> faces = detections.getDetectedItems();
                 if (faces.size() > 0) {
-                    Log.v(TAG, "received face result");
                     //todo draw boxes?
                     Face face = faces.get(0);
 
+                    if(faceDetector.imgNum == 4 && performRecog) {
+                        Log.v(TAG, "face detector img num is 4, stopping face detection");
+                        new PerformRecognitionTask().execute();
+                        performRecog= false;
+                    }
                 }
+
             }
         });
 
 
         cs = new CameraSource.Builder(this, faceDetector)
-                //.setFacing(CameraSource.CAMERA_FACING_FRONT)
-                .setAutoFocusEnabled(true)
                 .setFacing(CAMERA_FACING_FRONT)
                 .setRequestedPreviewSize(320, 240)
                 .build();
@@ -148,34 +154,34 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        cs.release();
+        faceDetector.release();
     }
 
     /**
+     * FOR DEBUG ONLY
      * Seems like we can only get 4 good pics, the 5th goes to hell
-     * @param view
+     * @param
      */
-    public void showPics(View view) {
-        cs.release();
+//    public void showPics(View view) {
+//        cs.release();
+//
+//        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
+//        if(b != null && testImg != null)
+//            testImg.setImageBitmap(b);
+//        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
+//        if(b1 != null && testImg1 != null)
+//            testImg1.setImageBitmap(b1);
+//        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
+//        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
+//        testImg2.setImageBitmap(b2);
+//        testImg3.setImageBitmap(b3);
+//    }
 
-        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
-        if(b != null && testImg != null)
-            testImg.setImageBitmap(b);
-        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
-        if(b1 != null && testImg1 != null)
-            testImg1.setImageBitmap(b1);
-        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
-        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
-        testImg2.setImageBitmap(b2);
-        testImg3.setImageBitmap(b3);
-    }
 
-    public void recognizePics(View view) {
-        useRecognizer();
-    }
 
-    private void useRecognizer() {
-        Log.v(TAG, "recognizer pressed");
+    private int recognizeFaces() {
+        Log.v(TAG, "Performing Face Recognition...");
         String trainingDir = this.getFilesDir().getAbsolutePath() + "/" + Utils.TRAIN_DIR;
 
         String testingFilePath = this.getFilesDir().getAbsolutePath()
@@ -230,10 +236,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         Log.v(TAG, "predicted label is " + predictedLabel);
         Log.v(TAG, "confidence is: " + confidence.get());
 
-
-        //todo send result.cancelled as well
-        setResult(Activity.RESULT_OK, new Intent());
-        finish();
+        return predictedLabel;
     }
 
     private void showFiles() {
@@ -269,6 +272,38 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    //todo make async tasks static to avoid leaks, add weak reference to activity
+    private class PerformRecognitionTask extends AsyncTask<Void, Integer, Integer> {
+
+        @Override
+        protected Integer doInBackground(Void... params) {
+            return recognizeFaces();
+        }
+
+        @Override
+        protected void onPostExecute(final Integer predictedLabel) {
+
+            new CountDownTimer(5000, 1000) {
+                String txt = "You are matched with label: " + predictedLabel;
+                public void onTick(long millisUntilFinished) {
+                    String tickInfo = txt + " count down " + millisUntilFinished/1000;
+                    resultTxt.setText(tickInfo);
+                }
+
+                public void onFinish() {
+                    if(predictedLabel == Integer.parseInt(Utils.YOUR_FACE_ID)) {
+                        setResult(Activity.RESULT_OK, new Intent());
+                    }
+                    else {
+                        setResult(Activity.RESULT_CANCELED, new Intent());
+                    }
+
+                    finish(); //this should release detector
+                }
+            }.start();
         }
     }
 }

@@ -411,8 +411,11 @@ public class MainActivity extends AppCompatActivity {
 
             case (FACE_ACTIVITY_REQ_CODE): {
                 if (resultCode == Activity.RESULT_OK) {
-                    //todo
+
                     setFaceTaskCompleted(true);
+                }
+                else {
+                    setFaceTaskCompleted(false);
                 }
                 break;
             }

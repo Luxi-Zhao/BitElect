@@ -29,12 +29,8 @@ public class CustomFaceDetector extends Detector<Face> {
     private static final String TAG = CustomFaceDetector.class.getSimpleName();
     private Detector<Face> detector;
     private Context context;
-    public Bitmap publicBitmap;
-    private int imgNum = 0;
-    private int timeout = 30;
-
-    private int firstWidth;
-    private int firstHeight;
+    public int imgNum = 0;
+    public int timeout = 30;
 
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
@@ -124,23 +120,5 @@ public class CustomFaceDetector extends Detector<Face> {
         return detector.setFocus(id);
     }
 
-    /**
-     *
-     * @param face
-     * @param width frame width
-     * @param height frame height
-     * @return
-     */
-    private Bitmap cropOutFace(Face face, int width, int height, Bitmap origB) {
-        //crop out face
-        float facex = face.getPosition().x >= 0 ? face.getPosition().x : 0;
-        float facey = face.getPosition().y >= 0 ? face.getPosition().y : 0;
-        float facew = face.getWidth() + facex < width ? face.getWidth() : width - facex;
-        float faceh = face.getHeight() + facey < height ? face.getHeight() : height - facey;
-
-
-        return Bitmap.createBitmap(origB, (int)facex, (int)facey, (int)facew, (int)faceh);
-        //Log.v(TAG, "cropped bitmap x " + facex + " y " + facey + " w " + facew + " h " + faceh);
-    }
 
 }
