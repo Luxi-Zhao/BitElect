@@ -135,8 +135,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     }
 
     private void clearFiles() {
-        Log.v(TAG, "-------------deteling all files in files dir");
-        File[] files = this.getFilesDir().listFiles();
+        Log.v(TAG, "-------------deteling all files in training dir");
+        File dir = new File(this.getFilesDir(), Utils.TRAIN_DIR);
+        File[] files = dir.listFiles();
         for(File file : files) {
             file.delete();
         }
@@ -145,10 +146,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if(cs != null)
-            cs.release();
-        if(faceDetector != null)
-            faceDetector.release();
+
     }
 
     /**
@@ -158,14 +156,14 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     public void showPics(View view) {
         cs.release();
 
-        Bitmap b = Utils.retrieveImg(YOUR_FACE_ID, "0", getApplicationContext());
+        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
         if(b != null && testImg != null)
             testImg.setImageBitmap(b);
-        Bitmap b1 = Utils.retrieveImg(YOUR_FACE_ID, "1", getApplicationContext());
+        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
         if(b1 != null && testImg1 != null)
             testImg1.setImageBitmap(b1);
-        Bitmap b2 = Utils.retrieveImg(YOUR_FACE_ID,"2", getApplicationContext());
-        Bitmap b3 = Utils.retrieveImg(YOUR_FACE_ID,"3", getApplicationContext());
+        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
+        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
         testImg2.setImageBitmap(b2);
         testImg3.setImageBitmap(b3);
     }
@@ -176,9 +174,18 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
     private void useRecognizer() {
         Log.v(TAG, "recognizer pressed");
-        String trainingDir = this.getFilesDir().getAbsolutePath();
+        String trainingDir = this.getFilesDir().getAbsolutePath() + "/" + Utils.TRAIN_DIR;
 
-        File root = new File(trainingDir);
+        String testingFilePath = this.getFilesDir().getAbsolutePath()
+                + "/" + Utils.TEST_DIR
+                + "/" + Utils.PASSPORT_FACE_ID
+                + "-face_"
+                + Utils.PASSPORT_SAMPLE_NUM
+                + ".png";
+
+        opencv_core.Mat testImg = imread(testingFilePath, CV_LOAD_IMAGE_GRAYSCALE);
+
+        File trainRoot = new File(trainingDir);
 
         FilenameFilter pngFilter = new FilenameFilter() {
             public boolean accept(File dir, String name) {
@@ -186,33 +193,28 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
         };
 
-        File[] imageFiles = root.listFiles(pngFilter);
+        File[] imageFiles = trainRoot.listFiles(pngFilter);
 
-        int numImages = imageFiles.length - 1; //todo keep an eye on this!!
+        int numImages = imageFiles.length; //todo keep an eye on this!!
         opencv_core.MatVector images = new opencv_core.MatVector(numImages);
 
         opencv_core.Mat labels = new opencv_core.Mat(numImages, 1, CV_32SC1);
         IntBuffer labelsBuf = labels.createBuffer();
 
-        opencv_core.Mat testImg = new opencv_core.Mat(1);
-
         int counter = 0;
         Log.v(TAG, "loading files...");
         for (File image : imageFiles) {
-           if(!"2-face_1.png".equals(image.getName().toLowerCase())) {
-            Log.v(TAG, "recognizer reading image " + image.getName());
-                opencv_core.Mat img = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
-                int faceID = Integer.parseInt(image.getName().split("\\-")[0]);
-                images.put(counter, img);
-                labelsBuf.put(counter, faceID);
 
-                counter++;
-            }
-            else {
+            opencv_core.Mat img = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
+            int faceID = Integer.parseInt(image.getName().split("\\-")[0]);
+            images.put(counter, img);
+            labelsBuf.put(counter, faceID);
+            Log.v(TAG, "training image " + image.getName() + " is read. Person ID " + faceID);
+            counter++;
 
-                testImg = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
-            }
         }
+
+
 
         opencv_face.FaceRecognizer faceRecognizer = opencv_face.LBPHFaceRecognizer.create();
         Log.v(TAG, "training");
@@ -255,7 +257,12 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 Log.v(TAG, "saving internet face with id " + faceID);
                 String namewopng = file.split("\\.")[0];
                 String sampleNumber = Character.toString(namewopng.charAt(namewopng.length() - 1));
-                Utils.saveImg(faceID, sampleNumber, d.getBitmap(), this);
+                Utils.saveImg(
+                        true,
+                        faceID,
+                        sampleNumber,
+                        d.getBitmap(),
+                        this);
             }
         } catch (IOException e) {
             e.printStackTrace();

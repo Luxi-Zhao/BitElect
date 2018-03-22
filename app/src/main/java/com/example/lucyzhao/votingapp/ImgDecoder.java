@@ -36,6 +36,12 @@ public class ImgDecoder {
             Log.v(TAG, "reading img");
             Bitmap b = readImageFromPPM(ppmPath);
 
+            Utils.saveImg(false,
+                    Utils.PASSPORT_FACE_ID,
+                    Utils.PASSPORT_SAMPLE_NUM,
+                    b,
+                    context);
+
             return b;
 
         } else if (mimeType.equalsIgnoreCase("image/x-wsq")) {

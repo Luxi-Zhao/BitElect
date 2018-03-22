@@ -397,5 +397,9 @@ public class NFCActivity extends AppCompatActivity {
 
     }
 
+    public void launchImgRecog(View view) {
+        startActivity(new Intent(this, FaceRecognitionActivity.class));
+    }
+
 
 }

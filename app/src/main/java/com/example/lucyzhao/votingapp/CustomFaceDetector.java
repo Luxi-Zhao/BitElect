@@ -95,7 +95,12 @@ public class CustomFaceDetector extends Detector<Face> {
             Log.v(TAG, "rotated get size" + rotatedB.getByteCount());
             try {
                 Log.v(TAG, "saved ");
-                Utils.saveImg(YOUR_FACE_ID, Integer.toString(imgNum), rotatedB, context);
+                Utils.saveImg(
+                        true,
+                        YOUR_FACE_ID,
+                        Integer.toString(imgNum),
+                        rotatedB,
+                        context);
 
             } catch (IOException e) {
                 e.printStackTrace();
