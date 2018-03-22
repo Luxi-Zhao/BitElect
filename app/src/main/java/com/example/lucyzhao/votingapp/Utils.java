@@ -38,7 +38,7 @@ public class Utils {
 
     public static final int ALLOWABLE_AGE = 18;
 
-    public static final int NUM_IMG_FILES = 4;
+    public static final int NUM_CAPTUREDS = 4;
 
     public static final String INTERNET_FACES_PATH = "internet_faces";
     public static final String YOUR_FACE_ID = "1";

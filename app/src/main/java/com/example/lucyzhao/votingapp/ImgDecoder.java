@@ -33,7 +33,6 @@ public class ImgDecoder {
 
             writeInputStreamToFile(jp2Path, inputStream);
             decodeJp2File(jp2Path, ppmPath);
-            Log.v(TAG, "reading img");
             Bitmap b = readImageFromPPM(ppmPath);
 
             Utils.saveImg(false,
@@ -101,7 +100,6 @@ public class ImgDecoder {
 
         ParameterList defParams = new ParameterList(pl);
         Decoder decoder = new Decoder(defParams);
-        Log.v(TAG, "decoder running");
         decoder.run();
     }
 
@@ -119,7 +117,6 @@ public class ImgDecoder {
             int width = readASCIIDecimal(reader);
             int height = readASCIIDecimal(reader);
             int maxColor = readASCIIDecimal(reader);
-            Log.v(TAG, "width: " + width + " height: " + height + " max color: " + maxColor);
 
             if (!checkMaxColor(maxColor)) {
                 return null;

@@ -29,8 +29,10 @@ public class CustomFaceDetector extends Detector<Face> {
     private static final String TAG = CustomFaceDetector.class.getSimpleName();
     private Detector<Face> detector;
     private Context context;
-    public int imgNum = 0;
-    public int timeout = 30;
+
+    // fields used to communicate with calling activity
+    private int imgNum = 0;
+    private int timeout = 30;
 
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
@@ -38,6 +40,12 @@ public class CustomFaceDetector extends Detector<Face> {
         this.context = context;
     }
 
+    /**
+     * FOR DEBUG ONLY
+     * @param face
+     * @param frame
+     * @param bitmap
+     */
     private void dumpData(Face face, Frame frame, Bitmap bitmap) {
         if(face == null) return;
         float facex = face.getPosition().x;
@@ -60,9 +68,8 @@ public class CustomFaceDetector extends Detector<Face> {
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
-        if(detectedFaces.size() > 0 && imgNum < 4 && timeout <= 0) {
+        if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTUREDS && timeout <= 0) {
             Face face = detectedFaces.get(detectedFaces.keyAt(0));
-            Log.v(TAG, "face detected");
 
             int width = frame.getMetadata().getWidth();
             int height = frame.getMetadata().getHeight();
@@ -87,14 +94,12 @@ public class CustomFaceDetector extends Detector<Face> {
             matrix.postRotate(rotDegree);
             Bitmap rotatedB = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
 
-            Log.v(TAG, "rotated get width:" + rotatedB.getWidth() + " rotated get height" + rotatedB.getHeight());
-            Log.v(TAG, "rotated get size" + rotatedB.getByteCount());
             try {
                 Log.v(TAG, "saved ");
                 Utils.saveImg(
                         true,
                         YOUR_FACE_ID,
-                        Integer.toString(imgNum),
+                        Integer.toString(getImgNum()),
                         rotatedB,
                         context);
 
@@ -102,7 +107,7 @@ public class CustomFaceDetector extends Detector<Face> {
                 e.printStackTrace();
             }
 
-            imgNum++;
+            setImgNum(getImgNum() + 1);
 
         }
         timeout--;
@@ -120,5 +125,12 @@ public class CustomFaceDetector extends Detector<Face> {
         return detector.setFocus(id);
     }
 
+    public synchronized void setImgNum(int imgNum) {
+        this.imgNum = imgNum;
+    }
+
+    public synchronized int getImgNum() {
+        return this.imgNum;
+    }
 
 }

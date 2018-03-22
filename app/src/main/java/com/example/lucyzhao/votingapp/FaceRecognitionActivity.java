@@ -40,6 +40,7 @@ import java.lang.reflect.Field;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 
+import static com.example.lucyzhao.votingapp.Utils.NUM_CAPTUREDS;
 import static com.example.lucyzhao.votingapp.Utils.YOUR_FACE_ID;
 import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_FRONT;
 import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
@@ -89,6 +90,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 Log.v(TAG, "in release");
             }
 
+            /**
+             * This method does not run on the UI thread
+             * @param detections
+             */
             @Override
             public void receiveDetections(Detector.Detections<Face> detections) {
 
@@ -97,11 +102,22 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                     //todo draw boxes?
                     Face face = faces.get(0);
 
-                    if(faceDetector.imgNum == 4 && performRecog) {
+                    if(faceDetector.getImgNum() == NUM_CAPTUREDS && performRecog) {
                         Log.v(TAG, "face detector img num is 4, stopping face detection");
                         new PerformRecognitionTask().execute();
                         performRecog= false;
                     }
+                    else if(performRecog){
+                        resultTxt.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                String txt = "Running face detection " + faceDetector.getImgNum();
+                                resultTxt.setText(txt);
+                            }
+                        });
+                    }
+
+
                 }
 
             }
@@ -143,7 +159,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     }
 
     private void clearFiles() {
-        Log.v(TAG, "-------------deteling all files in training dir");
+        Log.v(TAG, "-------------deleting all files in training dir");
         File dir = new File(this.getFilesDir(), Utils.TRAIN_DIR);
         File[] files = dir.listFiles();
         for(File file : files) {
