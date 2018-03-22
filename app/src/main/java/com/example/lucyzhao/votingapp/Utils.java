@@ -34,6 +34,9 @@ public class Utils {
 
     public static final int NUM_IMG_FILES = 4;
 
+    public static final String INTERNET_FACES_PATH = "internet_faces";
+    public static final String YOUR_FACE_ID = "1";
+
     public static boolean checkNationalityEligiblity(String nationality) {
         return nationality.equals(ALLOWABLE_NATIONALITY);
     }
@@ -61,22 +64,22 @@ public class Utils {
 
     /**
      *
-     * @param num in the form of 1,2,3
+     * @param sampleNumber in the form of 1,2,3
      * @param bitmap
      * @param context
      * @throws IOException
      */
-    public static void saveImg(String num, Bitmap bitmap, Context context) throws IOException {
+    public static void saveImg(String faceID, String sampleNumber, Bitmap bitmap, Context context) throws IOException {
 
-        String filename = "1-face_" + num + ".png";
+        String filename = faceID + "-face_" + sampleNumber + ".png";
         Log.v(TAG, "saving image..." + filename);
         java.io.FileOutputStream out = context.openFileOutput(filename, Context.MODE_PRIVATE);
         bitmap.compress(Bitmap.CompressFormat.PNG, 90, out);
     }
 
-    public static Bitmap retrieveImg(String num, Context context) {
+    public static Bitmap retrieveImg(String faceID, String num, Context context) {
         //return BitmapFactory.decodeFile(path);
-        String filename = "/1-face_" + num + ".png";
+        String filename = "/" + faceID + "-face_" + num + ".png";
         Log.v(TAG, "image " + filename + " retrieved!");
         Bitmap b = BitmapFactory.decodeFile(context.getFilesDir().getAbsolutePath() + filename);
         if(b == null) {

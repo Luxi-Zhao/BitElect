@@ -1,8 +1,12 @@
 package com.example.lucyzhao.votingapp;
 
 import android.annotation.SuppressLint;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
@@ -16,21 +20,26 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import java.io.IOException;
-
-import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_BACK;
-import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_FRONT;
-import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_COLOR;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
-
 import org.bytedeco.javacpp.DoublePointer;
 import org.bytedeco.javacpp.IntPointer;
 import org.bytedeco.javacpp.opencv_core;
 import org.bytedeco.javacpp.opencv_face;
-import org.bytedeco.javacpp.opencv_face.FaceRecognizer;
-import org.bytedeco.javacpp.opencv_core.MatVector;
+import org.jmrtd.Util;
+
+import java.io.File;
+import java.io.FilenameFilter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.IntBuffer;
+import java.util.ArrayList;
+
+import static com.example.lucyzhao.votingapp.Utils.YOUR_FACE_ID;
+import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_FRONT;
+import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
+import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
+import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
+
 
 public class FaceRecognitionActivity extends AppCompatActivity {
     private static final String TAG = FaceRecognitionActivity.class.getSimpleName();
@@ -48,6 +57,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
+        clearFiles();
+        showFiles();
+
+
         testImg = findViewById(R.id.test_face_img);
         testImg1 = findViewById(R.id.test_face_img1);
         testImg2 = findViewById(R.id.test_face_img2);
@@ -56,6 +69,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         testImg5 = findViewById(R.id.test_face_img5);
 
         surfaceView = findViewById(R.id.face_surface_view);
+        saveDrawableFacesToInternalStorage();
 
         faceDetector = new CustomFaceDetector(new FaceDetector.Builder(this)
                 .setTrackingEnabled(true)
@@ -116,13 +130,25 @@ public class FaceRecognitionActivity extends AppCompatActivity {
             }
         });
 
+
+
+    }
+
+    private void clearFiles() {
+        Log.v(TAG, "-------------deteling all files in files dir");
+        File[] files = this.getFilesDir().listFiles();
+        for(File file : files) {
+            file.delete();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        cs.release();
-        faceDetector.release();
+        if(cs != null)
+            cs.release();
+        if(faceDetector != null)
+            faceDetector.release();
     }
 
     /**
@@ -132,51 +158,107 @@ public class FaceRecognitionActivity extends AppCompatActivity {
     public void showPics(View view) {
         cs.release();
 
-        Bitmap b = Utils.retrieveImg("0", getApplicationContext());
+        Bitmap b = Utils.retrieveImg(YOUR_FACE_ID, "0", getApplicationContext());
         if(b != null && testImg != null)
             testImg.setImageBitmap(b);
-        Bitmap b1 = Utils.retrieveImg("1", getApplicationContext());
+        Bitmap b1 = Utils.retrieveImg(YOUR_FACE_ID, "1", getApplicationContext());
         if(b1 != null && testImg1 != null)
             testImg1.setImageBitmap(b1);
-        Bitmap b2 = Utils.retrieveImg("2", getApplicationContext());
-        Bitmap b3 = Utils.retrieveImg("3", getApplicationContext());
-        /*Bitmap b4 = Utils.retrieveImg("face7.png", getApplicationContext());
-        Bitmap b5 = Utils.retrieveImg("face8.png", getApplicationContext());*/
+        Bitmap b2 = Utils.retrieveImg(YOUR_FACE_ID,"2", getApplicationContext());
+        Bitmap b3 = Utils.retrieveImg(YOUR_FACE_ID,"3", getApplicationContext());
         testImg2.setImageBitmap(b2);
         testImg3.setImageBitmap(b3);
-//        testImg4.setImageBitmap(b4);
-//        testImg5.setImageBitmap(b5);
     }
 
     public void recognizePics(View view) {
-        Log.v(TAG, "start recognizing ");
-        MatVector imgs = new MatVector(Utils.NUM_IMG_FILES);
-        opencv_core.Mat labels = new opencv_core.Mat(Utils.NUM_IMG_FILES, 1, CV_32SC1);
-        for (int i = 0; i < Utils.NUM_IMG_FILES-1; i++) {
-            String filepath = getApplicationContext().getFilesDir().getAbsolutePath() + "/1-face_" + i + ".png";
-            opencv_core.Mat img = imread(filepath, CV_LOAD_IMAGE_COLOR);
-            if(img != null) {
-                Log.v(TAG, "img " + i + " is not null");
-                imgs.put(i, img);
+        useRecognizer();
+    }
+
+    private void useRecognizer() {
+        Log.v(TAG, "recognizer pressed");
+        String trainingDir = this.getFilesDir().getAbsolutePath();
+
+        File root = new File(trainingDir);
+
+        FilenameFilter pngFilter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.toLowerCase().endsWith(".png");
+            }
+        };
+
+        File[] imageFiles = root.listFiles(pngFilter);
+
+        int numImages = imageFiles.length - 1; //todo keep an eye on this!!
+        opencv_core.MatVector images = new opencv_core.MatVector(numImages);
+
+        opencv_core.Mat labels = new opencv_core.Mat(numImages, 1, CV_32SC1);
+        IntBuffer labelsBuf = labels.createBuffer();
+
+        opencv_core.Mat testImg = new opencv_core.Mat(1);
+
+        int counter = 0;
+        Log.v(TAG, "loading files...");
+        for (File image : imageFiles) {
+           if(!"2-face_1.png".equals(image.getName().toLowerCase())) {
+            Log.v(TAG, "recognizer reading image " + image.getName());
+                opencv_core.Mat img = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
+                int faceID = Integer.parseInt(image.getName().split("\\-")[0]);
+                images.put(counter, img);
+                labelsBuf.put(counter, faceID);
+
+                counter++;
             }
             else {
-                Log.v(TAG, "img " + i + " is null!!");
-            }
 
+                testImg = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
+            }
         }
 
+        opencv_face.FaceRecognizer faceRecognizer = opencv_face.LBPHFaceRecognizer.create();
+        Log.v(TAG, "training");
+        faceRecognizer.train(images, labels);
+        Log.v(TAG, "training done");
 
-        String testFilePath = getFilesDir().getAbsolutePath() + "/1-face_" + (Utils.NUM_IMG_FILES-1) + ".png";
-        opencv_core.Mat testImg = imread(testFilePath, CV_LOAD_IMAGE_GRAYSCALE);
 
-        FaceRecognizer faceRecognizer = opencv_face.LBPHFaceRecognizer.create();
-        faceRecognizer.train(imgs, labels);
-
-        IntPointer label = new IntPointer(1);
+        Log.v(TAG, "predicting test img");
+        IntPointer predictedFaceID = new IntPointer(1);
         DoublePointer confidence = new DoublePointer(1);
-        faceRecognizer.predict(testImg, label, confidence);
-        int predictedLabel = label.get(0);
+        faceRecognizer.predict(testImg, predictedFaceID, confidence);
+
+        int predictedLabel = predictedFaceID.get(0);
         Log.v(TAG, "predicted label is " + predictedLabel);
         Log.v(TAG, "confidence is: " + confidence.get());
+
+    }
+
+    private void showFiles() {
+        Log.v(TAG, "FILES in filesdir -------------------");
+        File[] files = this.getFilesDir().listFiles();
+        Log.d("Files", "Size: "+ files.length);
+        for (int i = 0; i < files.length; i++)
+        {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+    }
+
+    private void saveDrawableFacesToInternalStorage() {
+        AssetManager assetManager = this.getAssets();
+        try {
+            String[] files = assetManager.list(Utils.INTERNET_FACES_PATH);
+
+            for (String file : files) {
+                Log.v(TAG, "internet files opening:  " + file);
+                String pathname = Utils.INTERNET_FACES_PATH + "/" + file;
+                BitmapDrawable d = (BitmapDrawable) Drawable.createFromStream(assetManager.open(pathname), null);
+
+                String faceID = file.split("\\-")[0];
+                Log.v(TAG, "saving internet face with id " + faceID);
+                String namewopng = file.split("\\.")[0];
+                String sampleNumber = Character.toString(namewopng.charAt(namewopng.length() - 1));
+                Utils.saveImg(faceID, sampleNumber, d.getBitmap(), this);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

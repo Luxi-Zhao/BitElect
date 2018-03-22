@@ -18,6 +18,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import static com.example.lucyzhao.votingapp.Utils.YOUR_FACE_ID;
+
 
 /**
  * Created by LucyZhao on 2018/3/19.
@@ -29,10 +31,11 @@ public class CustomFaceDetector extends Detector<Face> {
     private Context context;
     public Bitmap publicBitmap;
     private int imgNum = 0;
-    private int timeout = 20;
+    private int timeout = 30;
 
     private int firstWidth;
     private int firstHeight;
+
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
         this.detector = detector;
@@ -57,6 +60,7 @@ public class CustomFaceDetector extends Detector<Face> {
         Log.v(TAG, "bitmap w " + bw + " bitmap h" + bh);
     }
 
+    //todo slow down face detection rate
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
@@ -81,32 +85,17 @@ public class CustomFaceDetector extends Detector<Face> {
             Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
 
             dumpData(face, frame, bitmap);
-            //crop out face
-            float facex = face.getPosition().x >= 0 ? face.getPosition().x : 0;
-            float facey = face.getPosition().y >= 0 ? face.getPosition().y : 0;
-            float facew = face.getWidth() + facex < width ? face.getWidth() : width - facex;
-            float faceh = face.getHeight() + facey < height ? face.getHeight() : height - facey;
 
-
-            bitmap = Bitmap.createBitmap(bitmap, (int)facex, (int)facey, (int)facew, (int)faceh);
-            //Log.v(TAG, "cropped bitmap x " + facex + " y " + facey + " w " + facew + " h " + faceh);
-
-            //rotate & set width, height to the first img detected
-            if(imgNum == 0) {
-                firstWidth = bitmap.getWidth();
-                firstHeight = bitmap.getHeight();
-            }
+            //rotate
             Matrix matrix = new Matrix();
             matrix.postRotate(rotDegree);
             Bitmap rotatedB = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-//            Bitmap rotatedB = Bitmap.createBitmap(bitmap,
-//                    0, 0, firstWidth, firstHeight, matrix, true);
 
             Log.v(TAG, "rotated get width:" + rotatedB.getWidth() + " rotated get height" + rotatedB.getHeight());
             Log.v(TAG, "rotated get size" + rotatedB.getByteCount());
             try {
                 Log.v(TAG, "saved ");
-                Utils.saveImg(Integer.toString(imgNum), rotatedB, context);
+                Utils.saveImg(YOUR_FACE_ID, Integer.toString(imgNum), rotatedB, context);
 
             } catch (IOException e) {
                 e.printStackTrace();
@@ -130,5 +119,23 @@ public class CustomFaceDetector extends Detector<Face> {
         return detector.setFocus(id);
     }
 
+    /**
+     *
+     * @param face
+     * @param width frame width
+     * @param height frame height
+     * @return
+     */
+    private Bitmap cropOutFace(Face face, int width, int height, Bitmap origB) {
+        //crop out face
+        float facex = face.getPosition().x >= 0 ? face.getPosition().x : 0;
+        float facey = face.getPosition().y >= 0 ? face.getPosition().y : 0;
+        float facew = face.getWidth() + facex < width ? face.getWidth() : width - facex;
+        float faceh = face.getHeight() + facey < height ? face.getHeight() : height - facey;
+
+
+        return Bitmap.createBitmap(origB, (int)facex, (int)facey, (int)facew, (int)faceh);
+        //Log.v(TAG, "cropped bitmap x " + facex + " y " + facey + " w " + facew + " h " + faceh);
+    }
 
 }
