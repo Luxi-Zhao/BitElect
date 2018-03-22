@@ -31,6 +31,8 @@ import com.android.volley.toolbox.Volley;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigInteger;
+import java.util.Random;
 
 import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
@@ -39,7 +41,7 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int QR_ACTIVITY_REQ_CODE = 111;
-    private static final String VOTING_URL = "http://192.168.4.1/?";
+    private static final String VOTING_URL = "http://192.168.43.27/?";
 
     // UI element
     AlertDialog.Builder votingAlertBuilder;
@@ -239,9 +241,11 @@ public class MainActivity extends AppCompatActivity {
 
         RequestQueue queue = Volley.newRequestQueue(this);
 
+        String encryptedCandidateID = encryptVote(Integer.valueOf(myVote.getCandidateID()));
+
         String url = VOTING_URL + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
                 + COMM_NFC_ID + "=" + myVote.getNfcID() + "&"
-                + COMM_CANDIDATE_ID + "=" + myVote.getCandidateID();
+                + COMM_CANDIDATE_ID + "=" + encryptedCandidateID;
         Log.v(TAG, "url is: " + url);
 
         // Request a string response from the provided URL.
@@ -263,6 +267,30 @@ public class MainActivity extends AppCompatActivity {
 
         // UI
         setVotingTaskCompleted();
+    }
+
+    private String encryptVote(int candidateID){
+        int zeroindex = candidateID-1;
+
+        Random rand = new Random();
+
+        BigInteger publicKey = BigInteger.valueOf(13969);
+        BigInteger publicKeysq = publicKey.pow(2);
+        BigInteger plainText = BigInteger.valueOf(zeroindex);
+
+        BigInteger num;
+
+        while(true) {
+            num = new BigInteger((int)Math.round(Math.log(publicKey.doubleValue())/Math.log(2)), 10, rand);
+            if(num.compareTo(BigInteger.ZERO) == 1 && num.compareTo(publicKey) == -1) {
+                break;
+            }
+        }
+
+        BigInteger temp = num.modPow(publicKey, publicKeysq);
+        BigInteger cipher = publicKey.add(BigInteger.valueOf(1)).modPow(plainText,publicKeysq).multiply(temp).mod(publicKeysq);
+
+        return Integer.toString(cipher.intValue());
     }
 
     private static class Vote {
