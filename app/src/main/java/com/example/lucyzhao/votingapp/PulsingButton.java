@@ -121,7 +121,7 @@ public class PulsingButton extends android.support.v7.widget.AppCompatButton {
 
     public void setCompleted() {
         stopAnimation();
-        setEnabled(false);
+        setEnabled(true);
         int color = ContextCompat.getColor(getContext(), R.color.colorBtnCompleted);
         btnBackground.setColor(color);
         btnBackground.setStroke(5, color);
@@ -129,9 +129,9 @@ public class PulsingButton extends android.support.v7.widget.AppCompatButton {
     }
 
     public void setUncompleted() {
-        startAnimation();
+        setEnabled(false);
         int color = ContextCompat.getColor(getContext(), R.color.colorPrimary);
-        btnBackground.setColor(Color.TRANSPARENT);
+        btnBackground.setColor(color);
         btnBackground.setStroke(5, color);
     }
 }

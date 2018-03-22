@@ -1,6 +1,8 @@
 package com.example.lucyzhao.votingapp;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
@@ -214,10 +216,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         }
 
-
-
         opencv_face.FaceRecognizer faceRecognizer = opencv_face.LBPHFaceRecognizer.create();
-        Log.v(TAG, "training");
         faceRecognizer.train(images, labels);
         Log.v(TAG, "training done");
 
@@ -231,6 +230,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         Log.v(TAG, "predicted label is " + predictedLabel);
         Log.v(TAG, "confidence is: " + confidence.get());
 
+
+        //todo send result.cancelled as well
+        setResult(Activity.RESULT_OK, new Intent());
+        finish();
     }
 
     private void showFiles() {

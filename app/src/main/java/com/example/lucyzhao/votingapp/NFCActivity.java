@@ -20,7 +20,6 @@ import android.util.SparseArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -32,7 +31,6 @@ import net.sf.scuba.smartcards.CardServiceException;
 
 import org.jmrtd.BACKey;
 import org.jmrtd.PassportService;
-import org.jmrtd.Util;
 import org.jmrtd.lds.icao.DG1File;
 import org.jmrtd.lds.icao.DG2File;
 import org.jmrtd.lds.icao.MRZInfo;
@@ -395,10 +393,6 @@ public class NFCActivity extends AppCompatActivity {
             this.nationalityEligible = eligible;
         }
 
-    }
-
-    public void launchImgRecog(View view) {
-        startActivity(new Intent(this, FaceRecognitionActivity.class));
     }
 
 

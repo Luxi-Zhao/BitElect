@@ -7,7 +7,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.drawable.GradientDrawable;
+import android.media.FaceDetector;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RadioButton;
-import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -29,9 +27,9 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.math.BigInteger;
 import java.util.Random;
 
 import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
@@ -41,6 +39,7 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int QR_ACTIVITY_REQ_CODE = 111;
+    private static final int FACE_ACTIVITY_REQ_CODE = 250;
     private static final String VOTING_URL = "http://192.168.43.27/?";
 
     // UI element
@@ -72,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "tasks completed is: " + tasksCompleted);
         taskManager.onTaskCompleted(tasksCompleted);
         // ignore any nfc feedback if passport is already scanned
-        if(tasksCompleted > 2) {
+        if (tasksCompleted > 2) {
             return;
         }
 
@@ -119,26 +118,29 @@ public class MainActivity extends AppCompatActivity {
         taskManager.onTaskCompleted(2);
     }
 
+    private void setFaceTaskCompleted(boolean match) {
+        taskManager.onTaskCompleted(3);
+    }
 
     private void setQRTaskCompleted(String qr_result) {
         myVote.setQrCode(qr_result);
-        taskManager.onTaskCompleted(3);
+        taskManager.onTaskCompleted(4);
     }
 
 
     protected void setCandSelTaskCompleted(String candID, String candName) {
         myVote.setCandidateID(candID);
         candidateName = candName;
-        taskManager.onTaskCompleted(4);
+        taskManager.onTaskCompleted(5);
     }
 
     private void setVotingTaskCompleted() {
-        taskManager.onTaskCompleted(5);
+        taskManager.onTaskCompleted(6);
     }
 
     /**
      * Updates the UI according to how many tasks the user has completed
-     *
+     * <p>
      * Get children views from linear layout
      * Initially, all elements are disabled except for the first one
      * When each task is completed, enable the next element and disable all previous elements
@@ -153,9 +155,9 @@ public class MainActivity extends AppCompatActivity {
             allLines = new ArrayList<>();
             LinearLayout ll = findViewById(R.id.task_layout);
             //not sure tho
-            for(int i = 0; i < ll.getChildCount(); i++) {
+            for (int i = 0; i < ll.getChildCount(); i++) {
                 View view = ll.getChildAt(i);
-                if(i % 2 == 0)
+                if (i % 2 == 0)
                     allBtns.add((PulsingButton) view);
                 else {
                     allLines.add(view);
@@ -163,22 +165,33 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        void startTasks(){
+        void startTasks() {
             allBtns.get(0).enablePulsingButton();
         }
 
         void onTaskCompleted(int taskNum) {
-            if(taskNum == 0) return;
-            for(int i = 0; i < taskNum; i++) {
+            if (taskNum == 0) return;
+            for (int i = 0; i < taskNum; i++) {
                 allBtns.get(i).setCompleted();
             }
 
-            for(int i = 0; i < taskNum - 1; i++) {
-               allLines.get(i)
-                .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorBtnCompleted));
+            for (int i = 0; i < taskNum - 1; i++) {
+                allLines.get(i)
+                        .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorBtnCompleted));
             }
 
-            if(taskNum < allBtns.size()) {
+            // ---------- for debug only
+//            for (int i = taskNum + 1; i < allBtns.size(); i++) {
+//                allBtns.get(i).setUncompleted();
+//            }
+//
+//            for (int i = taskNum - 1; i < allLines.size(); i++) {
+//                allLines.get(i)
+//                        .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
+//            }
+            // ----------
+
+            if (taskNum < allBtns.size()) {
                 allBtns.get(taskNum).enablePulsingButton();
             }
 
@@ -196,27 +209,6 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case (QR_ACTIVITY_REQ_CODE): {
-                if (resultCode == Activity.RESULT_OK) {
-                    // check QR Code scanning result
-                    String qr_result = data.getStringExtra(Utils.QR_RESULT);
-                    if (qr_result != null) {
-                        Log.v(TAG, "result of qr scanning is:" + qr_result);
-                        //myVote.setQrCode(qr_result);
-                        setQRTaskCompleted(qr_result);
-                    } else {
-                        Log.v(TAG, "qr scanning returned null!");
-                    }
-                }
-                break;
-            }
-
-        }
-    }
 
 
     //////////////////////////////////////////////////////////////
@@ -269,8 +261,8 @@ public class MainActivity extends AppCompatActivity {
         setVotingTaskCompleted();
     }
 
-    private String encryptVote(int candidateID){
-        int zeroindex = candidateID-1;
+    private String encryptVote(int candidateID) {
+        int zeroindex = candidateID - 1;
 
         Random rand = new Random();
 
@@ -280,15 +272,15 @@ public class MainActivity extends AppCompatActivity {
 
         BigInteger num;
 
-        while(true) {
-            num = new BigInteger((int)Math.round(Math.log(publicKey.doubleValue())/Math.log(2)), 10, rand);
-            if(num.compareTo(BigInteger.ZERO) == 1 && num.compareTo(publicKey) == -1) {
+        while (true) {
+            num = new BigInteger((int) Math.round(Math.log(publicKey.doubleValue()) / Math.log(2)), 10, rand);
+            if (num.compareTo(BigInteger.ZERO) == 1 && num.compareTo(publicKey) == -1) {
                 break;
             }
         }
 
         BigInteger temp = num.modPow(publicKey, publicKeysq);
-        BigInteger cipher = publicKey.add(BigInteger.valueOf(1)).modPow(plainText,publicKeysq).multiply(temp).mod(publicKeysq);
+        BigInteger cipher = publicKey.add(BigInteger.valueOf(1)).modPow(plainText, publicKeysq).multiply(temp).mod(publicKeysq);
 
         return Integer.toString(cipher.intValue());
     }
@@ -334,63 +326,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-//    public static class CandidateSelFragment extends DialogFragment {
-//        private RadioGroup radioGroup;
-//        private Button okBtn;
-//
-//        @Override
-//        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-//                                 Bundle savedInstanceState) {
-//            final View fragment = inflater.inflate(R.layout.fragment_candidate_sel, container, false);
-//            radioGroup = fragment.findViewById(R.id.radio_group);
-//            okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
-//            okBtn.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    String candID = getSelectedCandidateID();
-//                    String candName = getSelectedCandidateName(fragment);
-//
-//                    ((MainActivity) getActivity())
-//                            .setCandSelTaskCompleted(candID, candName);
-//                    dismiss();
-//                }
-//            });
-//
-//            return fragment;
-//        }
-//
-//        private String getSelectedCandidateID() {
-//            String candidateID = "";
-//            int id = radioGroup.getCheckedRadioButtonId();
-//            // Check which radio button was clicked
-//            switch (id) {
-//                case R.id.radio_clinton:
-//                    candidateID = "1";
-//
-//                    break;
-//                case R.id.radio_trump:
-//                    candidateID = "2";
-//                    break;
-//
-//                case R.id.radio_someoneelse:
-//                    candidateID = "3";
-//                    break;
-//            }
-//            return candidateID;
-//        }
-//
-//        private String getSelectedCandidateName(View fragment) {
-//            int id = radioGroup.getCheckedRadioButtonId();
-//            RadioButton selectedCand = fragment.findViewById(id);
-//
-//            // if no item is chosen, this field would be null
-//            if (selectedCand == null)
-//                return "";
-//            else
-//                return selectedCand.getText().toString();
-//        }
-//
-//    }
 
     //////////////////////////////////////////////////////////////
     ////////////////////////////PASSPORT//////////////////////////
@@ -444,6 +379,44 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
             dismiss();
+        }
+    }
+
+    //////////////////////////////////////////////////////////////
+    ///////////////////////FACE RECOGNITION///////////////////////
+    //////////////////////////////////////////////////////////////
+
+    public void scanFacePrompt(View view) {
+        Intent intent = new Intent(this, FaceRecognitionActivity.class);
+        startActivityForResult(intent, FACE_ACTIVITY_REQ_CODE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case (QR_ACTIVITY_REQ_CODE): {
+                if (resultCode == Activity.RESULT_OK) {
+                    // check QR Code scanning result
+                    String qr_result = data.getStringExtra(Utils.QR_RESULT);
+                    if (qr_result != null) {
+                        Log.v(TAG, "result of qr scanning is:" + qr_result);
+                        setQRTaskCompleted(qr_result);
+                    } else {
+                        Log.v(TAG, "qr scanning returned null!");
+                    }
+                }
+                break;
+            }
+
+            case (FACE_ACTIVITY_REQ_CODE): {
+                if (resultCode == Activity.RESULT_OK) {
+                    //todo
+                    setFaceTaskCompleted(true);
+                }
+                break;
+            }
+
         }
     }
 
