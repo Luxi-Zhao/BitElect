@@ -25,15 +25,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.jmrtd.Util;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CandidateSelFragment extends DialogFragment {
     private static final String TAG = CandidateSelFragment.class.getSimpleName();
@@ -41,18 +40,28 @@ public class CandidateSelFragment extends DialogFragment {
 
     private RadioGroup radioGroup;
     private Button okBtn;
-    private ImageView testImg;
-    private TextView testBio;
-    private RadioButton testRadioBtn;
+
+    private List<ImageView> candImgs = new ArrayList<>();
+    private List<TextView> candBios = new ArrayList<>();
+
+    //private RadioButton testRadioBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View fragment = inflater.inflate(R.layout.fragment_candidate_sel, container, false);
         radioGroup = fragment.findViewById(R.id.radio_group);
-        testImg = fragment.findViewById(R.id.testimg);
-        testBio = fragment.findViewById(R.id.text1);
-        testRadioBtn = fragment.findViewById(R.id.radio_clinton);
+        ImageView cand1Img = fragment.findViewById(R.id.cand1Img);
+        TextView cand1Bio = fragment.findViewById(R.id.cand1Info);
+        ImageView cand2Img = fragment.findViewById(R.id.cand2Img);
+        TextView cand2Bio = fragment.findViewById(R.id.cand2Info);
+
+        candImgs.add(cand1Img);
+        candImgs.add(cand2Img);
+        candBios.add(cand1Bio);
+        candBios.add(cand2Bio);
+
+        //testRadioBtn = fragment.findViewById(R.id.radio_clinton);
 
         okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
         okBtn.setOnClickListener(new View.OnClickListener() {
@@ -62,7 +71,8 @@ public class CandidateSelFragment extends DialogFragment {
             }
         });
 
-        getCandidateProfile("bfbachmann", "1");
+        getCandidateProfile("peterdeutsch", 1);
+        getCandidateProfile("Luxi-Zhao", 2);
 
         return fragment;
     }
@@ -93,10 +103,6 @@ public class CandidateSelFragment extends DialogFragment {
             case R.id.radio_trump:
                 candidateID = "2";
                 break;
-
-            case R.id.radio_someoneelse:
-                candidateID = "3";
-                break;
         }
         return candidateID;
     }
@@ -113,7 +119,7 @@ public class CandidateSelFragment extends DialogFragment {
     }
 
 
-    private void getCandidateProfile(String candUserName, String candID) {
+    private void getCandidateProfile(String candUserName, final int candID) {
         RequestQueue queue = Volley.newRequestQueue(getContext());
 
         String url = CAND_INFO_URL + candUserName;
@@ -125,7 +131,7 @@ public class CandidateSelFragment extends DialogFragment {
                     @Override
                     public void onResponse(String response) {
                         Log.v(TAG, response);
-                        processResponse(response);
+                        processResponse(response, candID);
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -141,19 +147,20 @@ public class CandidateSelFragment extends DialogFragment {
     /**
      * Updates bio field and starts getting profile image
      * @param response
+     * @param candID limited to 1 or 2
      */
-    private void processResponse(String response) {
-        JSONObject obj = null;
+    private void processResponse(String response, int candID) {
+        JSONObject obj;
         try {
             obj = new JSONObject(response);
             String bio = obj.getString(Utils.BIO);
             if(!bio.equals("null")) {
-                testBio.setText(bio);
-                Log.v(TAG, "bio is" + bio);
+                candBios.get(candID - 1).setText(bio);
+                Log.v(TAG, "CAND " + candID + " bio is" + bio);
             }
 
             String profile_url = obj.getString(Utils.AVATAR_URL);
-            new ProfilePicTask().execute(profile_url);
+            new ProfilePicTask(candID).execute(profile_url);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -162,7 +169,13 @@ public class CandidateSelFragment extends DialogFragment {
     }
 
 
+    //todo refactor async tasks
     private class ProfilePicTask extends AsyncTask<String, Void, Bitmap> {
+        final int candID;
+
+        ProfilePicTask(int candID) {
+            this.candID = candID;
+        }
         protected Bitmap doInBackground(String... params) {
             try {
                 String urlStr = params[0];
@@ -183,10 +196,14 @@ public class CandidateSelFragment extends DialogFragment {
          * @param b
          */
         protected void onPostExecute(Bitmap b) {
-            if(b != null) {
-               // testImg.setImageBitmap(b);
+            // check if fragment is attached to activity
+            if(b != null && isAdded()) {
+               // cand1Img.setImageBitmap(b);
                 BitmapDrawable bd = new BitmapDrawable(getResources(), b);
-                testRadioBtn.setBackground(bd);
+                candImgs.get(candID - 1).setBackground(bd);
+            }
+            else {
+                Log.v(TAG, "profile img view is null");
             }
         }
     }
