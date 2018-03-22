@@ -51,6 +51,7 @@ import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 public class FaceRecognitionActivity extends AppCompatActivity {
     private static final String TAG = FaceRecognitionActivity.class.getSimpleName();
     SurfaceView surfaceView;
+    FaceOverlay faceOverlay;
     CustomFaceDetector faceDetector;
     CameraSource cs;
     ImageView testImg;
@@ -73,11 +74,13 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         resultTxt = findViewById(R.id.face_recog_result_txt);
 
         surfaceView = findViewById(R.id.face_surface_view);
+        faceOverlay = findViewById(R.id.face_overlay);
         saveDrawableFacesToInternalStorage();
 
         faceDetector = new CustomFaceDetector(new FaceDetector.Builder(this)
                 .setTrackingEnabled(true)
                 .setProminentFaceOnly(true)
+                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .build(), this);
 
 
@@ -100,7 +103,9 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 final SparseArray<Face> faces = detections.getDetectedItems();
                 if (faces.size() > 0) {
                     //todo draw boxes?
-                    Face face = faces.get(0);
+                    Face face = faces.valueAt(0);
+                    //Log.v(TAG, "detector is setting face " + face.getHeight() + " " + face.getWidth());
+                    faceOverlay.setFace(face);
 
                     if(faceDetector.getImgNum() == NUM_CAPTUREDS && performRecog) {
                         Log.v(TAG, "face detector img num is 4, stopping face detection");
@@ -179,20 +184,20 @@ public class FaceRecognitionActivity extends AppCompatActivity {
      * Seems like we can only get 4 good pics, the 5th goes to hell
      * @param
      */
-//    public void showPics(View view) {
-//        cs.release();
-//
-//        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
-//        if(b != null && testImg != null)
-//            testImg.setImageBitmap(b);
-//        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
-//        if(b1 != null && testImg1 != null)
-//            testImg1.setImageBitmap(b1);
-//        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
-//        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
-//        testImg2.setImageBitmap(b2);
-//        testImg3.setImageBitmap(b3);
-//    }
+    public void showPics(View view) {
+        cs.release();
+
+        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
+        if(b != null && testImg != null)
+            testImg.setImageBitmap(b);
+        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
+        if(b1 != null && testImg1 != null)
+            testImg1.setImageBitmap(b1);
+        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
+        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
+        testImg2.setImageBitmap(b2);
+        testImg3.setImageBitmap(b3);
+    }
 
 
 
