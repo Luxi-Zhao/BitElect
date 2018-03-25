@@ -102,7 +102,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
                 final SparseArray<Face> faces = detections.getDetectedItems();
                 if (faces.size() > 0) {
-                    //todo draw boxes?
                     Face face = faces.valueAt(0);
                     //Log.v(TAG, "detector is setting face " + face.getHeight() + " " + face.getWidth());
                     faceOverlay.setFace(face);
@@ -201,7 +200,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
 
 
-    private int recognizeFaces() {
+    private int recognizeFacesOld() {
         Log.v(TAG, "Performing Face Recognition...");
         String trainingDir = this.getFilesDir().getAbsolutePath() + "/" + Utils.TRAIN_DIR;
 
@@ -260,6 +259,10 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         return predictedLabel;
     }
 
+    private int recognizeFaces() {
+        return 0;
+    }
+
     private void showFiles() {
         Log.v(TAG, "FILES in filesdir -------------------");
         File[] files = this.getFilesDir().listFiles();
@@ -307,7 +310,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         @Override
         protected void onPostExecute(final Integer predictedLabel) {
 
-            new CountDownTimer(5000, 1000) {
+            new CountDownTimer(1000, 1000) {
                 String txt = "You are matched with label: " + predictedLabel;
                 public void onTick(long millisUntilFinished) {
                     String tickInfo = txt + " count down " + millisUntilFinished/1000;

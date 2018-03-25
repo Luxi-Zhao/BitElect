@@ -205,7 +205,8 @@ public class MainActivity extends AppCompatActivity {
     //////////////////////////////////////////////////////////////
 
     public void scanQRCode(View view) {
-        Intent intent = new Intent(this, QRCodeActivity.class);
+        //Intent intent = new Intent(this, QRCodeActivity.class); todo change this backckckckk
+        Intent intent = new Intent(this, TestActivity.class);
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
     }
 

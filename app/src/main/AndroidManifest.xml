@@ -40,9 +40,8 @@
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name=".FaceRecognitionActivity">
-
-        </activity>
+        <activity android:name=".FaceRecognitionActivity"></activity>
+        <activity android:name=".TestActivity"></activity>
     </application>
 
 </manifest>
