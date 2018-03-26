@@ -1,0 +1,66 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context="com.example.lucyzhao.votingapp.StepperFragment">
+
+    <LinearLayout
+        android:id="@+id/stepper_circle_ll"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/StepperCircle"
+            android:text="1" />
+
+        <View style="@style/StepperVerticalLine" />
+
+        <TextView
+            style="@style/StepperCircle"
+            android:text="2" />
+
+        <View style="@style/StepperVerticalLine" />
+
+        <TextView
+            style="@style/StepperCircle"
+            android:text="3" />
+
+        <View style="@style/StepperVerticalLine" />
+
+        <TextView
+            style="@style/StepperCircle"
+            android:text="4" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:id="@+id/stepper_labels_ll"
+        android:orientation="vertical">
+
+        <TextView
+            style="@style/StepperLabel"
+            android:layout_marginTop="19dp"
+            android:text="@string/open_conn" />
+
+        <TextView
+            style="@style/StepperLabel"
+            android:text="@string/read_mrz" />
+
+        <TextView
+            style="@style/StepperLabel"
+            android:text="@string/read_passport_photo" />
+
+        <TextView
+            style="@style/StepperLabel"
+            android:text="@string/decode_img" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

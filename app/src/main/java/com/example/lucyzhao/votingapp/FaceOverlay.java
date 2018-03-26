@@ -6,17 +6,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import com.google.android.gms.vision.face.Face;
-import com.google.android.gms.vision.face.Landmark;
-
-import java.util.List;
-
-import static com.google.android.gms.vision.face.Landmark.LEFT_EYE;
 
 /**
  * Created by LucyZhao on 2018/3/6.
@@ -25,10 +19,8 @@ import static com.google.android.gms.vision.face.Landmark.LEFT_EYE;
 public class FaceOverlay extends View {
     private static final String TAG = FaceOverlay.class.getSimpleName();
     private static final int SCALE = 4;
-    private Rect clip;
     private Rect boundary;
-    private int left, top, right, bottom;
-    private int w, h;
+    private int w;
 
     private Paint boundaryPaint;
     private Paint decoPaint;
@@ -57,7 +49,6 @@ public class FaceOverlay extends View {
     }
 
 
-
     /**
      * @param w    Current width of view.
      * @param h    Current height of view.
@@ -69,7 +60,6 @@ public class FaceOverlay extends View {
         super.onSizeChanged(w, h, oldw, oldh);
         boundaryPaint = new Paint();
         decoPaint = new Paint();
-        clip = new Rect();
         boundary = new Rect();
 
         decoPaint.setColor(Color.GREEN);
@@ -79,14 +69,13 @@ public class FaceOverlay extends View {
         boundaryPaint.setStyle(Paint.Style.STROKE);
 
         this.w = w;
-        this.h = h;
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         Face mFace = face;
-        if(mFace == null) {
+        if (mFace == null) {
             Log.v(TAG, "mFace is null");
             return;
         }
@@ -100,18 +89,7 @@ public class FaceOverlay extends View {
         boundary.set(w - left, top, w - right, bot);
         canvas.drawRect(boundary, boundaryPaint);
 
-//        List<Landmark> landmarkList = mFace.getLandmarks();
-//        Log.v(TAG, "lanmakrs size" + landmarkList.size());
-//        for (Landmark landmark : landmarkList) {
-//            int cx = (int) (landmark.getPosition().x * SCALE);
-//            int cy = (int) (landmark.getPosition().y * SCALE);
-//            canvas.drawCircle(w - cx, w - cy, 4, decoPaint);
-//            Log.v(TAG, "cx cy" + cx + "  " + cy);
-//        }
-
     }
-
-
 
 
 }

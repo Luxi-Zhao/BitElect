@@ -33,30 +33,24 @@
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:id="@+id/nfc_progress_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        >
 
-        <TextView
-            android:id="@+id/nfc_result_txt"
-            style="@style/ItemTagText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="10dp" />
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="500dp"
+            android:id="@+id/stepper_frag"/>
 
         <ProgressBar
-            android:id="@+id/nfc_stepper"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="center_horizontal"
-            android:layout_margin="20dp"
-            android:progressTint="@color/colorPrimary" />
-    </LinearLayout>
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@+id/stepper_frag"
+            />
+    </RelativeLayout>
 
 
 </RelativeLayout>

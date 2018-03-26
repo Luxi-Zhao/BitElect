@@ -7,6 +7,10 @@
 
     <string name="scan_passport_prompt">Stick you passport to the back of your phone please</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="open_conn">"Establish connection with NFC chip"</string>
+    <string name="read_mrz">"Read machine readable zone"</string>
+    <string name="read_passport_photo">"Read passport photo"</string>
+    <string name="decode_img">"Decode image"</string>
+    <string name="auth_failed">Authentication failed</string>
+    <string name="reading_failed">Passport reading failed</string>
 </resources>

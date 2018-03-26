@@ -1,5 +1,6 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.FragmentTransaction;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,16 +59,15 @@ public class NFCActivity extends AppCompatActivity {
     private String nfcResult = "";
 
     // UI
+    private LinearLayout nfcInfoLayout;
     private InfoAdapter infoAdapter;
     private List<BioInfo> infoList = new ArrayList<>();
-    private TextView nfcResultTxt;
     private PulsingButton goVoteBtn;
     private ImageView NFCImg;
-    private ProgressBar nfcProgressIndicator;
-    private LinearLayout nfcInfoLayout;
-    private LinearLayout nfcProgressLayout;
 
-    private static final SparseArray<String> progressLables = new SparseArray<>();
+    private RelativeLayout nfcProgressLayout;
+    private StepperFragment stepper;
+
 
     //////////////////////////////////////////////////////////////
     ///////////////////////////CALLBACKS//////////////////////////
@@ -83,17 +84,19 @@ public class NFCActivity extends AppCompatActivity {
         infoRecycler.setLayoutManager(layoutManager);
         infoRecycler.setAdapter(infoAdapter);
 
-        nfcResultTxt = findViewById(R.id.nfc_result_txt);
         goVoteBtn = findViewById(R.id.go_vote_btn);
         goVoteBtn.setVisibility(View.INVISIBLE);
         NFCImg = findViewById(R.id.NFCImage);
 
-        initProgressLabels();
-        nfcProgressIndicator = findViewById(R.id.nfc_stepper);
-        nfcProgressIndicator.setMax(10);
         nfcInfoLayout = findViewById(R.id.nfc_mrz_info);
         nfcInfoLayout.setVisibility(View.GONE);
+
         nfcProgressLayout = findViewById(R.id.nfc_progress_layout);
+        stepper = new StepperFragment();
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.stepper_frag, stepper);
+        transaction.addToBackStack(null);
+        transaction.commit();
 
         // read NFC
         nfcAdapter = NfcAdapter.getDefaultAdapter(this);
@@ -133,16 +136,6 @@ public class NFCActivity extends AppCompatActivity {
     ////////////////////////////PASSPORT//////////////////////////
     //////////////////////////////////////////////////////////////
 
-    private static void initProgressLabels() {
-        progressLables.put(1, "Opening connection with NFC chip");
-        progressLables.put(2, "Reading from your passport");
-        progressLables.put(3, "Reading machine readable zone");
-        progressLables.put(5, "Reading passport photo");
-        progressLables.put(8, "Reading passport photo");
-        progressLables.put(9, "Decoding image");
-        progressLables.put(10, "Done");
-    }
-
 
     private void readPassport(Intent intent) {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
@@ -157,8 +150,6 @@ public class NFCActivity extends AppCompatActivity {
             List<String> techArr = Arrays.asList(tag.getTechList());
             if (techArr.contains(ISODEP_TECH_STRING)) {
                 new ReadPassportTask(birthDate, expDate, docNum, this).execute(tag);
-                //Log.v(TAG, "executing read image task...");
-                //new ReadPassportImgTask(birthDate, expDate, docNum).execute(tag);
             } else {
                 Toast.makeText(this, "please scan a passport", Toast.LENGTH_SHORT).show();
             }
@@ -192,22 +183,20 @@ public class NFCActivity extends AppCompatActivity {
             IsoDep isoTag = IsoDep.get(params[0]);
             CardService cardService = CardService.getInstance(isoTag);
             try {
-                publishProgress(1);
                 BACKey bacKey = new BACKey(docNum, birthDate, expiryDate);
                 PassportService passportService = new PassportService(cardService, 256, 224, false, true);
                 passportService.open();
                 passportService.sendSelectApplet(false);
                 passportService.doBAC(bacKey);
 
-                publishProgress(2);
+                publishProgress(1);
                 InputStream dg1Is = passportService.getInputStream(PassportService.EF_DG1);
                 InputStream dg2Is = passportService.getInputStream(PassportService.EF_DG2);
 
-                publishProgress(3);
                 DG1File dg1File = new DG1File(dg1Is);
-                publishProgress(5);
+                publishProgress(2);
                 DG2File dg2File = new DG2File(dg2Is);
-                publishProgress(8);
+                publishProgress(3);
 
                 NFCData nfcData = new NFCData();
                 nfcData.mrzInfo = dg1File.getMRZInfo();
@@ -222,11 +211,10 @@ public class NFCActivity extends AppCompatActivity {
                 if (!allFaceImageInfos.isEmpty()) {
                     FaceImageInfo faceImageInfo = allFaceImageInfos.get(0);
                     InputStream imgIs = faceImageInfo.getImageInputStream();
-                    publishProgress(9);
+                    publishProgress(4);
                     Bitmap b = ImgDecoder.decodeImage(activity.getApplicationContext(), faceImageInfo.getMimeType(), imgIs);
                     nfcData.passportPic = b;
                 }
-                publishProgress(10);
                 return nfcData;
             } catch (CardServiceException e) {
                 e.printStackTrace();
@@ -241,8 +229,7 @@ public class NFCActivity extends AppCompatActivity {
             NFCActivity activity = activityRef.get();
             if(activity == null || activity.isFinishing()) return;
 
-            activity.nfcResultTxt.setText(progressLables.get(progress[0]));
-            activity.nfcProgressIndicator.setProgress(progress[0]);
+            activity.stepper.setStepCompleted(progress[0]);
         }
 
         protected void onPostExecute(NFCData nfcData) {
@@ -251,14 +238,14 @@ public class NFCActivity extends AppCompatActivity {
 
             if (nfcData == null) {
                 Log.v(TAG, "no data");
-                activity.nfcResultTxt.setText("Passport Reading Failed");
+                activity.stepper.setTaskFailed(activity.getString(R.string.reading_failed));
                 return;
             }
             MRZInfo mrzInfo = nfcData.mrzInfo;
             Bitmap b = nfcData.passportPic;
 
             if (mrzInfo == null) {
-                activity.nfcResultTxt.setText("Authentication Failed");
+                activity.stepper.setTaskFailed(activity.getString(R.string.auth_failed));
                 return;
             }
 
