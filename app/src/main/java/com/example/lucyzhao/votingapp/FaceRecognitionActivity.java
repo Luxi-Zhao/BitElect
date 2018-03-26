@@ -26,61 +26,45 @@ import com.google.android.gms.vision.Detector;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
-import org.bytedeco.javacpp.DoublePointer;
-import org.bytedeco.javacpp.IntPointer;
-import org.bytedeco.javacpp.opencv_core;
-import org.bytedeco.javacpp.opencv_face;
-import org.jmrtd.Util;
-
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Field;
-import java.nio.IntBuffer;
-import java.util.ArrayList;
+import java.lang.ref.WeakReference;
 
 import static com.example.lucyzhao.votingapp.Utils.NUM_CAPTUREDS;
+import static com.example.lucyzhao.votingapp.Utils.PASSPORT_FACE_ID;
+import static com.example.lucyzhao.votingapp.Utils.PASSPORT_SAMPLE_NUM;
 import static com.example.lucyzhao.votingapp.Utils.YOUR_FACE_ID;
 import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_FRONT;
-import static org.bytedeco.javacpp.opencv_core.CV_32SC1;
-import static org.bytedeco.javacpp.opencv_imgcodecs.CV_LOAD_IMAGE_GRAYSCALE;
-import static org.bytedeco.javacpp.opencv_imgcodecs.imread;
 
 
 public class FaceRecognitionActivity extends AppCompatActivity {
     private static final String TAG = FaceRecognitionActivity.class.getSimpleName();
+    private static final int COUNT_DOWN = 5000;
+    private static final float SIM_RATIO_THRESHOLD = (float) 0.4;
     SurfaceView surfaceView;
     FaceOverlay faceOverlay;
     CustomFaceDetector faceDetector;
     CameraSource cs;
-    ImageView testImg;
-    ImageView testImg1;
-    ImageView testImg2;
-    ImageView testImg3;
     TextView resultTxt;
+    PerformRecognitionTask performRecognitionTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
-        clearFiles();
+        Utils.clearFiles(this);
         showFiles();
 
-        testImg = findViewById(R.id.test_face_img);
-        testImg1 = findViewById(R.id.test_face_img1);
-        testImg2 = findViewById(R.id.test_face_img2);
-        testImg3 = findViewById(R.id.test_face_img3);
         resultTxt = findViewById(R.id.face_recog_result_txt);
 
         surfaceView = findViewById(R.id.face_surface_view);
         faceOverlay = findViewById(R.id.face_overlay);
-        saveDrawableFacesToInternalStorage();
+
+        performRecognitionTask = new PerformRecognitionTask(this);
 
         faceDetector = new CustomFaceDetector(new FaceDetector.Builder(this)
                 .setTrackingEnabled(true)
                 .setProminentFaceOnly(true)
-                .setLandmarkType(FaceDetector.ALL_LANDMARKS)
                 .build(), this);
 
 
@@ -103,15 +87,13 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 final SparseArray<Face> faces = detections.getDetectedItems();
                 if (faces.size() > 0) {
                     Face face = faces.valueAt(0);
-                    //Log.v(TAG, "detector is setting face " + face.getHeight() + " " + face.getWidth());
                     faceOverlay.setFace(face);
 
-                    if(faceDetector.getImgNum() == NUM_CAPTUREDS && performRecog) {
+                    if (faceDetector.getImgNum() == NUM_CAPTUREDS && performRecog) {
                         Log.v(TAG, "face detector img num is 4, stopping face detection");
-                        new PerformRecognitionTask().execute();
-                        performRecog= false;
-                    }
-                    else if(performRecog){
+                        performRecognitionTask.execute();
+                        performRecog = false;
+                    } else if (performRecog) {
                         resultTxt.post(new Runnable() {
                             @Override
                             public void run() {
@@ -159,17 +141,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         });
 
 
-
     }
 
-    private void clearFiles() {
-        Log.v(TAG, "-------------deleting all files in training dir");
-        File dir = new File(this.getFilesDir(), Utils.TRAIN_DIR);
-        File[] files = dir.listFiles();
-        for(File file : files) {
-            file.delete();
-        }
-    }
 
     @Override
     protected void onDestroy() {
@@ -178,101 +151,44 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         faceDetector.release();
     }
 
-    /**
-     * FOR DEBUG ONLY
-     * Seems like we can only get 4 good pics, the 5th goes to hell
-     * @param
-     */
-    public void showPics(View view) {
-        cs.release();
+    private static float recognizeFaces(Context context) {
+        Bitmap passportPhoto = Utils.retrieveImg(false,
+                PASSPORT_FACE_ID,
+                PASSPORT_SAMPLE_NUM,
+                context);
 
-        Bitmap b = Utils.retrieveImg(true, YOUR_FACE_ID, "0", getApplicationContext());
-        if(b != null && testImg != null)
-            testImg.setImageBitmap(b);
-        Bitmap b1 = Utils.retrieveImg(true, YOUR_FACE_ID, "1", getApplicationContext());
-        if(b1 != null && testImg1 != null)
-            testImg1.setImageBitmap(b1);
-        Bitmap b2 = Utils.retrieveImg(true, YOUR_FACE_ID,"2", getApplicationContext());
-        Bitmap b3 = Utils.retrieveImg(true, YOUR_FACE_ID,"3", getApplicationContext());
-        testImg2.setImageBitmap(b2);
-        testImg3.setImageBitmap(b3);
-    }
-
-
-
-    private int recognizeFacesOld() {
-        Log.v(TAG, "Performing Face Recognition...");
-        String trainingDir = this.getFilesDir().getAbsolutePath() + "/" + Utils.TRAIN_DIR;
-
-        String testingFilePath = this.getFilesDir().getAbsolutePath()
-                + "/" + Utils.TEST_DIR
-                + "/" + Utils.PASSPORT_FACE_ID
-                + "-face_"
-                + Utils.PASSPORT_SAMPLE_NUM
-                + ".png";
-
-        opencv_core.Mat testImg = imread(testingFilePath, CV_LOAD_IMAGE_GRAYSCALE);
-
-        File trainRoot = new File(trainingDir);
-
-        FilenameFilter pngFilter = new FilenameFilter() {
-            public boolean accept(File dir, String name) {
-                return name.toLowerCase().endsWith(".png");
+        float maxRatio = 0;
+        for (int i = 0; i < NUM_CAPTUREDS; i++) {
+            Bitmap cameraCapture = Utils.retrieveImg(true,
+                    YOUR_FACE_ID,
+                    Integer.toString(i),
+                    context);
+            float ratio = FaceComparer.compareImgs(passportPhoto, cameraCapture);
+            if (ratio > maxRatio) {
+                maxRatio = ratio;
             }
-        };
-
-        File[] imageFiles = trainRoot.listFiles(pngFilter);
-
-        int numImages = imageFiles.length; //todo keep an eye on this!!
-        opencv_core.MatVector images = new opencv_core.MatVector(numImages);
-
-        opencv_core.Mat labels = new opencv_core.Mat(numImages, 1, CV_32SC1);
-        IntBuffer labelsBuf = labels.createBuffer();
-
-        int counter = 0;
-        Log.v(TAG, "loading files...");
-        for (File image : imageFiles) {
-
-            opencv_core.Mat img = imread(image.getAbsolutePath(), CV_LOAD_IMAGE_GRAYSCALE);
-            int faceID = Integer.parseInt(image.getName().split("\\-")[0]);
-            images.put(counter, img);
-            labelsBuf.put(counter, faceID);
-            Log.v(TAG, "training image " + image.getName() + " is read. Person ID " + faceID);
-            counter++;
-
         }
 
-        opencv_face.FaceRecognizer faceRecognizer = opencv_face.LBPHFaceRecognizer.create();
-        faceRecognizer.train(images, labels);
-        Log.v(TAG, "training done");
-
-
-        Log.v(TAG, "predicting test img");
-        IntPointer predictedFaceID = new IntPointer(1);
-        DoublePointer confidence = new DoublePointer(1);
-        faceRecognizer.predict(testImg, predictedFaceID, confidence);
-
-        int predictedLabel = predictedFaceID.get(0);
-        Log.v(TAG, "predicted label is " + predictedLabel);
-        Log.v(TAG, "confidence is: " + confidence.get());
-
-        return predictedLabel;
+        return maxRatio;
     }
 
-    private int recognizeFaces() {
-        return 0;
-    }
 
+
+    /**
+     * FOR DEBUG ONLY
+     */
     private void showFiles() {
         Log.v(TAG, "FILES in filesdir -------------------");
         File[] files = this.getFilesDir().listFiles();
-        Log.d("Files", "Size: "+ files.length);
-        for (int i = 0; i < files.length; i++)
-        {
+        Log.d("Files", "Size: " + files.length);
+        for (int i = 0; i < files.length; i++) {
             Log.d("Files", "FileName:" + files[i].getName());
         }
     }
 
+    /**
+     * Called in onCreate to save assets to internal storage
+     */
     private void saveDrawableFacesToInternalStorage() {
         AssetManager assetManager = this.getAssets();
         try {
@@ -299,33 +215,44 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         }
     }
 
-    //todo make async tasks static to avoid leaks, add weak reference to activity
-    private class PerformRecognitionTask extends AsyncTask<Void, Integer, Integer> {
+    private static class PerformRecognitionTask extends AsyncTask<Void, Integer, Float> {
+        private WeakReference<FaceRecognitionActivity> activityRef;
 
-        @Override
-        protected Integer doInBackground(Void... params) {
-            return recognizeFaces();
+        PerformRecognitionTask(FaceRecognitionActivity context) {
+            activityRef = new WeakReference<>(context);
         }
 
         @Override
-        protected void onPostExecute(final Integer predictedLabel) {
+        protected Float doInBackground(Void... params) {
+            FaceRecognitionActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return (float)0.0;
+            return recognizeFaces(activityRef.get().getApplicationContext());
+        }
 
-            new CountDownTimer(1000, 1000) {
-                String txt = "You are matched with label: " + predictedLabel;
+        @Override
+        protected void onPostExecute(final Float simRatio) {
+
+            new CountDownTimer(COUNT_DOWN, 1000) {
+                String txt = "Similarity ratio: " + simRatio;
+
                 public void onTick(long millisUntilFinished) {
-                    String tickInfo = txt + " count down " + millisUntilFinished/1000;
-                    resultTxt.setText(tickInfo);
+                    FaceRecognitionActivity activity = activityRef.get();
+                    if(activity == null || activity.isFinishing()) return;
+                    String tickInfo = txt + " count down " + millisUntilFinished / 1000;
+                    activity.resultTxt.setText(tickInfo);
+
                 }
 
                 public void onFinish() {
-                    if(predictedLabel == Integer.parseInt(Utils.YOUR_FACE_ID)) {
-                        setResult(Activity.RESULT_OK, new Intent());
-                    }
-                    else {
-                        setResult(Activity.RESULT_CANCELED, new Intent());
+                    FaceRecognitionActivity activity = activityRef.get();
+                    if(activity == null || activity.isFinishing()) return;
+                    if (simRatio > SIM_RATIO_THRESHOLD) {
+                        activity.setResult(Activity.RESULT_OK, new Intent());
+                    } else {
+                        activity.setResult(Activity.RESULT_CANCELED, new Intent());
                     }
 
-                    finish(); //this should release detector
+                    activity.finish(); //this should release detector
                 }
             }.start();
         }

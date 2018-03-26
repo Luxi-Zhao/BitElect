@@ -39,6 +39,7 @@ import org.jmrtd.lds.iso19794.FaceInfo;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -155,7 +156,7 @@ public class NFCActivity extends AppCompatActivity {
             Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             List<String> techArr = Arrays.asList(tag.getTechList());
             if (techArr.contains(ISODEP_TECH_STRING)) {
-                new ReadPassportTask(birthDate, expDate, docNum).execute(tag);
+                new ReadPassportTask(birthDate, expDate, docNum, this).execute(tag);
                 //Log.v(TAG, "executing read image task...");
                 //new ReadPassportImgTask(birthDate, expDate, docNum).execute(tag);
             } else {
@@ -165,22 +166,29 @@ public class NFCActivity extends AppCompatActivity {
         }
     }
 
-    private class NFCData {
-        MRZInfo mrzInfo = null;
-        Bitmap passportPic = null;
-    }
 
-    private class ReadPassportTask extends AsyncTask<Tag, Integer, NFCData> {
+
+    private static class ReadPassportTask extends AsyncTask<Tag, Integer, ReadPassportTask.NFCData> {
+        WeakReference<NFCActivity> activityRef;
         private String birthDate, expiryDate, docNum;
 
-        ReadPassportTask(String birthdate, String expirydate, String docnum) {
+        class NFCData {
+            MRZInfo mrzInfo = null;
+            Bitmap passportPic = null;
+        }
+
+        ReadPassportTask(String birthdate, String expirydate, String docnum, NFCActivity nfcActivity) {
             this.birthDate = birthdate;
             this.expiryDate = expirydate;
             this.docNum = docnum;
+            activityRef = new WeakReference<>(nfcActivity);
         }
 
         @Override
         protected NFCData doInBackground(Tag... params) {
+            NFCActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return null;
+
             IsoDep isoTag = IsoDep.get(params[0]);
             CardService cardService = CardService.getInstance(isoTag);
             try {
@@ -215,7 +223,7 @@ public class NFCActivity extends AppCompatActivity {
                     FaceImageInfo faceImageInfo = allFaceImageInfos.get(0);
                     InputStream imgIs = faceImageInfo.getImageInputStream();
                     publishProgress(9);
-                    Bitmap b = ImgDecoder.decodeImage(getApplicationContext(), faceImageInfo.getMimeType(), imgIs);
+                    Bitmap b = ImgDecoder.decodeImage(activity.getApplicationContext(), faceImageInfo.getMimeType(), imgIs);
                     nfcData.passportPic = b;
                 }
                 publishProgress(10);
@@ -230,26 +238,32 @@ public class NFCActivity extends AppCompatActivity {
 
         @Override
         protected void onProgressUpdate(Integer... progress) {
-            nfcResultTxt.setText(progressLables.get(progress[0]));
-            nfcProgressIndicator.setProgress(progress[0]);
+            NFCActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return;
+
+            activity.nfcResultTxt.setText(progressLables.get(progress[0]));
+            activity.nfcProgressIndicator.setProgress(progress[0]);
         }
 
         protected void onPostExecute(NFCData nfcData) {
+            NFCActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return;
+
             if (nfcData == null) {
                 Log.v(TAG, "no data");
-                nfcResultTxt.setText("Passport Reading Failed");
+                activity.nfcResultTxt.setText("Passport Reading Failed");
                 return;
             }
             MRZInfo mrzInfo = nfcData.mrzInfo;
             Bitmap b = nfcData.passportPic;
 
             if (mrzInfo == null) {
-                nfcResultTxt.setText("Authentication Failed");
+                activity.nfcResultTxt.setText("Authentication Failed");
                 return;
             }
 
-            nfcProgressLayout.setVisibility(View.GONE);
-            nfcInfoLayout.setVisibility(View.VISIBLE);
+            activity.nfcProgressLayout.setVisibility(View.GONE);
+            activity.nfcInfoLayout.setVisibility(View.VISIBLE);
 
             String lastName = mrzInfo.getPrimaryIdentifier().replaceAll("\\W", "");
             String firstName = mrzInfo.getSecondaryIdentifier().replaceAll("\\W", "");
@@ -259,45 +273,49 @@ public class NFCActivity extends AppCompatActivity {
 
             // update info list UI
             enableVoting(String.valueOf(Math.abs(docNumber.hashCode())), mrzInfo);
-            infoList.removeAll(infoList);
-            infoList.add(new BioInfo("Name", lastName + ", " + firstName));
-            infoList.add(new BioInfo(Utils.PASSPORT_NATIONALITY_STR, nationality));
+            activity.infoList.removeAll(activity.infoList);
+
+            activity.infoList.add(activity.new BioInfo("Name", lastName + ", " + firstName));
+            activity.infoList.add(activity.new BioInfo(Utils.PASSPORT_NATIONALITY_STR, nationality));
 
             SimpleDateFormat fromFormat = new SimpleDateFormat("yyMMdd");
             SimpleDateFormat toFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.CANADA);
             try {
                 Date birthDate = fromFormat.parse(mrzInfo.getDateOfBirth());
                 Date expiryDate = fromFormat.parse(mrzInfo.getDateOfExpiry());
-                infoList.add(new BioInfo(Utils.PASSPORT_BIRTHDATE_STR, toFormat.format(birthDate)));
-                infoList.add(new BioInfo("Passport Expiry Date", toFormat.format(expiryDate)));
+                activity.infoList.add(activity.new BioInfo(Utils.PASSPORT_BIRTHDATE_STR, toFormat.format(birthDate)));
+                //activity.infoList.add(activity.new BioInfo("Passport Expiry Date", toFormat.format(expiryDate)));
             } catch (ParseException e) {
                 e.printStackTrace();
             }
 
-            infoList.add(new BioInfo("Personal Number", personalNumber));
-            infoList.add(new BioInfo("Document Number", docNumber));
-            infoAdapter.notifyDataSetChanged();
+            activity.infoList.add(activity.new BioInfo("Personal Number", personalNumber));
+            //activity.infoList.add(activity.new BioInfo("Document Number", docNumber));
+            activity.infoAdapter.notifyDataSetChanged();
 
             // handle bitmap
             if (b == null) {
                 Log.v(TAG, "bitmap is null!!!!!!!");
             } else {
-                NFCImg.setImageBitmap(b);
+                activity.NFCImg.setImageBitmap(b);
             }
         }
 
         private void enableVoting(String nfcResultStr, MRZInfo mrzInfo) {
-            goVoteBtn.setVisibility(View.VISIBLE);
+            NFCActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return;
+
+            activity.goVoteBtn.setVisibility(View.VISIBLE);
             boolean ageEligible = Utils.checkAgeEligibility(mrzInfo.getDateOfBirth());
             boolean nationalityEligible = Utils.checkNationalityEligiblity(mrzInfo.getNationality());
-            infoAdapter.setAgeElibility(ageEligible);
-            infoAdapter.setNationalityElibility(nationalityEligible);
+            activity.infoAdapter.setAgeElibility(ageEligible);
+            activity.infoAdapter.setNationalityElibility(nationalityEligible);
 
             if (ageEligible && nationalityEligible) {
-                goVoteBtn.enablePulsingButton();
-                nfcResult = nfcResultStr;
+                activity.goVoteBtn.enablePulsingButton();
+                activity.nfcResult = nfcResultStr;
             } else {
-                goVoteBtn.setEnabled(false);
+                activity.goVoteBtn.setEnabled(false);
             }
         }
 

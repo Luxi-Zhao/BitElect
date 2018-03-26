@@ -101,7 +101,6 @@ public class QRCodeActivity extends AppCompatActivity {
                     Intent intent = new Intent();
                     intent.putExtra(Utils.QR_RESULT, qrResult);
 
-                    //todo send result.cancelled as well
                     setResult(Activity.RESULT_OK, intent);
                     finish();
                 }

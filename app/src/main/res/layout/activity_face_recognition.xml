@@ -19,43 +19,6 @@
         android:id="@+id/face_overlay"
         android:layout_centerVertical="true"/>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="showPic"
-            android:id="@+id/showPicBtn"
-            android:onClick="showPics"/>
-
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-
-            android:id="@+id/test_face_img"/>
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/test_face_img1"/>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-
-            android:id="@+id/test_face_img2"/>
-
-        <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:id="@+id/test_face_img3"/>
-
-    </LinearLayout>
 
     <TextView
         android:layout_width="wrap_content"

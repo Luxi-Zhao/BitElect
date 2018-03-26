@@ -52,7 +52,6 @@ public class FaceOverlay extends View {
     }
 
     protected void setFace(@NonNull Face face) {
-        Log.v(TAG, "setting face...");
         this.face = face;
         postInvalidate();
     }

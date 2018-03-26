@@ -45,11 +45,11 @@ public class Utils {
     public static final String PASSPORT_FACE_ID = "0";
     public static final String PASSPORT_SAMPLE_NUM = "0";
 
-    public static final String TRAIN_DIR = "train_dir";
-    public static final String TEST_DIR = "test_dir";
+    private static final String TRAIN_DIR = "train_dir";
+    private static final String TEST_DIR = "test_dir";
 
     public static boolean checkNationalityEligiblity(String nationality) {
-        return nationality.equals(ALLOWABLE_NATIONALITY);
+        return true;
     }
 
     /**
@@ -155,5 +155,13 @@ public class Utils {
         return origB;
     }
 
+    public static void clearFiles(Context context) {
+        Log.v(TAG, "-------------deleting all files in training dir");
+        File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
+        File[] files = dir.listFiles();
+        for(File file : files) {
+            file.delete();
+        }
+    }
 
 }

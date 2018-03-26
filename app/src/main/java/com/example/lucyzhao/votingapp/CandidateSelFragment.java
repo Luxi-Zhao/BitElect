@@ -30,6 +30,7 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.ref.WeakReference;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -81,10 +82,9 @@ public class CandidateSelFragment extends DialogFragment {
         String candID = getSelectedCandidateID();
         String candName = getSelectedCandidateName(fragment);
         Log.v(TAG, "cand id is" + candID);
-        if(candID.isEmpty()) {
+        if (candID.isEmpty()) {
             Toast.makeText(getContext(), "Please choose a candidate!", Toast.LENGTH_SHORT).show();
-        }
-        else {
+        } else {
             ((MainActivity) getActivity())
                     .setCandSelTaskCompleted(candID, candName);
             dismiss();
@@ -146,21 +146,22 @@ public class CandidateSelFragment extends DialogFragment {
 
     /**
      * Updates bio field and starts getting profile image
+     *
      * @param response
-     * @param candID limited to 1 or 2
+     * @param candID   limited to 1 or 2
      */
     private void processResponse(String response, int candID) {
         JSONObject obj;
         try {
             obj = new JSONObject(response);
             String bio = obj.getString(Utils.BIO);
-            if(!bio.equals("null")) {
+            if (!bio.equals("null")) {
                 candBios.get(candID - 1).setText(bio);
                 Log.v(TAG, "CAND " + candID + " bio is" + bio);
             }
 
             String profile_url = obj.getString(Utils.AVATAR_URL);
-            new ProfilePicTask(candID).execute(profile_url);
+            new ProfilePicTask(candID, this).execute(profile_url);
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -169,13 +170,15 @@ public class CandidateSelFragment extends DialogFragment {
     }
 
 
-    //todo refactor async tasks
-    private class ProfilePicTask extends AsyncTask<String, Void, Bitmap> {
+    private static class ProfilePicTask extends AsyncTask<String, Void, Bitmap> {
         final int candID;
+        WeakReference<CandidateSelFragment> fragmentRef;
 
-        ProfilePicTask(int candID) {
+        ProfilePicTask(int candID, CandidateSelFragment fragment) {
             this.candID = candID;
+            fragmentRef = new WeakReference<>(fragment);
         }
+
         protected Bitmap doInBackground(String... params) {
             try {
                 String urlStr = params[0];
@@ -193,16 +196,21 @@ public class CandidateSelFragment extends DialogFragment {
 
         /**
          * Display profile image on screen
+         *
          * @param b
          */
         protected void onPostExecute(Bitmap b) {
             // check if fragment is attached to activity
-            if(b != null && isAdded()) {
-               // cand1Img.setImageBitmap(b);
-                BitmapDrawable bd = new BitmapDrawable(getResources(), b);
-                candImgs.get(candID - 1).setBackground(bd);
+            CandidateSelFragment fragment = fragmentRef.get();
+            if (fragment == null || fragment.isDetached() || fragment.isRemoving()) {
+                return;
             }
-            else {
+
+            if (b != null && fragment.isAdded()) {
+                // cand1Img.setImageBitmap(b);
+                BitmapDrawable bd = new BitmapDrawable(fragment.getResources(), b);
+                fragment.candImgs.get(candID - 1).setBackground(bd);
+            } else {
                 Log.v(TAG, "profile img view is null");
             }
         }
