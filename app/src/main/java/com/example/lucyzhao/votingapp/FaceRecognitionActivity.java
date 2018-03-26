@@ -11,14 +11,11 @@ import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
@@ -30,7 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import static com.example.lucyzhao.votingapp.Utils.NUM_CAPTUREDS;
+import static com.example.lucyzhao.votingapp.Utils.NUM_CAPTURES;
 import static com.example.lucyzhao.votingapp.Utils.PASSPORT_FACE_ID;
 import static com.example.lucyzhao.votingapp.Utils.PASSPORT_SAMPLE_NUM;
 import static com.example.lucyzhao.votingapp.Utils.YOUR_FACE_ID;
@@ -56,7 +53,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         showFiles();
 
         resultTxt = findViewById(R.id.face_recog_result_txt);
-
         surfaceView = findViewById(R.id.face_surface_view);
         faceOverlay = findViewById(R.id.face_overlay);
 
@@ -86,18 +82,18 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
                 final SparseArray<Face> faces = detections.getDetectedItems();
                 if (faces.size() > 0) {
-                    Face face = faces.valueAt(0);
+                    final Face face = faces.valueAt(0);
                     faceOverlay.setFace(face);
 
-                    if (faceDetector.getImgNum() == NUM_CAPTUREDS && performRecog) {
-                        Log.v(TAG, "face detector img num is 4, stopping face detection");
+                    if (faceDetector.getImgNum() == NUM_CAPTURES && performRecog) {
+                        Log.v(TAG, "stopping face detection");
                         performRecognitionTask.execute();
                         performRecog = false;
                     } else if (performRecog) {
                         resultTxt.post(new Runnable() {
                             @Override
                             public void run() {
-                                String txt = "Running face detection " + faceDetector.getImgNum();
+                                String txt = "Running face detection " + (faceDetector.getImgNum() + 1);
                                 resultTxt.setText(txt);
                             }
                         });
@@ -158,7 +154,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 context);
 
         float maxRatio = 0;
-        for (int i = 0; i < NUM_CAPTUREDS; i++) {
+        for (int i = 0; i < NUM_CAPTURES; i++) {
             Bitmap cameraCapture = Utils.retrieveImg(true,
                     YOUR_FACE_ID,
                     Integer.toString(i),
@@ -171,7 +167,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         return maxRatio;
     }
-
 
 
     /**
@@ -225,7 +220,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         @Override
         protected Float doInBackground(Void... params) {
             FaceRecognitionActivity activity = activityRef.get();
-            if(activity == null || activity.isFinishing()) return (float)0.0;
+            if (activity == null || activity.isFinishing()) return (float) 0.0;
             return recognizeFaces(activityRef.get().getApplicationContext());
         }
 
@@ -237,15 +232,15 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
                 public void onTick(long millisUntilFinished) {
                     FaceRecognitionActivity activity = activityRef.get();
-                    if(activity == null || activity.isFinishing()) return;
-                    String tickInfo = txt + " count down " + millisUntilFinished / 1000;
+                    if (activity == null || activity.isFinishing()) return;
+                    String tickInfo = txt + "\n Going back in " + millisUntilFinished / 1000 + " seconds";
                     activity.resultTxt.setText(tickInfo);
 
                 }
 
                 public void onFinish() {
                     FaceRecognitionActivity activity = activityRef.get();
-                    if(activity == null || activity.isFinishing()) return;
+                    if (activity == null || activity.isFinishing()) return;
                     if (simRatio > SIM_RATIO_THRESHOLD) {
                         activity.setResult(Activity.RESULT_OK, new Intent());
                     } else {

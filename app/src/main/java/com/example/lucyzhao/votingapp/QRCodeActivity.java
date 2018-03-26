@@ -5,15 +5,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.vision.CameraSource;
 import com.google.android.gms.vision.Detector;
@@ -27,7 +26,6 @@ import java.io.IOException;
  */
 public class QRCodeActivity extends AppCompatActivity {
     private static final String TAG = QRCodeActivity.class.getSimpleName();
-
     private static final int MY_PERMISSIONS_REQUEST_CAMERA = 1100;
 
     SurfaceView surfaceView;
@@ -35,6 +33,8 @@ public class QRCodeActivity extends AppCompatActivity {
     SurfaceHolder surfaceHolder;
     CameraSource cs;
     BarcodeDetector bd;
+
+    String qrResult = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +61,7 @@ public class QRCodeActivity extends AppCompatActivity {
                 if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA)
                         == PackageManager.PERMISSION_GRANTED) {
                     startScanning();
-                }
-                else {
+                } else {
                     Log.v(TAG, "requesting permission");
                     requestPermissions(
                             new String[]{Manifest.permission.CAMERA},
@@ -84,7 +83,6 @@ public class QRCodeActivity extends AppCompatActivity {
 
         //determines when the detector receives a result
         bd.setProcessor(new Detector.Processor<Barcode>() {
-            String qrResult = "no result";
             @Override
             public void release() {
                 Log.v(TAG, "in release");
@@ -92,9 +90,8 @@ public class QRCodeActivity extends AppCompatActivity {
 
             @Override
             public void receiveDetections(Detector.Detections<Barcode> detections) {
-                //todo add delay
                 final SparseArray<Barcode> barcodes = detections.getDetectedItems();
-                if(barcodes.size() > 0) {
+                if (barcodes.size() > 0) {
                     Log.v(TAG, "received result");
                     qrResult = barcodes.valueAt(0).rawValue;
 
@@ -102,7 +99,7 @@ public class QRCodeActivity extends AppCompatActivity {
                     intent.putExtra(Utils.QR_RESULT, qrResult);
 
                     setResult(Activity.RESULT_OK, intent);
-                    finish();
+                    finish();   //finish activity
                 }
             }
         });

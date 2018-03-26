@@ -32,7 +32,11 @@ public class CustomFaceDetector extends Detector<Face> {
 
     // fields used to communicate with calling activity
     private int imgNum = 0;
-    private int timeout = 30;
+
+    private static final int INITIAL_TIMEOUT = 30;
+    private static final int TIMEOUT = 10;
+    private int initialTimeout = INITIAL_TIMEOUT; //number of detections before starting capture
+    private int timeout = TIMEOUT;
 
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
@@ -68,52 +72,71 @@ public class CustomFaceDetector extends Detector<Face> {
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
-        if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTUREDS && timeout <= 0) {
-            Face face = detectedFaces.get(detectedFaces.keyAt(0));
-
-            int width = frame.getMetadata().getWidth();
-            int height = frame.getMetadata().getHeight();
-            int rotation = frame.getMetadata().getRotation();
-            int rotDegree = (rotation % 4) * 90;
-
-            // convert captured frame to bitmap
-            ByteBuffer buf = frame.getGrayscaleImageData();
-            byte[] nv21Bytes = new byte[buf.remaining()];
-            buf.get(nv21Bytes);
-
-            YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 20, baos);
-            byte[] imgBytes = baos.toByteArray();
-            Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
-
-            dumpData(face, frame, bitmap);
-
-            //rotate
-            Matrix matrix = new Matrix();
-            matrix.postRotate(rotDegree);
-            Bitmap rotatedB = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-            try {
-                Log.v(TAG, "saved ");
-                Utils.saveImg(
-                        true,
-                        YOUR_FACE_ID,
-                        Integer.toString(getImgNum()),
-                        rotatedB,
-                        context);
-
-            } catch (IOException e) {
-                e.printStackTrace();
+//        if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTURES && initialTimeout <= 0) {
+//            Face face = detectedFaces.valueAt(0);
+//            retrieveFaceFromCapture(face, frame);
+//        }
+//        else if(initialTimeout > 0) initialTimeout--;
+        if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTURES) {
+            int imgNum = getImgNum();
+            if(imgNum == 0 && initialTimeout > 0) {
+                initialTimeout--;
             }
-
-            setImgNum(getImgNum() + 1);
-
+            else if(imgNum == 0 && initialTimeout <= 0) {
+                Face face = detectedFaces.valueAt(0);
+                retrieveFaceFromCapture(face, frame);
+            }
+            else if(imgNum > 0 && timeout > 0) {
+                timeout--;
+            }
+            else {
+                Face face = detectedFaces.valueAt(0);
+                retrieveFaceFromCapture(face, frame);
+            }
         }
-        timeout--;
         return detectedFaces;
     }
 
+    private void retrieveFaceFromCapture(Face face, Frame frame) {
+        int width = frame.getMetadata().getWidth();
+        int height = frame.getMetadata().getHeight();
+        int rotation = frame.getMetadata().getRotation();
+        int rotDegree = (rotation % 4) * 90;
+
+        // convert captured frame to bitmap
+        ByteBuffer buf = frame.getGrayscaleImageData();
+        byte[] nv21Bytes = new byte[buf.remaining()];
+        buf.get(nv21Bytes);
+
+        YuvImage yuvImage = new YuvImage(nv21Bytes, ImageFormat.NV21, width, height, null);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        yuvImage.compressToJpeg(new Rect(0, 0, yuvImage.getWidth(), yuvImage.getHeight()), 20, baos);
+        byte[] imgBytes = baos.toByteArray();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(imgBytes, 0, imgBytes.length);
+
+        dumpData(face, frame, bitmap);
+
+        //rotate
+        Matrix matrix = new Matrix();
+        matrix.postRotate(rotDegree);
+        Bitmap rotatedB = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+
+        try {
+            Log.v(TAG, "saved ");
+            Utils.saveImg(
+                    true,
+                    YOUR_FACE_ID,
+                    Integer.toString(getImgNum()),
+                    rotatedB,
+                    context);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        setImgNum(getImgNum() + 1);
+        timeout = TIMEOUT;
+    }
 
     @Override
     public boolean isOperational() {
