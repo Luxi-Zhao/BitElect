@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
-    tools:context="com.example.lucyzhao.votingapp.CandidateInfoActivity">
+    tools:context="com.example.lucyzhao.votingapp.CandidateInfoFragment">
 
     <TextView
         style="@style/CandidateConfigTitle"
@@ -70,7 +70,6 @@
         style="@style/MainActivityButtons"
         android:layout_marginTop="30dp"
         android:id="@+id/candidate_config_ok_btn"
-        android:onClick="submitConfig"
         android:text="OK"/>
 
 </LinearLayout>
