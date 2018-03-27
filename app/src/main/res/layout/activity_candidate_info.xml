@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context="com.example.lucyzhao.votingapp.CandidateInfoActivity">
+
+    <TextView
+        style="@style/CandidateConfigTitle"
+        android:text="Candidate Information" />
+
+    <!--- Candidate 1 -->
+
+    <TextView
+        style="@style/CandidateConfigTitle2"
+        android:text="Candidate 1" />
+
+    <LinearLayout
+        style="@style/CandidateConfigInfoBox">
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="First Name: " />
+        <EditText
+            style="@style/CandidateConfigEditText"
+            android:id="@+id/cand1fn"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CandidateConfigInfoBox">
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Last Name: " />
+        <EditText
+            style="@style/CandidateConfigEditText"
+            android:id="@+id/cand1ln"/>
+    </LinearLayout>
+
+    <!--- Candidate 2 -->
+    <TextView
+        style="@style/CandidateConfigTitle2"
+        android:text="Candidate 2"/>
+
+    <LinearLayout
+        style="@style/CandidateConfigInfoBox">
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="First Name: " />
+        <EditText
+            style="@style/CandidateConfigEditText"
+            android:id="@+id/cand2fn"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CandidateConfigInfoBox">
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Last Name: " />
+        <EditText
+            style="@style/CandidateConfigEditText"
+            android:id="@+id/cand2ln"
+            android:imeOptions="actionDone"/>
+    </LinearLayout>
+
+
+    <Button
+        style="@style/MainActivityButtons"
+        android:layout_marginTop="30dp"
+        android:id="@+id/candidate_config_ok_btn"
+        android:onClick="submitConfig"
+        android:text="OK"/>
+
+</LinearLayout>

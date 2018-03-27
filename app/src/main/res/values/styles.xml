@@ -99,4 +99,41 @@
         <item name="android:layout_height">wrap_content</item>
     </style>
 
+    <style name="CandidateConfigTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:layout_marginBottom">20dp</item>
+    </style>
+
+    <style name="CandidateConfigTitle2" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="CandidateConfigTag" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">@color/colorGrey</item>
+    </style>
+
+    <style name="CandidateConfigEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:background">@drawable/edit_text_rect</item>
+        <item name="android:textSize">20sp</item>
+        <item name="android:inputType">textPersonName</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:imeOptions">actionNext</item>
+    </style>
+
+    <style name="CandidateConfigInfoBox" >
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">10dp</item>
+    </style>
+
 </resources>

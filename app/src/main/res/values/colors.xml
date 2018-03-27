@@ -7,12 +7,6 @@
     <color name="colorAccent">#87001b</color>
 
     <color name="colorQROverlay">#801e1404</color>
-    <!--<color name="colorBtnShade1">#1f096690</color>-->
-    <!--<color name="colorBtnShade2">#1f3e90b4</color>-->
-    <!--<color name="colorBtnShade3">#1f79bcdb</color>-->
-    <!--<color name="colorBtnShade4">#1fb3f3fc</color>-->
-    <!--<color name="colorBtnShade5">#1f54adb3</color>-->
-    <!--<color name="colorBtnCompleted">#66bb6a</color>-->
 
     <color name="colorBtnShade1">#38f0dfcd</color>
     <color name="colorBtnShade2">#1fd4ac6e</color>
@@ -20,6 +14,8 @@
     <color name="colorBtnShade4">#1fe1cc81</color>
     <color name="colorBtnShade5">#33826f10</color>
     <color name="colorBtnCompleted">#1b5100</color>
+
+    <color name="colorGrey">#616161</color>
 
     <array name="btnColors">
         <item>@color/colorBtnShade1</item>

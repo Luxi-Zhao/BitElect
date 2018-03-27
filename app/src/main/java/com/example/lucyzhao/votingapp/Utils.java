@@ -13,7 +13,9 @@ import com.google.android.gms.vision.face.FaceDetector;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Calendar;
+import java.util.Random;
 
 /**
  * Created by LucyZhao on 2018/3/8.
@@ -24,10 +26,13 @@ public class Utils {
     public static final String QR_RESULT = "qr_result";
     public static final String NFC_RESULT = "nfc_result";
 
+    /*----------- DE1-SOC COMM --------------*/
+    public static final String VOTING_URL = "http://192.168.43.27/?";
     public static final String COMM_NFC_ID = "NFCID";
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
 
+    /*----------- GitHub --------------*/
     public static final String AVATAR_URL = "avatar_url";
     public static final String NAME = "name";
     public static final String BIO = "bio";
@@ -35,7 +40,6 @@ public class Utils {
     public static final String PASSPORT_BIRTHDATE_STR = "Birthdate";
     public static final String PASSPORT_NATIONALITY_STR = "Nationality";
     public static final String ALLOWABLE_NATIONALITY = "CHN";
-
     public static final int ALLOWABLE_AGE = 18;
 
     public static final int NUM_CAPTURES = 4;
@@ -47,6 +51,11 @@ public class Utils {
 
     private static final String TRAIN_DIR = "train_dir";
     private static final String TEST_DIR = "test_dir";
+
+
+    ///////////////////////////////////////////////////////////////////////
+    /////////////////////////ELIGIBILITY CHECKING//////////////////////////
+    ///////////////////////////////////////////////////////////////////////
 
     public static boolean checkNationalityEligiblity(String nationality) {
         return true;
@@ -74,6 +83,19 @@ public class Utils {
         return age >= ALLOWABLE_AGE;
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////IMG/FILE SAVING/////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
+    public static void clearFiles(Context context) {
+        Log.v(TAG, "-------------deleting all files in training dir");
+        File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
+        File[] files = dir.listFiles();
+        for (File file : files) {
+            file.delete();
+        }
+    }
+
     /**
      * @param sampleNumber in the form of 1,2,3
      * @param bitmap
@@ -82,7 +104,7 @@ public class Utils {
      */
     public static void saveImg(boolean training, String faceID, String sampleNumber, Bitmap bitmap, Context context) throws IOException {
         bitmap = cropFace(bitmap, context);
-        if(bitmap == null) return;
+        if (bitmap == null) return;
         String filename = faceID + "-face_" + sampleNumber + ".png";
         Log.v(TAG, "saving image..." + filename + " for training? " + training);
 
@@ -122,6 +144,10 @@ public class Utils {
         return b;
     }
 
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////IMG MANIPULATION////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
     public static Bitmap cropFace(Bitmap origB, Context context) {
         FaceDetector faceDetector = new
                 FaceDetector.Builder(context).setTrackingEnabled(false)
@@ -132,22 +158,21 @@ public class Utils {
         }
         Frame frame = new Frame.Builder().setBitmap(origB).build();
         SparseArray<Face> faces = faceDetector.detect(frame);
-        if(faces.size() > 0) {
+        if (faces.size() > 0) {
             Face face = faces.valueAt(0);
             int x1 = (int) face.getPosition().x;
             int y1 = (int) face.getPosition().y;
             float x2 = x1 + face.getWidth();
             float y2 = y1 + face.getHeight();
 
-            if(x1 > 0
+            if (x1 > 0
                     && y1 > 0
                     && x2 < frame.getMetadata().getWidth()
                     && y2 < frame.getMetadata().getHeight()
                     ) {
                 Log.v(TAG, "face cropped");
                 origB = Bitmap.createBitmap(origB, x1, y1, (int) face.getWidth(), (int) face.getHeight());
-            }
-            else {
+            } else {
                 Log.v(TAG, "face out of bound, orig img returned");
             }
 
@@ -156,13 +181,31 @@ public class Utils {
         return origB;
     }
 
-    public static void clearFiles(Context context) {
-        Log.v(TAG, "-------------deleting all files in training dir");
-        File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
-        File[] files = dir.listFiles();
-        for(File file : files) {
-            file.delete();
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////ENCRYPTION//////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+    public static String encryptVote(int candidateID) {
+        int zeroindex = candidateID - 1;
+
+        Random rand = new Random();
+
+        BigInteger publicKey = BigInteger.valueOf(13969);
+        BigInteger publicKeysq = publicKey.pow(2);
+        BigInteger plainText = BigInteger.valueOf(zeroindex);
+
+        BigInteger num;
+
+        while (true) {
+            num = new BigInteger((int) Math.round(Math.log(publicKey.doubleValue()) / Math.log(2)), 10, rand);
+            if (num.compareTo(BigInteger.ZERO) == 1 && num.compareTo(publicKey) == -1) {
+                break;
+            }
         }
+
+        BigInteger temp = num.modPow(publicKey, publicKeysq);
+        BigInteger cipher = publicKey.add(BigInteger.valueOf(1)).modPow(plainText, publicKeysq).multiply(temp).mod(publicKeysq);
+
+        return Integer.toString(cipher.intValue());
     }
 
 }
