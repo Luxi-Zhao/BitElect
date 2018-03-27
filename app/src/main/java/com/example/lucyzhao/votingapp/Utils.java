@@ -97,6 +97,18 @@ public class Utils {
     }
 
     /**
+     * FOR DEBUG ONLY
+     */
+    public static void showFiles(Context context) {
+        Log.v(TAG, "FILES in filesdir -------------------");
+        File[] files = context.getFilesDir().listFiles();
+        Log.d("Files", "Size: " + files.length);
+        for (int i = 0; i < files.length; i++) {
+            Log.d("Files", "FileName:" + files[i].getName());
+        }
+    }
+
+    /**
      * @param sampleNumber in the form of 1,2,3
      * @param bitmap
      * @param context

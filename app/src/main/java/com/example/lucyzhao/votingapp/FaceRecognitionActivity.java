@@ -4,10 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -50,7 +47,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_face_recognition);
         Utils.clearFiles(this);
-        showFiles();
+        Utils.showFiles(this);
 
         resultTxt = findViewById(R.id.face_recog_result_txt);
         surfaceView = findViewById(R.id.face_surface_view);
@@ -168,47 +165,6 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         return maxRatio;
     }
 
-
-    /**
-     * FOR DEBUG ONLY
-     */
-    private void showFiles() {
-        Log.v(TAG, "FILES in filesdir -------------------");
-        File[] files = this.getFilesDir().listFiles();
-        Log.d("Files", "Size: " + files.length);
-        for (int i = 0; i < files.length; i++) {
-            Log.d("Files", "FileName:" + files[i].getName());
-        }
-    }
-
-    /**
-     * Called in onCreate to save assets to internal storage
-     */
-    private void saveDrawableFacesToInternalStorage() {
-        AssetManager assetManager = this.getAssets();
-        try {
-            String[] files = assetManager.list(Utils.INTERNET_FACES_PATH);
-
-            for (String file : files) {
-                Log.v(TAG, "internet files opening:  " + file);
-                String pathname = Utils.INTERNET_FACES_PATH + "/" + file;
-                BitmapDrawable d = (BitmapDrawable) Drawable.createFromStream(assetManager.open(pathname), null);
-
-                String faceID = file.split("\\-")[0];
-                Log.v(TAG, "saving internet face with id " + faceID);
-                String namewopng = file.split("\\.")[0];
-                String sampleNumber = Character.toString(namewopng.charAt(namewopng.length() - 1));
-                Utils.saveImg(
-                        true,
-                        faceID,
-                        sampleNumber,
-                        d.getBitmap(),
-                        this);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
 
     private static class PerformRecognitionTask extends AsyncTask<Void, Integer, Float> {
         private WeakReference<FaceRecognitionActivity> activityRef;
