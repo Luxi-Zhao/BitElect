@@ -1,12 +1,25 @@
 package com.example.lucyzhao.votingapp;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
+import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
 
 public class CandidateInfoActivity extends AppCompatActivity {
     private static final String TAG = CandidateInfoActivity.class.getSimpleName();
@@ -36,24 +49,47 @@ public class CandidateInfoActivity extends AppCompatActivity {
         String cand2LastNameStr = cand2LastName.getText().toString();
         String cand2FirstNameStr = cand2FirstName.getText().toString();
 
-        if(checkFields(cand1FirstNameStr, cand1LastNameStr, cand2FirstNameStr, cand2LastNameStr)) {
-            sendConfig();
-        }
-        else {
+        if (checkFields(cand1FirstNameStr, cand1LastNameStr, cand2FirstNameStr, cand2LastNameStr)) {
+            sendConfig(cand1LastNameStr, cand1FirstNameStr, cand2LastNameStr, cand2FirstNameStr);
+        } else {
             Toast.makeText(getApplicationContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
         }
         Log.v(TAG, cand1FirstNameStr);
     }
 
-    private void sendConfig() {
+    private void sendConfig(String cand1LN, String cand1FN, String cand2LN, String cand2FN) {
+        RequestQueue queue = Volley.newRequestQueue(this);
 
+        String url = VOTING_URL
+                + COMM_CAND1_FN + "=" + cand1FN + "&"
+                + COMM_CAND1_LN + "=" + cand1LN + "&"
+                + COMM_CAND2_FN + "=" + cand2FN + "&"
+                + COMM_CAND2_LN + "=" + cand2LN;
+
+        Log.v(TAG, "url is: " + url);
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        //todo
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                //todo
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(stringRequest);
     }
 
 
     private boolean checkFields(String s1, String s2, String s3, String s4) {
-        if(s1.isEmpty() || s2.isEmpty() || s3.isEmpty() || s4.isEmpty()) {
+        if (s1.isEmpty() || s2.isEmpty() || s3.isEmpty() || s4.isEmpty()) {
             return false;
-        }
-        else return true;
+        } else return true;
     }
 }

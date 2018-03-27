@@ -32,6 +32,11 @@ public class Utils {
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
 
+    public static final String COMM_CAND1_FN = "CAND1FN";
+    public static final String COMM_CAND1_LN = "CAND1LN";
+    public static final String COMM_CAND2_FN = "CAND2FN";
+    public static final String COMM_CAND2_LN = "CAND2LN";
+
     /*----------- GitHub --------------*/
     public static final String AVATAR_URL = "avatar_url";
     public static final String NAME = "name";
