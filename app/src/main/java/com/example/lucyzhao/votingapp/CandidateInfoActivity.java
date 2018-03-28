@@ -1,11 +1,9 @@
 package com.example.lucyzhao.votingapp;
 
-import android.app.Fragment;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -23,8 +21,8 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
 
-public class CandidateInfoFragment extends Fragment {
-    private static final String TAG = CandidateInfoFragment.class.getSimpleName();
+public class CandidateInfoActivity extends NavActivity {
+    private static final String TAG = CandidateInfoActivity.class.getSimpleName();
     private Button okBtn;
 
     private EditText cand1LastName;
@@ -32,22 +30,17 @@ public class CandidateInfoFragment extends Fragment {
     private EditText cand2LastName;
     private EditText cand2FirstName;
 
-
-    public CandidateInfoFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        final View fragment = inflater.inflate(R.layout.fragment_candidate_info, container, false);
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        super.onCreateDrawer(R.layout.activity_candidate_info);
 
-        okBtn = fragment.findViewById(R.id.candidate_config_ok_btn);
+        okBtn = findViewById(R.id.candidate_config_ok_btn);
 
-        cand1LastName = fragment.findViewById(R.id.cand1ln);
-        cand1FirstName = fragment.findViewById(R.id.cand1fn);
-        cand2LastName = fragment.findViewById(R.id.cand2ln);
-        cand2FirstName = fragment.findViewById(R.id.cand2fn);
+        cand1LastName = findViewById(R.id.cand1ln);
+        cand1FirstName = findViewById(R.id.cand1fn);
+        cand2LastName = findViewById(R.id.cand2ln);
+        cand2FirstName = findViewById(R.id.cand2fn);
 
         okBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,18 +53,16 @@ public class CandidateInfoFragment extends Fragment {
                 if (checkFields(cand1FirstNameStr, cand1LastNameStr, cand2FirstNameStr, cand2LastNameStr)) {
                     sendConfig(cand1LastNameStr, cand1FirstNameStr, cand2LastNameStr, cand2FirstNameStr);
                 } else {
-                    Toast.makeText(fragment.getContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
                 Log.v(TAG, cand1FirstNameStr);
             }
         });
-        return fragment;
     }
 
 
-
     private void sendConfig(String cand1LN, String cand1FN, String cand2LN, String cand2FN) {
-        RequestQueue queue = Volley.newRequestQueue(getContext());
+        RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = VOTING_URL
                 + COMM_CAND1_FN + "=" + cand1FN + "&"

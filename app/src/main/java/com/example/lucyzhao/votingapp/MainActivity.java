@@ -37,7 +37,7 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends NavActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static final int QR_ACTIVITY_REQ_CODE = 111;
     private static final int FACE_ACTIVITY_REQ_CODE = 250;
@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        super.onCreateDrawer(R.layout.activity_main);
         Log.v(TAG, "in onCreate");
 
         // UI elements

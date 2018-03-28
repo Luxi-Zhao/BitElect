@@ -37,14 +37,8 @@
         <activity android:name=".FaceRecognitionActivity" />
         <activity android:name=".TestActivity" />
 
-        <meta-data
-            android:name="preloaded_fonts"
-            android:resource="@array/preloaded_fonts" />
-
-        <activity
-            android:name=".HomeActivity"
-            android:label="@string/title_activity_home"
-            android:theme="@style/AppTheme">
+        <activity android:name=".NavActivity"></activity>
+        <activity android:name=".CandidateInfoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

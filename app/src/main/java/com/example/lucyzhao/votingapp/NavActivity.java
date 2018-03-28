@@ -1,28 +1,26 @@
 package com.example.lucyzhao.votingapp;
 
-import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.view.View;
+import android.content.Intent;
+import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
 
-public class HomeActivity extends AppCompatActivity
+import org.bytedeco.javacv.Frame;
+
+public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    DrawerLayout drawer;
+    protected void onCreateDrawer(@LayoutRes int layoutResID) {
         setContentView(R.layout.activity_home);
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-
+        drawer = findViewById(R.id.drawer_layout);
+        FrameLayout content = findViewById(R.id.nav_content_frame);
+        getLayoutInflater().inflate(layoutResID, content, true);
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -42,25 +40,22 @@ public class HomeActivity extends AppCompatActivity
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_vote) {
+            startActivity(new Intent(this, MainActivity.class));
+            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
+            finish();
+        } else if (id == R.id.nav_poll_result) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_blockchain) {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_config) {
+            startActivity(new Intent(this, CandidateInfoActivity.class));
+            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
+            finish();
         }
-
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
 }
