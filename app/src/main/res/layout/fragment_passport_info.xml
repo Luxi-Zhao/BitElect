@@ -1,37 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:padding="20dp">
 
-
-    <EditText
-        android:id="@+id/passport_num_edit_text"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Passport Number" />
+        android:id="@+id/passport_info_layout"
+        android:orientation="vertical">
+        <EditText
+            android:id="@+id/passport_num_edit_text"
+            style="@style/PassportInfoEditText"
+            android:hint="Passport Number" />
 
-    <EditText
-        android:id="@+id/birthdate_edit_text"
+        <EditText
+            android:id="@+id/birthdate_edit_text"
+            style="@style/PassportInfoEditText"
+            android:hint="Birth Date: yymmdd"
+            android:inputType="date" />
+
+        <EditText
+            android:id="@+id/expirydate_edit_text"
+            style="@style/PassportInfoEditText"
+            android:imeOptions="actionDone"
+            android:hint="Expiry Date: yymmdd"
+            android:inputType="date" />
+
+
+        <Button
+            android:id="@+id/save_info_ok_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="OK" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Birth Date: yymmdd"
-        android:inputType="date" />
-
-    <EditText
-        android:id="@+id/expirydate_edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Expiry Date: yymmdd"
-        android:inputType="date" />
-
-
-    <Button
-        android:id="@+id/save_info_ok_btn"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="OK" />
+        android:layout_centerVertical="true"
+        android:id="@+id/passport_scan_prompt_layout"
+        android:layout_height="wrap_content">
+        <ImageView
+            android:layout_width="70dp"
+            android:layout_height="80dp"
+            android:background="@drawable/nfc_scan"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/scan_passport_prompt"
+            android:paddingLeft="20dp"
+            android:textSize="20sp"/>
+    </LinearLayout>
 
 
-</LinearLayout>
+
+</RelativeLayout>

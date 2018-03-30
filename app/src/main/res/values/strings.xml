@@ -5,7 +5,7 @@
     <string name="shared_pref_birthdate">passportBirthdate</string>
     <string name="shared_pref_expirydate">passportExpirydate</string>
 
-    <string name="scan_passport_prompt">Stick you passport to the back of your phone please</string>
+    <string name="scan_passport_prompt">Stick your passport to the back of your phone please</string>
 
     <string name="open_conn">"Establish connection with NFC chip"</string>
     <string name="read_mrz">"Read machine readable zone"</string>

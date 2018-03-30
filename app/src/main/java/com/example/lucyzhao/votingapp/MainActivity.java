@@ -26,6 +26,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.vision.text.Line;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -327,10 +328,17 @@ public class MainActivity extends NavActivity {
         private EditText docNum;
         private Button okBtn;
 
+        private LinearLayout infoLayout;
+        private LinearLayout promptLayout;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View fragment = inflater.inflate(R.layout.fragment_passport_info, container, false);
+            infoLayout = fragment.findViewById(R.id.passport_info_layout);
+            promptLayout = fragment.findViewById(R.id.passport_scan_prompt_layout);
+            promptLayout.setVisibility(View.GONE);
+
             birthDate = fragment.findViewById(R.id.birthdate_edit_text);
             expiryDate = fragment.findViewById(R.id.expirydate_edit_text);
             docNum = fragment.findViewById(R.id.passport_num_edit_text);
@@ -349,7 +357,8 @@ public class MainActivity extends NavActivity {
 
                     ((MainActivity) getActivity())
                             .setEnterPassportInfoTaskCompleted(docNumStr, birthDateStr, expiryDateStr);
-                    dismiss();
+                    infoLayout.setVisibility(View.INVISIBLE);
+                    promptLayout.setVisibility(View.VISIBLE);
                 }
             });
 

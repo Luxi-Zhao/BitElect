@@ -10,30 +10,29 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorBackground"
         android:orientation="vertical"
-        android:padding="30dp">
+        android:padding="40dp">
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+        <!--<LinearLayout-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:layout_gravity="center_horizontal"-->
+            <!--android:orientation="vertical">-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="It's time to"
-                android:textColor="#fefefe"
-                android:textSize="40sp" />
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="It's time to"-->
+                <!--android:textColor="#fefefe"-->
+                <!--android:textSize="40sp" />-->
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="VOTE"
-                android:textColor="#ffffff"
-                android:textSize="70sp" />
-        </LinearLayout>
+            <!--<TextView-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="VOTE"-->
+                <!--android:textColor="#ffffff"-->
+                <!--android:textSize="70sp" />-->
+        <!--</LinearLayout>-->
 
         <LinearLayout
             android:id="@+id/task_layout"
@@ -67,7 +66,7 @@
                 android:id="@+id/task3btn"
                 style="@style/MainActivityButtons"
                 android:onClick="scanFacePrompt"
-                android:text="Scan your face" />
+                android:text="Facial recognition" />
 
             <View
                 android:id="@+id/line_3"
