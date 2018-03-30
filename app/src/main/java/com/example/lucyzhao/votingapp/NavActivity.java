@@ -11,6 +11,11 @@ import android.widget.FrameLayout;
 
 import org.bytedeco.javacv.Frame;
 
+/**
+ * Base activity that provides the Navigation Drawer
+ * Activities extending this layout should call
+ * super.onCreateDrawer(R.layout.activity_layout) instead of setContentView
+ */
 public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -47,7 +52,9 @@ public class NavActivity extends AppCompatActivity
             overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
             finish();
         } else if (id == R.id.nav_poll_result) {
-
+            startActivity(new Intent(this, PollResultActivity.class));
+            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
+            finish();
         } else if (id == R.id.nav_blockchain) {
 
         } else if (id == R.id.nav_config) {

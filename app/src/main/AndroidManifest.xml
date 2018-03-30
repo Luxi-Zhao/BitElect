@@ -17,7 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
+        <activity android:name=".MainActivity" />
         <activity android:name=".QRCodeActivity" />
         <activity
             android:name=".NFCActivity"
@@ -36,8 +36,7 @@
         </activity>
         <activity android:name=".FaceRecognitionActivity" />
         <activity android:name=".TestActivity" />
-
-        <activity android:name=".NavActivity"></activity>
+        <activity android:name=".NavActivity" />
         <activity android:name=".CandidateInfoActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -45,6 +44,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".PollResultActivity"></activity>
     </application>
 
 </manifest>
