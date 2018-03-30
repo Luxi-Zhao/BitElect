@@ -237,7 +237,7 @@ public class MainActivity extends AppCompatActivity {
 
         String encryptedCandidateID = Utils.encryptVote(Integer.valueOf(myVote.getCandidateID()));
 
-        String url = VOTING_URL + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
+        String url = VOTING_URL + "REQUESTTYPE=VOTEREQUEST &" + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
                 + COMM_NFC_ID + "=" + myVote.getNfcID() + "&"
                 + COMM_CANDIDATE_ID + "=" + encryptedCandidateID;
         Log.v(TAG, "url is: " + url);
@@ -247,7 +247,7 @@ public class MainActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //todo
+                        Log.v(TAG,response);
                     }
                 }, new Response.ErrorListener() {
             @Override

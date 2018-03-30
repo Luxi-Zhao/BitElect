@@ -15,10 +15,14 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
 
 public class CandidateInfoActivity extends AppCompatActivity {
@@ -61,6 +65,8 @@ public class CandidateInfoActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 
         String url = VOTING_URL
+                + "REQUESTTYPE=CONFIGREQUEST&"
+                + COMM_NFC_ID + "=" + "1234" + "&"
                 + COMM_CAND1_FN + "=" + cand1FN + "&"
                 + COMM_CAND1_LN + "=" + cand1LN + "&"
                 + COMM_CAND2_FN + "=" + cand2FN + "&"
@@ -73,19 +79,52 @@ public class CandidateInfoActivity extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        //todo
+                        Log.v(TAG,"RESPONSE:"+response);
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //todo
+                //No Response
             }
         });
 
         // Add the request to the RequestQueue.
         queue.add(stringRequest);
+
+        url = VOTING_URL;
+
+        // Request a string response from the provided URL.
+        StringRequest infoRequest = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.v(TAG,"RESPONSE:"+response);
+                        readResponse(response);
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.v(TAG,"ERROR" + error.toString());
+
+            }
+        });
+
+        // Add the request to the RequestQueue.
+        queue.add(infoRequest);
     }
 
+
+    private void readResponse(String response){
+        try{
+            JSONObject jsonObj = new JSONObject(response);
+            String configResponse = jsonObj.getString("CONFIGACCEPTED");
+
+            Toast.makeText(getApplicationContext(), "Response:" + configResponse, Toast.LENGTH_SHORT).show();
+        } catch (JSONException e){
+            Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+        }
+
+    }
 
     private boolean checkFields(String s1, String s2, String s3, String s4) {
         if (s1.isEmpty() || s2.isEmpty() || s3.isEmpty() || s4.isEmpty()) {
