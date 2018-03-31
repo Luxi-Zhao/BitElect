@@ -14,12 +14,22 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
+import com.koushikdutta.async.future.Future;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
+import static java.lang.Thread.sleep;
 
 public class CandidateInfoActivity extends NavActivity {
     private static final String TAG = CandidateInfoActivity.class.getSimpleName();
@@ -29,6 +39,9 @@ public class CandidateInfoActivity extends NavActivity {
     private EditText cand1FirstName;
     private EditText cand2LastName;
     private EditText cand2FirstName;
+
+    private String httpResponseText;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -63,31 +76,62 @@ public class CandidateInfoActivity extends NavActivity {
 
     private void sendConfig(String cand1LN, String cand1FN, String cand2LN, String cand2FN) {
         RequestQueue queue = Volley.newRequestQueue(this);
+        httpResponseText = "";
 
         String url = VOTING_URL
+                + "REQUESTTYPE=CONFIGREQUEST&"
+                + COMM_NFC_ID + "=" + "1234" + "&"
                 + COMM_CAND1_FN + "=" + cand1FN + "&"
                 + COMM_CAND1_LN + "=" + cand1LN + "&"
                 + COMM_CAND2_FN + "=" + cand2FN + "&"
                 + COMM_CAND2_LN + "=" + cand2LN;
 
+        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + "1234";
         Log.v(TAG, "url is: " + url);
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //todo
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //todo
-            }
-        });
+        JsonObject json = null;
 
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        int retryCounter = 0;
+
+        try{
+            json = Ion.with(getApplicationContext()).load(url).asJsonObject().get();
+            Log.v(TAG, "output is: " + json.toString());
+
+            while(json.get("RESPONSETYPE").toString().equals("\"NULL\"")){
+                sleep(100);
+                json = Ion.with(getApplicationContext()).load(cleanurl).asJsonObject().get();
+                Log.v(TAG, "output is: " + json.toString());
+
+                retryCounter++;
+                Log.v(TAG, "count:" + retryCounter);
+
+                if(retryCounter > 5){
+                    Log.v(TAG, "Retried 5 times!");
+                    throw new RuntimeException();
+                }
+            }
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+        }
+
+        if(json != null){
+            try {
+                String configResponse = json.get("CONFIGACCEPTED").toString();
+                Log.v(TAG, "configacc is: " + configResponse);
+
+                if (configResponse.equals("\"T\"")) {
+                    Toast.makeText(getApplicationContext(), "Configuration Successful!", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getApplicationContext(), "Configuration Unsuccessful!", Toast.LENGTH_SHORT).show();
+                }
+            }
+            catch(Exception e){
+                Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+            }
+        } else{
+            Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 

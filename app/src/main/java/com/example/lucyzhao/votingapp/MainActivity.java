@@ -27,6 +27,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
+import com.koushikdutta.ion.Ion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +37,7 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_QR_CODE;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
+import static java.lang.Thread.sleep;
 
 public class MainActivity extends NavActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
@@ -307,30 +310,57 @@ public class MainActivity extends NavActivity {
 
         String encryptedCandidateID = Utils.encryptVote(Integer.valueOf(myVote.getCandidateID()));
 
-        String url = VOTING_URL + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
+        String url = VOTING_URL + "REQUESTTYPE=VOTEREQUEST&" + COMM_QR_CODE + "=" + myVote.getQrCode() + "&"
                 + COMM_NFC_ID + "=" + myVote.getNfcID() + "&"
                 + COMM_CANDIDATE_ID + "=" + encryptedCandidateID;
         Log.v(TAG, "url is: " + url);
 
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //todo
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                //todo
+        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + myVote.getNfcID();
+
+        JsonObject json = null;
+        int retryCounter = 0;
+
+        try{
+            json = Ion.with(getApplicationContext()).load(url).asJsonObject().get();
+            Log.v(TAG, "output is: " + json.toString());
+
+            while(json.get("RESPONSETYPE").toString().equals("\"NULL\"")){
+                sleep(100);
+                json = Ion.with(getApplicationContext()).load(cleanurl).asJsonObject().get();
+                Log.v(TAG, "output is: " + json.toString());
+
+                retryCounter++;
+                Log.v(TAG, "count:" + retryCounter);
+
+                if(retryCounter > 5){
+                    Log.v(TAG, "Retried 5 times!");
+                    throw new RuntimeException();
+                }
             }
-        });
+        } catch (Exception e){
+            Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+        }
 
-        // Add the request to the RequestQueue.
-        queue.add(stringRequest);
+        if(json != null){
+            try {
+                String configResponse = json.get("VOTEACCEPTED").toString();
+                Log.v(TAG, "acceptstring is: " + configResponse);
 
-        // UI
-        setVotingTaskCompleted();
+                if (configResponse.equals("\"T\"")) {
+                    Toast.makeText(getApplicationContext(), "Vote Confirmed!", Toast.LENGTH_SHORT).show();
+                    // UI
+                    setVotingTaskCompleted();
+                } else {
+                    String rejectionReason = json.get("REJECTIONMESSAGE").toString();
+                    Toast.makeText(getApplicationContext(), "Vote Denied! " + rejectionReason, Toast.LENGTH_SHORT).show();
+                }
+            }
+            catch(Exception e){
+                Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+            }
+        } else{
+            Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+        }
     }
 
 

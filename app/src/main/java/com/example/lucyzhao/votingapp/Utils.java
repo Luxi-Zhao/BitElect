@@ -27,7 +27,7 @@ public class Utils {
     public static final String NFC_RESULT = "nfc_result";
 
     /*----------- DE1-SOC COMM --------------*/
-    public static final String VOTING_URL = "http://192.168.43.27/?";
+    public static final String VOTING_URL = "http://192.168.1.16/?";
     public static final String COMM_NFC_ID = "NFCID";
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
@@ -96,8 +96,10 @@ public class Utils {
         Log.v(TAG, "-------------deleting all files in training dir");
         File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
         File[] files = dir.listFiles();
-        for (File file : files) {
-            file.delete();
+        if(files != null) {
+            for (File file : files) {
+                file.delete();
+            }
         }
     }
 
