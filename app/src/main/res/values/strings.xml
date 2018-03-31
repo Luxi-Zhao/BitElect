@@ -19,4 +19,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+
+    <string name="vote_btn_pos_str">Yes, VOTE!</string>
+    <string name="vote_btn_neg_str">Cancel</string>
+    <string name="vote_done_str">You have voted.</string>
 </resources>

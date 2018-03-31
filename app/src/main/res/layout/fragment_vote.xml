@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp">
+
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/ic_action_alert" />
+
+        <TextView
+            style="@style/AlertText"
+            android:id="@+id/vote_confirmation_txt"
+            android:text="Are you sure you want to vote for" />
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/candidate_cancel_btn"
+        style="@style/AccentButton"
+        android:layout_marginBottom="10dp"
+        android:text="@string/vote_btn_neg_str" />
+
+    <Button
+        android:id="@+id/candidate_vote_btn"
+        style="@style/PrimaryButton"
+        android:text="@string/vote_btn_pos_str" />
+
+</LinearLayout>

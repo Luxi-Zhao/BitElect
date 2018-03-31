@@ -12,7 +12,8 @@
         <EditText
             android:id="@+id/passport_num_edit_text"
             style="@style/PassportInfoEditText"
-            android:hint="Passport Number" />
+            android:hint="Passport Number"
+            android:inputType="text"/>
 
         <EditText
             android:id="@+id/birthdate_edit_text"
@@ -45,11 +46,9 @@
             android:layout_height="80dp"
             android:background="@drawable/nfc_scan"/>
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/AlertText"
             android:text="@string/scan_passport_prompt"
-            android:paddingLeft="20dp"
-            android:textSize="20sp"/>
+           />
     </LinearLayout>
 
 

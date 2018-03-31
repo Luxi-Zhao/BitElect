@@ -1,60 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content"
-    android:padding="20dp"
-    android:orientation="vertical">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
 
     <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/radio_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/radio_group"
-        android:clickable="false"
-        android:orientation="vertical">
-        <RadioButton android:id="@+id/radio_clinton"
+        android:clickable="false">
+
+
+        <RadioButton
+            android:id="@+id/radio_clinton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Peter Deutsch"
-        />
+            android:text="Peter Deutsch" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <ImageView
+                android:id="@+id/cand1Img"
                 android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:id="@+id/cand1Img"/>
+                android:layout_height="70dp" />
+
             <TextView
+                android:id="@+id/cand1Info"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cand1Info"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
 
-        <RadioButton android:id="@+id/radio_trump"
+        <RadioButton
+            android:id="@+id/radio_trump"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Luxi Zhao"
-        />
+            android:text="Luxi Zhao" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
+
             <ImageView
+                android:id="@+id/cand2Img"
                 android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:id="@+id/cand2Img"/>
+                android:layout_height="70dp" />
+
             <TextView
+                android:id="@+id/cand2Info"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/cand2Info"/>
+                android:layout_height="wrap_content" />
         </LinearLayout>
 
 
     </RadioGroup>
 
     <Button
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/candidate_sel_ok_btn"
-        android:text="ok"/>
+        android:layout_marginTop="10dp"
+        style="@style/AccentButton"
+        android:text="ok" />
+
+
 </LinearLayout>

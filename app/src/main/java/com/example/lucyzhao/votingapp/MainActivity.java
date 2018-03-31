@@ -3,14 +3,14 @@ package com.example.lucyzhao.votingapp;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.FaceDetector;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +18,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -26,12 +27,9 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-import com.google.android.gms.vision.text.Line;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static com.example.lucyzhao.votingapp.Utils.COMM_CANDIDATE_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
@@ -47,10 +45,13 @@ public class MainActivity extends NavActivity {
     // UI element
     AlertDialog.Builder votingAlertBuilder;
 
-    // UI task tracking that tracks how many tasks the user has completed
+    // vote related
     private Vote myVote = Vote.getInstance();
     private static String candidateName;
+
+    // UI task tracking that tracks how many tasks the user has completed
     private static int tasksCompleted = 0;
+    private static boolean voteCompleted = false;
     private UITaskManager taskManager;
 
 
@@ -71,13 +72,13 @@ public class MainActivity extends NavActivity {
         taskManager = new UITaskManager();
         // handle UI appropriately when only some data is collected
         Log.v(TAG, "tasks completed is: " + tasksCompleted);
-        taskManager.onTaskCompleted(tasksCompleted);
+        //taskManager.onTaskCompleted(tasksCompleted);
+        taskManager.initUI();
+
         // ignore any nfc feedback if passport is already scanned
-        if (tasksCompleted > 2) {
+        if (tasksCompleted > 1) {
             return;
         }
-
-
         // check NFC scanning result
         String nfc_result = getIntent().getStringExtra(Utils.NFC_RESULT);
         if (nfc_result != null) {
@@ -101,43 +102,32 @@ public class MainActivity extends NavActivity {
     //////////////////UI TASK FLOW MANAGEMENT/////////////////////
     //////////////////////////////////////////////////////////////
 
-    private void setEnterPassportInfoTaskCompleted(String docNumStr, String birthDateStr, String expiryDateStr) {
-        SharedPreferences sharedPref = this
-                .getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.shared_pref_doc_num), docNumStr);
-        editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
-        editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
-        editor.apply(); //asynchronously save to pref
-        Log.v(TAG, "saved to pref");
-
-        taskManager.onTaskCompleted(1);
-    }
-
 
     private void setPassportScanTaskCompleted(String nfc_result) {
         myVote.setNfcID(nfc_result);
-        taskManager.onTaskCompleted(2);
+        taskManager.onTaskCompleted(1);
     }
 
     private void setFaceTaskCompleted(boolean match) {
-        taskManager.onTaskCompleted(3);
+        taskManager.onTaskCompleted(2);
     }
 
     private void setQRTaskCompleted(String qr_result) {
         myVote.setQrCode(qr_result);
-        taskManager.onTaskCompleted(4);
+        taskManager.onTaskCompleted(3);
+        voteCompleted = false;
+        showSelectCandFrag();
     }
 
 
     protected void setCandSelTaskCompleted(String candID, String candName) {
         myVote.setCandidateID(candID);
         candidateName = candName;
-        taskManager.onTaskCompleted(5);
+        showVoteFrag();
     }
 
     private void setVotingTaskCompleted() {
-        taskManager.onTaskCompleted(6);
+        taskManager.onVoteCompleted();
     }
 
     /**
@@ -150,13 +140,14 @@ public class MainActivity extends NavActivity {
     private class UITaskManager {
         private List<PulsingButton> allBtns;
         private List<View> allLines;
+        int numTasks;
 
         // must be called in onCreate()
         UITaskManager() {
             allBtns = new ArrayList<>();
             allLines = new ArrayList<>();
             LinearLayout ll = findViewById(R.id.task_layout);
-            //not sure tho
+
             for (int i = 0; i < ll.getChildCount(); i++) {
                 View view = ll.getChildAt(i);
                 if (i % 2 == 0)
@@ -165,10 +156,33 @@ public class MainActivity extends NavActivity {
                     allLines.add(view);
                 }
             }
+            numTasks = allBtns.size();
         }
 
         void startTasks() {
             allBtns.get(0).enablePulsingButton();
+        }
+
+        void initUI() {
+            if(tasksCompleted == numTasks) {
+                if(voteCompleted) {
+                    onVoteCompleted();
+                }
+                else {
+                    showSelectCandFrag();
+                }
+            }
+            else {
+                VoteUncomplFragment fragment = new VoteUncomplFragment();
+                showFrag(fragment);
+            }
+            onTaskCompleted(tasksCompleted);
+        }
+
+        void onVoteCompleted() {
+            voteCompleted = true;
+            VoteComplFragment fragment = new VoteComplFragment();
+            showFrag(fragment);
         }
 
         void onTaskCompleted(int taskNum) {
@@ -201,6 +215,12 @@ public class MainActivity extends NavActivity {
         }
     }
 
+    private void showFrag(Fragment frag) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.candidate_task_container, frag);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
 
     //////////////////////////////////////////////////////////////
     ////////////////////////////QR CODE///////////////////////////
@@ -218,14 +238,63 @@ public class MainActivity extends NavActivity {
     ////////////////////////////VOTING////////////////////////////
     //////////////////////////////////////////////////////////////
 
-    public void selectCandidate(View view) {
-        new CandidateSelFragment().show(getFragmentManager(), "selectCandidate");
+    private void showSelectCandFrag() {
+        CandidateSelFragment candidateSelFragment = new CandidateSelFragment();
+        showFrag(candidateSelFragment);
     }
 
-    public void vote(View view) {
-        votingAlertBuilder.setMessage("Are you sure you want to choose " + candidateName + "?");
-        AlertDialog dialog = votingAlertBuilder.create();
-        dialog.show();
+    private void showVoteFrag() {
+        VoteFragment voteFragment = new VoteFragment();
+        showFrag(voteFragment);
+    }
+
+    public static class VoteComplFragment extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_vote_compl, container, false);
+        }
+    }
+
+    public static class VoteUncomplFragment extends Fragment {
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            return inflater.inflate(R.layout.fragment_vote_not_compl, container, false);
+        }
+    }
+
+    public static class VoteFragment extends Fragment {
+        Button vote;
+        Button cancel;
+        TextView confirmation;
+        MainActivity myActivity;
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final View fragment = inflater.inflate(R.layout.fragment_vote, container, false);
+            vote = fragment.findViewById(R.id.candidate_vote_btn);
+            cancel = fragment.findViewById(R.id.candidate_cancel_btn);
+            confirmation = fragment.findViewById(R.id.vote_confirmation_txt);
+            myActivity = (MainActivity) getActivity();
+
+            String confStr = "Are you sure you want to vote for " + candidateName + "?";
+            confirmation.setText(confStr);
+
+            vote.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    myActivity.submitVote();
+                }
+            });
+            cancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    myActivity.showSelectCandFrag();
+                }
+            });
+            return fragment;
+        }
     }
 
     private void submitVote() {
@@ -316,10 +385,15 @@ public class MainActivity extends NavActivity {
         new PassportInfoPromptFragment().show(getFragmentManager(), "enterPassportInfo");
     }
 
-    public void scanPassportPrompt(View view) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
-        builder.setMessage(R.string.scan_passport_prompt);
-        builder.create().show();
+    private void savePassportInfoToPref(String docNumStr, String birthDateStr, String expiryDateStr) {
+        SharedPreferences sharedPref = this
+                .getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(getString(R.string.shared_pref_doc_num), docNumStr);
+        editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
+        editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
+        editor.apply(); //asynchronously save to pref
+        Log.v(TAG, "saved to pref");
     }
 
     public static class PassportInfoPromptFragment extends DialogFragment implements View.OnClickListener {
@@ -356,7 +430,7 @@ public class MainActivity extends NavActivity {
                     }
 
                     ((MainActivity) getActivity())
-                            .setEnterPassportInfoTaskCompleted(docNumStr, birthDateStr, expiryDateStr);
+                            .savePassportInfoToPref(docNumStr, birthDateStr, expiryDateStr);
                     infoLayout.setVisibility(View.INVISIBLE);
                     promptLayout.setVisibility(View.VISIBLE);
                 }

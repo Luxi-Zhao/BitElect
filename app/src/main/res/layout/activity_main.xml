@@ -11,60 +11,40 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="40dp">
+        android:paddingBottom="40dp"
+        android:paddingEnd="10dp"
+        android:paddingStart="10dp"
+        android:paddingTop="10dp">
 
-        <!--<LinearLayout-->
-            <!--android:layout_width="wrap_content"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--android:layout_gravity="center_horizontal"-->
-            <!--android:orientation="vertical">-->
 
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="It's time to"-->
-                <!--android:textColor="#fefefe"-->
-                <!--android:textSize="40sp" />-->
+        <TextView
+            style="@style/MainActivityTitle"
+            android:text="Authentication" />
 
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="VOTE"-->
-                <!--android:textColor="#ffffff"-->
-                <!--android:textSize="70sp" />-->
-        <!--</LinearLayout>-->
 
         <LinearLayout
             android:id="@+id/task_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_gravity="center_horizontal"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="20dp">
 
 
             <com.example.lucyzhao.votingapp.PulsingButton
                 android:id="@+id/task1btn"
-                style="@style/MainActivityButtons"
+                style="@style/TaskButton"
                 android:onClick="enterPassportInfo"
-                android:text="enter passport info" />
+                android:text="Scan passport" />
 
             <View
                 android:id="@+id/line_1"
                 style="@style/MainActivityVerticalLine" />
 
             <com.example.lucyzhao.votingapp.PulsingButton
-                android:id="@+id/task2btn"
-                style="@style/MainActivityButtons"
-                android:onClick="scanPassportPrompt"
-                android:text="Scan your passport" />
-
-            <View
-                android:id="@+id/line_2"
-                style="@style/MainActivityVerticalLine" />
-
-            <com.example.lucyzhao.votingapp.PulsingButton
                 android:id="@+id/task3btn"
-                style="@style/MainActivityButtons"
+                style="@style/TaskButton"
                 android:onClick="scanFacePrompt"
                 android:text="Facial recognition" />
 
@@ -74,30 +54,22 @@
 
             <com.example.lucyzhao.votingapp.PulsingButton
                 android:id="@+id/task4btn"
-                style="@style/MainActivityButtons"
+                style="@style/TaskButton"
                 android:onClick="scanQRCode"
                 android:text="scan QR code" />
-
-            <View
-                android:id="@+id/line_4"
-                style="@style/MainActivityVerticalLine" />
-
-            <com.example.lucyzhao.votingapp.PulsingButton
-                android:id="@+id/task5btn"
-                style="@style/MainActivityButtons"
-                android:onClick="selectCandidate"
-                android:text="select a candidate" />
-
-            <View
-                android:id="@+id/line_5"
-                style="@style/MainActivityVerticalLine" />
-
-            <com.example.lucyzhao.votingapp.PulsingButton
-                android:id="@+id/task6btn"
-                style="@style/MainActivityButtons"
-                android:onClick="vote"
-                android:text="vote" />
         </LinearLayout>
+
+        <TextView
+            style="@style/MainActivityTitle"
+            android:text="Vote" />
+
+        <View style="@style/MainActivityHorizontalLine" />
+
+        <FrameLayout
+            android:id="@+id/candidate_task_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
 
     </LinearLayout>
 

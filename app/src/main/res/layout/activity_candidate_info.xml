@@ -67,7 +67,7 @@
 
 
     <Button
-        style="@style/MainActivityButtons"
+        style="@style/PrimaryButton"
         android:layout_marginTop="30dp"
         android:id="@+id/candidate_config_ok_btn"
         android:text="OK"/>

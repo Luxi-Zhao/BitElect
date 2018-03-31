@@ -2,6 +2,7 @@ package com.example.lucyzhao.votingapp;
 
 
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -35,7 +36,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CandidateSelFragment extends DialogFragment {
+public class CandidateSelFragment extends Fragment {
     private static final String TAG = CandidateSelFragment.class.getSimpleName();
     private static final String CAND_INFO_URL = "https://api.github.com/users/";
 
@@ -44,8 +45,6 @@ public class CandidateSelFragment extends DialogFragment {
 
     private List<ImageView> candImgs = new ArrayList<>();
     private List<TextView> candBios = new ArrayList<>();
-
-    //private RadioButton testRadioBtn;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -87,7 +86,6 @@ public class CandidateSelFragment extends DialogFragment {
         } else {
             ((MainActivity) getActivity())
                     .setCandSelTaskCompleted(candID, candName);
-            dismiss();
         }
     }
 

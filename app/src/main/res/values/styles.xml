@@ -14,10 +14,27 @@
         <item name="android:padding">10dp</item>
     </style>
 
+    <style name="MainActivityTitle" parent="TextAppearance.AppCompat.Title">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:layout_marginTop">20dp</item>
+        <item name="android:textColor">@color/colorGrey</item>
+        <item name="android:layout_marginStart">20dp</item>
+    </style>
+
     <style name="PassportInfoEditText" parent="Widget.AppCompat.EditText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
         <item name="android:maxLines">1</item>
         <item name="android:imeOptions">actionNext</item>
-        <item name="android:layout_width">match_parent</item>
+    </style>
+
+    <style name="AlertText" parent="TextAppearance.AppCompat">
+        <item name="android:textSize">20sp</item>
+        <item name="android:paddingStart">20dp</item>
+        <item name="android:paddingEnd">20dp</item>
+        <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
@@ -45,25 +62,26 @@
     </style>
 
 
-    <style name="MainActivityButtons" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">#ffffff</item>
+    <style name="PrimaryButton" parent="Widget.AppCompat.Button.Borderless">
+        <item name="android:textColor">#fff</item>
         <item name="android:textSize">15sp</item>
         <item name="android:padding">10dp</item>
         <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:background">@drawable/custom_button</item>
+        <item name="android:background">@drawable/primary_button</item>
         <item name="android:layout_width">200dp</item>
         <item name="android:layout_height">wrap_content</item>
     </style>
 
-    <style name="MainActivityText" parent="Widget.AppCompat.Button.Borderless">
-        <item name="android:textColor">#ffffff</item>
-        <item name="android:textSize">15sp</item>
-        <item name="android:padding">10dp</item>
-        <item name="android:layout_margin">10dp</item>
-        <item name="android:layout_gravity">center_horizontal</item>
-        <item name="android:layout_width">wrap_content</item>
-        <item name="android:layout_height">wrap_content</item>
+    <style name="AccentButton" parent="PrimaryButton">
+        <item name="android:background">@drawable/accent_button</item>
+        <item name="android:textColor">@color/colorPrimary</item>
     </style>
+
+    <style name="TaskButton" parent="PrimaryButton" >
+        <item name="android:background">@drawable/task_button</item>
+        <item name="android:textColor">@color/colorPrimary</item>
+    </style>
+
 
     <style name="MainActivityRadioGroup" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textColor">#33312e</item>
@@ -75,10 +93,17 @@
     </style>
 
     <style name="MainActivityVerticalLine">
-        <item name="android:layout_gravity">center_horizontal</item>
         <item name="android:layout_width">1dp</item>
         <item name="android:layout_height">70dp</item>
-        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+        <item name="android:background">@color/colorGrey</item>
+    </style>
+
+    <style name="MainActivityHorizontalLine">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">2dp</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:background">@color/colorGrey</item>
     </style>
 
     <style name="StepperCircle" parent="TextAppearance.AppCompat">

@@ -2,6 +2,7 @@ package com.example.lucyzhao.votingapp;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.support.annotation.Nullable;
@@ -21,7 +22,7 @@ public class BarGraph extends View {
     private Rect bar;
 
     private double w, h;
-    private int result1 = 10, result2 = 20;
+    private int result1 = 2, result2 = 1;
     private String cand1FN = "Luxi", cand1LN = "Zhao", cand2FN="Kanglong", cand2LN="Qiu";
     private static final double GRAPH_MARGIN_RATIO = 1.0 / 8.0;
     private double graphMargin;
@@ -75,7 +76,12 @@ public class BarGraph extends View {
         textPaint = new Paint();
 
         cand1Paint.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimary));
-        cand2Paint.setColor(ContextCompat.getColor(getContext(), R.color.colorPrimaryDark));
+        cand2Paint.setColor(ContextCompat.getColor(getContext(), R.color.colorAccent));
+        cand1Paint.setShadowLayer(12, 0, 0, Color.GRAY);
+        setLayerType(LAYER_TYPE_SOFTWARE, cand1Paint);
+        cand2Paint.setShadowLayer(12, 0, 0, Color.GRAY);
+        setLayerType(LAYER_TYPE_SOFTWARE, cand2Paint);
+
         linePaint.setStyle(Paint.Style.STROKE);
         linePaint.setStrokeWidth(LINE_STROKE_WIDTH);
         linePaint.setColor(ContextCompat.getColor(getContext(), R.color.colorGrey));

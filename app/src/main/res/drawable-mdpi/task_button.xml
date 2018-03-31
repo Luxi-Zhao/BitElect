@@ -4,5 +4,5 @@
         android:state_pressed="true" />
     <item android:drawable="@drawable/button_pressed"
         android:state_focused="true" />
-    <item android:drawable="@drawable/button_default" />
+    <item android:drawable="@drawable/button_default_task" />
 </selector>
