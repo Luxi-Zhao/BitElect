@@ -96,8 +96,10 @@ public class Utils {
         Log.v(TAG, "-------------deleting all files in training dir");
         File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
         File[] files = dir.listFiles();
-        for (File file : files) {
-            file.delete();
+        if(files != null) {
+            for (File file : files) {
+                file.delete();
+            }
         }
     }
 
