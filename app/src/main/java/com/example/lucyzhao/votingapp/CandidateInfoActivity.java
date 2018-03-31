@@ -1,11 +1,13 @@
 package com.example.lucyzhao.votingapp;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -47,6 +49,7 @@ public class CandidateInfoActivity extends NavActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_candidate_info);
+        setTypeFace();
 
         okBtn = findViewById(R.id.candidate_config_ok_btn);
 
@@ -71,6 +74,13 @@ public class CandidateInfoActivity extends NavActivity {
                 Log.v(TAG, cand1FirstNameStr);
             }
         });
+    }
+
+    private void setTypeFace() {
+        Typeface typeface = getResources().getFont(R.font.quicksand);
+
+        TextView txt = findViewById(R.id.cand_config_title_txt);
+        txt.setTypeface(typeface);
     }
 
 

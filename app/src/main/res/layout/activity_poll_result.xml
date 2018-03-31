@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorBackground"
     tools:context="com.example.lucyzhao.votingapp.PollResultActivity">
 
     <com.example.lucyzhao.votingapp.BarGraph
@@ -12,6 +13,7 @@
 
     <TextView
         android:text="Poll Results"
+        android:id="@+id/poll_result_title_txt"
         style="@style/MainActivityTitle"/>
 
 </RelativeLayout>

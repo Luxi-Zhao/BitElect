@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +32,7 @@ import com.android.volley.toolbox.Volley;
 import com.google.gson.JsonObject;
 import com.koushikdutta.ion.Ion;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,6 +65,7 @@ public class MainActivity extends NavActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_main);
+        setTypeFace();
         Log.v(TAG, "in onCreate");
 
         // UI elements
@@ -101,10 +105,18 @@ public class MainActivity extends NavActivity {
         taskManager.onTaskCompleted(tasksCompleted);
     }
 
+    private void setTypeFace() {
+        Typeface typeface = getResources().getFont(R.font.quicksand);
+
+        TextView txt = findViewById(R.id.main_title_txt);
+        TextView txt2 = findViewById(R.id.main_title_txt2);
+        txt.setTypeface(typeface);
+        txt2.setTypeface(typeface);
+    }
+
     //////////////////////////////////////////////////////////////
     //////////////////UI TASK FLOW MANAGEMENT/////////////////////
     //////////////////////////////////////////////////////////////
-
 
     private void setPassportScanTaskCompleted(String nfc_result) {
         myVote.setNfcID(nfc_result);
@@ -233,6 +245,8 @@ public class MainActivity extends NavActivity {
         Intent intent = new Intent(this, QRCodeActivity.class);
 
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
+        //todo change back
+        //startActivity(new Intent(this, TestActivity.class));
     }
 
 

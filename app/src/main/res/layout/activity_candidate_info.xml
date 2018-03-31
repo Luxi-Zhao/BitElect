@@ -5,10 +5,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="20dp"
+    android:background="@color/colorBackground"
     tools:context="com.example.lucyzhao.votingapp.CandidateInfoActivity">
 
     <TextView
         style="@style/CandidateConfigTitle"
+        android:id="@+id/cand_config_title_txt"
         android:text="Candidate Information" />
 
     <!--- Candidate 1 -->

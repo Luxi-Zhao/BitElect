@@ -12,6 +12,7 @@ import android.util.Log;
 public class FaceComparer {
     private static final String TAG = FaceComparer.class.getSimpleName();
     private static final int SIM_THRESHOLD = 15;
+    public static Bitmap greyTar, greySrc;
     /**
      *
      * @param target passport photo
@@ -27,8 +28,11 @@ public class FaceComparer {
 
         Bitmap greyTarget = toGreyScale(scaledTarget);
         Bitmap greySource = toGreyScale(scaledSource);
+        greySrc = greySource;
+        greyTar = greyTarget;
 
         int countEquals = 0;
+        int countTooDark = 0;
         int numPixels = greySource.getWidth() * greySource.getHeight();
 
         for(int i = 0; i < greyTarget.getWidth(); i++ ) {
@@ -42,6 +46,7 @@ public class FaceComparer {
                 else if(ret == 2) {
                     numPixels--;
                 }
+                if(pixelTooDark(p1)) countTooDark++;
             }
         }
 
@@ -49,7 +54,21 @@ public class FaceComparer {
         float percent = (float) countEquals / (float) numPixels;
         Log.v(TAG, "number of equals " + countEquals + " number of pixels " + numPixels);
         Log.v(TAG, "width * height " + greySource.getWidth() * greySource.getHeight());
-        return percent * 100;
+        float compareResult = percent * 100;
+        float tooDarkRatio = (float) countTooDark / (float) numPixels * 100;
+        Log.v(TAG, "too dar ratio" + tooDarkRatio);
+
+        //if 10% of the pixels are "too dark", we brighten the picture
+        if(tooDarkRatio > 10) {
+            Log.v(TAG, "picture too dark");
+            greySource = brightenImg(greySource, tooDarkRatio);
+            Log.v(TAG, "enter recursion");
+            compareResult = compareImgs(greyTarget, greySource);
+        }
+        else {
+            Log.v(TAG, "picture not too dark");
+        }
+        return compareResult;
     }
 
     /**
@@ -74,7 +93,7 @@ public class FaceComparer {
         }
         // each pixel stored as 4 byte
         Bitmap ret = Bitmap.createBitmap(greyPs, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        ret = Bitmap.createBitmap(ret, 0, (int)(bitmap.getHeight()*(2.0/6.0)), bitmap.getWidth(), (int)(bitmap.getHeight()*(4.0/6.0)));
+        //ret = Bitmap.createBitmap(ret, 0, (int)(bitmap.getHeight()*(2.0/6.0)), bitmap.getWidth(), (int)(bitmap.getHeight()*(4.0/6.0)));
         bitmap.recycle();
         return ret;
     }
@@ -92,4 +111,26 @@ public class FaceComparer {
         else if(Math.abs(p1 - p2) <= SIM_THRESHOLD) return 1;
         else return 0;
     }
+
+    private static boolean pixelTooDark(int p) {
+        int r = Color.red(p);
+        return r < 10;
+    }
+
+    private static Bitmap brightenImg(Bitmap bitmap, float darknessRatio) {
+
+        int size = bitmap.getByteCount();
+        int[] pixels = new int[size];
+        int[] brightPs = new int[size];
+        bitmap.getPixels(pixels, 0, bitmap.getWidth(), 0,0, bitmap.getWidth(), bitmap.getHeight() );
+        for(int i = 0; i < size; i++) {
+            int p1 = pixels[i];
+            int r = Color.red(p1) + (int)(255*(darknessRatio/100));
+            int p2 = Color.rgb(r, r, r);
+            brightPs[i] = p2;
+        }
+        Bitmap ret = Bitmap.createBitmap(brightPs, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        return ret;
+    }
+
 }

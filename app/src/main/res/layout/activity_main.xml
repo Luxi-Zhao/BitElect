@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:background="@color/colorBackground"
     tools:context="com.example.lucyzhao.votingapp.MainActivity">
 
     <LinearLayout
@@ -18,6 +19,7 @@
 
 
         <TextView
+            android:id="@+id/main_title_txt"
             style="@style/MainActivityTitle"
             android:text="Authentication" />
 
@@ -61,6 +63,7 @@
 
         <TextView
             style="@style/MainActivityTitle"
+            android:id="@+id/main_title_txt2"
             android:text="Vote" />
 
         <View style="@style/MainActivityHorizontalLine" />
@@ -69,6 +72,7 @@
             android:id="@+id/candidate_task_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorBackground"
             android:layout_marginTop="20dp" />
 
     </LinearLayout>

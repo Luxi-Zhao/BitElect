@@ -2,17 +2,17 @@
 <resources>
     <!--<color name="colorPrimary">#0777bd</color>-->
     <color name="colorPrimary">#ff0000</color>
-    <color name="colorPrimaryDark">#87001b</color>
-    <color name="colorBackground">#cdff0000</color>
+    <color name="colorPrimaryDark">#000</color>
+    <color name="colorBackground">#FFFFF0</color>
     <color name="colorAccent">#005B99</color>
 
     <color name="colorQROverlay">#801e1404</color>
 
-    <color name="colorBtnShade1">#38f0dfcd</color>
-    <color name="colorBtnShade2">#1fd4ac6e</color>
-    <color name="colorBtnShade3">#33ddd8cf</color>
-    <color name="colorBtnShade4">#1fe1cc81</color>
-    <color name="colorBtnShade5">#33826f10</color>
+    <color name="colorBtnShade1">#0fff0000</color>
+    <color name="colorBtnShade2">#0fff0000</color>
+    <color name="colorBtnShade3">#0fff0000</color>
+    <color name="colorBtnShade4">#0fff0000</color>
+    <color name="colorBtnShade5">#0fff0000</color>
     <color name="colorBtnCompleted">#008751</color>
 
     <color name="colorGrey">#616161</color>
