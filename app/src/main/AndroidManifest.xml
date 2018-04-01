@@ -17,8 +17,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-
-        <activity android:name=".MainActivity" >
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -44,13 +43,14 @@
         <activity android:name=".FaceRecognitionActivity" />
         <activity android:name=".TestActivity" />
         <activity android:name=".NavActivity" />
-        <activity android:name=".CandidateInfoActivity">
-        </activity>
-        <activity android:name=".PollResultActivity"></activity>
+        <activity android:name=".CandidateInfoActivity"></activity>
+        <activity android:name=".PollResultActivity" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+
+        <activity android:name=".BlockchainUIActivity"></activity>
     </application>
 
 </manifest>

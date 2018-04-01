@@ -1,5 +1,6 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
@@ -48,21 +49,21 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_vote) {
-            startActivity(new Intent(this, MainActivity.class));
-            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
-            finish();
+            startActivityWithAnim(MainActivity.class);
         } else if (id == R.id.nav_poll_result) {
-            startActivity(new Intent(this, PollResultActivity.class));
-            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
-            finish();
+            startActivityWithAnim(PollResultActivity.class);
         } else if (id == R.id.nav_blockchain) {
-
+            startActivityWithAnim(BlockchainUIActivity.class);
         } else if (id == R.id.nav_config) {
-            startActivity(new Intent(this, CandidateInfoActivity.class));
-            overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
-            finish();
+            startActivityWithAnim(CandidateInfoActivity.class);
         }
         return true;
+    }
+
+    private void startActivityWithAnim(Class<?> cls) {
+        startActivity(new Intent(this, cls));
+        overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
+        finish();
     }
 
 }
