@@ -11,15 +11,23 @@ import android.util.Log;
 
 public class FaceComparer {
     private static final String TAG = FaceComparer.class.getSimpleName();
-    private static final int SIM_THRESHOLD = 15;
-    public static Bitmap greyTar, greySrc;
+    private static final int SIM_THRESHOLD = 25;
+    private static final int TOO_DARK_THRESHOLD = 10; // 10% of the pixels are too dark
+
+    public static Bitmap greyTar, greySrc, maxSrc;
+
+    public static float compareImgs(Bitmap target, Bitmap source) {
+        Bitmap croppedTarget = cropHair(target);
+        Bitmap croppedSource = cropHair(source);
+        return compareImgsRec(croppedTarget, croppedSource);
+    }
     /**
      *
      * @param target passport photo
      * @param source picture taken by camera
      * @return similarity ratio
      */
-    public static float compareImgs(Bitmap target, Bitmap source) {
+    public static float compareImgsRec(Bitmap target, Bitmap source) {
         int smallH = Math.min(target.getHeight(), source.getHeight());
         int smallW = Math.min(target.getWidth(), source.getWidth());
 
@@ -34,7 +42,7 @@ public class FaceComparer {
         int countEquals = 0;
         int countTooDark = 0;
         int numPixels = greySource.getWidth() * greySource.getHeight();
-
+        Log.v(TAG, "original number of pixels " + numPixels);
         for(int i = 0; i < greyTarget.getWidth(); i++ ) {
             for(int j = 0; j < greyTarget.getHeight(); j++) {
                 int p1 = greySource.getPixel(i, j);
@@ -50,20 +58,19 @@ public class FaceComparer {
             }
         }
 
-
         float percent = (float) countEquals / (float) numPixels;
-        Log.v(TAG, "number of equals " + countEquals + " number of pixels " + numPixels);
-        Log.v(TAG, "width * height " + greySource.getWidth() * greySource.getHeight());
+        Log.v(TAG, "number of equals " + countEquals + " number of pixels without white pixels" + numPixels);
+
         float compareResult = percent * 100;
         float tooDarkRatio = (float) countTooDark / (float) numPixels * 100;
-        Log.v(TAG, "too dar ratio" + tooDarkRatio);
+        Log.v(TAG, "too dark ratio" + tooDarkRatio);
 
         //if 10% of the pixels are "too dark", we brighten the picture
-        if(tooDarkRatio > 10) {
+        if(tooDarkRatio > TOO_DARK_THRESHOLD) {
             Log.v(TAG, "picture too dark");
             greySource = brightenImg(greySource, tooDarkRatio);
             Log.v(TAG, "enter recursion");
-            compareResult = compareImgs(greyTarget, greySource);
+            compareResult = compareImgsRec(greyTarget, greySource);
         }
         else {
             Log.v(TAG, "picture not too dark");
@@ -72,7 +79,7 @@ public class FaceComparer {
     }
 
     /**
-     * Returns a greyscaled, cropped bitmap
+     * Returns a greyscaled bitmap
      * Modifications: Recycles bitmap passed in
      * @param bitmap
      * @return greyscaled bitmap
@@ -93,9 +100,13 @@ public class FaceComparer {
         }
         // each pixel stored as 4 byte
         Bitmap ret = Bitmap.createBitmap(greyPs, bitmap.getWidth(), bitmap.getHeight(), Bitmap.Config.ARGB_8888);
-        //ret = Bitmap.createBitmap(ret, 0, (int)(bitmap.getHeight()*(2.0/6.0)), bitmap.getWidth(), (int)(bitmap.getHeight()*(4.0/6.0)));
+
         bitmap.recycle();
         return ret;
+    }
+
+    private static Bitmap cropHair(Bitmap bitmap) {
+        return Bitmap.createBitmap(bitmap, 0, (int)(bitmap.getHeight()*(2.0/6.0)), bitmap.getWidth(), (int)(bitmap.getHeight()*(4.0/6.0)));
     }
 
     /**
@@ -107,14 +118,14 @@ public class FaceComparer {
     private static int pixelsAreEqual(int p1, int p2) {
         int r1 = Color.red(p1);
         int r2 = Color.red(p2);
-        if(r1 == 0 || r2 == 0) return 2;
+        if(r1 > 250 || r2 > 250) return 2;
         else if(Math.abs(p1 - p2) <= SIM_THRESHOLD) return 1;
         else return 0;
     }
 
     private static boolean pixelTooDark(int p) {
         int r = Color.red(p);
-        return r < 10;
+        return r < 20;
     }
 
     private static Bitmap brightenImg(Bitmap bitmap, float darknessRatio) {

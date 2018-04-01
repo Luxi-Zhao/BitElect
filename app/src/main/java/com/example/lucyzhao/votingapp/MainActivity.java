@@ -79,8 +79,17 @@ public class MainActivity extends NavActivity {
         taskManager = new UITaskManager();
         // handle UI appropriately when only some data is collected
         Log.v(TAG, "tasks completed is: " + tasksCompleted);
-        //taskManager.onTaskCompleted(tasksCompleted);
         taskManager.initUI();
+
+        // view images used for comparison on long click
+        Button faceRecogBtn = findViewById(R.id.task3btn);
+        faceRecogBtn.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                startActivity(new Intent(getApplicationContext(), TestActivity.class));
+                return false;
+            }
+        });
 
         // ignore any nfc feedback if passport is already scanned
         if (tasksCompleted > 1) {
@@ -124,7 +133,9 @@ public class MainActivity extends NavActivity {
     }
 
     private void setFaceTaskCompleted(boolean match) {
-        taskManager.onTaskCompleted(2);
+        if(match) {
+            taskManager.onTaskCompleted(2);
+        }
     }
 
     private void setQRTaskCompleted(String qr_result) {
@@ -245,8 +256,6 @@ public class MainActivity extends NavActivity {
         Intent intent = new Intent(this, QRCodeActivity.class);
 
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
-        //todo change back
-        //startActivity(new Intent(this, TestActivity.class));
     }
 
 

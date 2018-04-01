@@ -34,12 +34,13 @@ import static com.google.android.gms.vision.CameraSource.CAMERA_FACING_FRONT;
 public class FaceRecognitionActivity extends AppCompatActivity {
     private static final String TAG = FaceRecognitionActivity.class.getSimpleName();
     private static final int COUNT_DOWN = 5000;
-    private static final float SIM_RATIO_THRESHOLD = (float) 0.4;
+    private static final float SIM_RATIO_THRESHOLD = (float) 0.7;
     SurfaceView surfaceView;
     FaceOverlay faceOverlay;
     CustomFaceDetector faceDetector;
     CameraSource cs;
     TextView resultTxt;
+    TextView failTxt;
     PerformRecognitionTask performRecognitionTask;
 
     @Override
@@ -50,6 +51,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
         Utils.showFiles(this);
 
         resultTxt = findViewById(R.id.face_recog_result_txt);
+        failTxt = findViewById(R.id.face_recog_fail_txt);
         surfaceView = findViewById(R.id.face_surface_view);
         faceOverlay = findViewById(R.id.face_overlay);
 
@@ -151,6 +153,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 context);
 
         float maxRatio = 0;
+
         for (int i = 0; i < NUM_CAPTURES; i++) {
             Bitmap cameraCapture = Utils.retrieveImg(true,
                     YOUR_FACE_ID,
@@ -182,6 +185,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(final Float simRatio) {
+            final boolean faceRecogResult = simRatio > SIM_RATIO_THRESHOLD;
 
             new CountDownTimer(COUNT_DOWN, 1000) {
                 String txt = "Similarity ratio: " + simRatio;
@@ -191,13 +195,17 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                     if (activity == null || activity.isFinishing()) return;
                     String tickInfo = txt + "\n Going back in " + millisUntilFinished / 1000 + " seconds";
                     activity.resultTxt.setText(tickInfo);
-
+                    String failTxt = "Faces don't match. Make sure you have good lighting.";
+                    String passTxt = "Faces match.";
+                    if(faceRecogResult)
+                        activity.failTxt.setText(passTxt);
+                    else activity.failTxt.setText(failTxt);
                 }
 
                 public void onFinish() {
                     FaceRecognitionActivity activity = activityRef.get();
                     if (activity == null || activity.isFinishing()) return;
-                    if (simRatio > SIM_RATIO_THRESHOLD) {
+                    if (faceRecogResult) {
                         activity.setResult(Activity.RESULT_OK, new Intent());
                     } else {
                         activity.setResult(Activity.RESULT_CANCELED, new Intent());

@@ -66,6 +66,7 @@ public class NFCActivity extends AppCompatActivity {
     private ImageView NFCImg;
 
     private RelativeLayout nfcProgressLayout;
+    private ProgressBar nfcProgressBar;
     private StepperFragment stepper;
 
 
@@ -92,6 +93,7 @@ public class NFCActivity extends AppCompatActivity {
         nfcInfoLayout.setVisibility(View.GONE);
 
         nfcProgressLayout = findViewById(R.id.nfc_progress_layout);
+        nfcProgressBar = findViewById(R.id.nfc_progress_bar);
         stepper = new StepperFragment();
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.stepper_frag, stepper);
@@ -236,6 +238,7 @@ public class NFCActivity extends AppCompatActivity {
             NFCActivity activity = activityRef.get();
             if(activity == null || activity.isFinishing()) return;
 
+            activity.nfcProgressBar.setVisibility(View.GONE);
             if (nfcData == null) {
                 Log.v(TAG, "no data");
                 activity.stepper.setTaskFailed(activity.getString(R.string.reading_failed));

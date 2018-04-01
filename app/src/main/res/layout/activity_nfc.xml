@@ -50,6 +50,7 @@
         <ProgressBar
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:id="@+id/nfc_progress_bar"
             android:layout_centerHorizontal="true"
             android:layout_below="@+id/stepper_frag"
             />

@@ -8,11 +8,11 @@
 
     <color name="colorQROverlay">#801e1404</color>
 
-    <color name="colorBtnShade1">#0fff0000</color>
-    <color name="colorBtnShade2">#0fff0000</color>
-    <color name="colorBtnShade3">#0fff0000</color>
-    <color name="colorBtnShade4">#0fff0000</color>
-    <color name="colorBtnShade5">#0fff0000</color>
+    <color name="colorBtnShade1">#0aff0000</color>
+    <color name="colorBtnShade2">#0aff0000</color>
+    <color name="colorBtnShade3">#0aff0000</color>
+    <color name="colorBtnShade4">#0aff0000</color>
+    <color name="colorBtnShade5">#0aff0000</color>
     <color name="colorBtnCompleted">#008751</color>
 
     <color name="colorGrey">#616161</color>
