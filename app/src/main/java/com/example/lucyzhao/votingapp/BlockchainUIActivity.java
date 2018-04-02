@@ -21,6 +21,7 @@ public class BlockchainUIActivity extends NavActivity {
     BlockchainAdapter blockchainAdapter;
     List<Block> blockchain = new ArrayList<>();
     LinearLayoutManager llm;
+    private static final int INIT_COLOR = Color.RED;
     private static final String TAG = BlockchainUIActivity.class.getSimpleName();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,11 +31,13 @@ public class BlockchainUIActivity extends NavActivity {
         recyclerView = findViewById(R.id.blockchain_recycler);
         llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
-        blockchain.add(new Block());
-        blockchain.add(new Block());
-        blockchain.add(new Block());
-        blockchain.add(new Block());
-
+        for(int i = 0; i < 10; i++) {
+            int bgColor = generateRandColor();
+            int prevColor;
+            if(i == 0) prevColor = INIT_COLOR;
+            else prevColor = blockchain.get(i-1).hashColor;
+            blockchain.add(new Block(bgColor, prevColor));
+        }
         this.blockchainAdapter = new BlockchainAdapter(blockchain);
 
         recyclerView.setAdapter(this.blockchainAdapter);
@@ -43,7 +46,22 @@ public class BlockchainUIActivity extends NavActivity {
     public class Block {
         private String data;
         private String hash, prevHash;
+        private int hashColor, prevHashColor;
         private String nonce;
+
+        Block(int hashColor, int prevHashColor) {
+            this.hashColor = hashColor;
+            this.prevHashColor = prevHashColor;
+        }
+    }
+
+    private int generateRandColor() {
+        Random rnd = new Random();
+        int r = rnd.nextInt(200);
+        int g = rnd.nextInt(200);
+        int b = rnd.nextInt(200);
+        int color = Color.rgb(r, g, b);
+        return color;
     }
 
     /**
@@ -102,52 +120,30 @@ public class BlockchainUIActivity extends NavActivity {
         }
 
         private void configureBlockViewHolder(BlockViewHolder vh, int position) {
-            Random rnd = new Random();
-            int r = rnd.nextInt(256);
-            int g = rnd.nextInt(256);
-            int b = rnd.nextInt(256);
-            int color = Color.rgb(r, g, b);
-            int borderColor = Color.rgb(r - 40, g - 40, b - 40);
-            setHashDrawable(vh.hash, color, borderColor);
-
-            if(position == 0) {
-                setPrevHashDrawable(vh.prevHash, Color.RED, Color.BLUE);
-                return;
-            }
-            BlockViewHolder prevView = (BlockViewHolder)recyclerView.findViewHolderForAdapterPosition(position - 2);
-
-            if(prevView == null) {
-                Log.v(TAG, "prev view null, return");
-                return;
-            }
-            GradientDrawable drawable = (GradientDrawable)prevView.prevHash.getBackground();
-            if(drawable == null) {
-                Log.v(TAG, "drawable null, return");
-                return;
-            }
-            int prevColor = drawable.getColors()[0];
-            setPrevHashDrawable(vh.prevHash, prevColor, Color.BLUE);
+            int color = blockchain.get(getBlockIndex(position)).hashColor;
+            int prevColor = blockchain.get(getBlockIndex(position)).prevHashColor;
+            setHashDrawable(vh.hash, color);
+            setPrevHashDrawable(vh.prevHash, prevColor);
         }
 
-        private void setHashDrawable(View hashView, int bgColor, int borderColor) {
+        private void setHashDrawable(View hashView, int bgColor) {
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.RECTANGLE);
             shape.setCornerRadii(new float[]{0, 0, 0, 0, 16, 16, 0, 0});
             shape.setColor(bgColor);
-            shape.setStroke(5, borderColor);
             hashView.setBackground(shape);
         }
 
-        private void setPrevHashDrawable(View hashView, int bgColor, int borderColor) {
+        private void setPrevHashDrawable(View hashView, int bgColor) {
             GradientDrawable shape = new GradientDrawable();
             shape.setShape(GradientDrawable.RECTANGLE);
-            shape.setCornerRadii(new float[]{8, 8, 0, 0, 0, 0, 0, 0});
+            shape.setCornerRadii(new float[]{16, 16, 0, 0, 0, 0, 0, 0});
             shape.setColor(bgColor);
-            shape.setStroke(5, borderColor);
             hashView.setBackground(shape);
         }
 
         private int getBlockIndex(int heteroListPos) {
+            Log.v(TAG, "UI list position is " + heteroListPos + "   blockchain pos is " + heteroListPos/2);
             return heteroListPos / 2;
         }
 
