@@ -2,6 +2,7 @@ package com.example.lucyzhao.votingapp;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Typeface;
@@ -62,7 +63,7 @@ public class Utils {
 
 
     ///////////////////////////////////////////////////////////////////////
-    /////////////////////////ELIGIBILITY CHECKING//////////////////////////
+    ////////////////PASSPORT/ELIGIBILITY CHECKING//////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
     public static boolean checkNationalityEligiblity(String nationality) {
@@ -89,6 +90,17 @@ public class Utils {
         if (today.get(Calendar.DAY_OF_YEAR) < bDay.get(Calendar.DAY_OF_YEAR)) age--;
 
         return age >= ALLOWABLE_AGE;
+    }
+
+    public static void savePassportInfoToPref(Context context, String docNumStr, String birthDateStr, String expiryDateStr) {
+        SharedPreferences sharedPref = context
+                .getSharedPreferences(context.getString(R.string.pref_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPref.edit();
+        editor.putString(context.getString(R.string.shared_pref_doc_num), docNumStr);
+        editor.putString(context.getString(R.string.shared_pref_birthdate), birthDateStr);
+        editor.putString(context.getString(R.string.shared_pref_expirydate), expiryDateStr);
+        editor.apply(); //asynchronously save to pref
+        Log.v(TAG, "saved to pref");
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -235,6 +247,12 @@ public class Utils {
     ///////////////////////////////////UI//////////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
+    /**
+     * Only usable for activities with layouts directly associated with them
+     * Does not apply to fragments, navigation drawers, etc.
+     * @param activity
+     * @param ids TextView ids
+     */
     public static void setTypeFace(Activity activity, int... ids) {
         Typeface typeface = activity.getResources().getFont(R.font.quicksand);
         for(int id : ids) {

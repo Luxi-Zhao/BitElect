@@ -17,6 +17,8 @@
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="navigation_drawer_docnum_none">Please scan your passport</string>
+    <string name="navigation_drawer_tag">Your document number:</string>
 
     <string name="action_settings">Settings</string>
 

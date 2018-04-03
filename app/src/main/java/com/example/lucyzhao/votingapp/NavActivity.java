@@ -1,7 +1,9 @@
 package com.example.lucyzhao.votingapp;
 
-import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -9,8 +11,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
-
-import org.bytedeco.javacv.Frame;
+import android.widget.TextView;
 
 /**
  * Base activity that provides the Navigation Drawer
@@ -21,6 +22,9 @@ public class NavActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     DrawerLayout drawer;
+    TextView docNum, docNumTag;
+    private static final int STR_LEN = 4;
+
     protected void onCreateDrawer(@LayoutRes int layoutResID) {
         setContentView(R.layout.activity_home);
 
@@ -30,6 +34,22 @@ public class NavActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        docNum = navigationView.getHeaderView(0).findViewById(R.id.nav_doc_number);
+        docNumTag = navigationView.getHeaderView(0).findViewById(R.id.nav_doc_number_tag);
+        setTypeFace();
+
+        String docNumStr = getDocNum();
+        if (docNumStr.equals("")) {
+            docNumTag.setText(R.string.navigation_drawer_docnum_none);
+            docNum.setText("");
+        } else {
+            docNumTag.setText(R.string.navigation_drawer_tag);
+            String sub = docNumStr.substring(0, STR_LEN);
+            sub += "...";
+            docNum.setText(sub);
+        }
+
     }
 
     @Override
@@ -56,6 +76,8 @@ public class NavActivity extends AppCompatActivity
             startActivityWithAnim(BlockchainUIActivity.class);
         } else if (id == R.id.nav_config) {
             startActivityWithAnim(CandidateInfoActivity.class);
+        } else if (id == R.id.nav_clear) {
+            clearProgress();
         }
         return true;
     }
@@ -64,6 +86,26 @@ public class NavActivity extends AppCompatActivity
         startActivity(new Intent(this, cls));
         overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
         finish();
+    }
+
+    private String getDocNum() {
+        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
+        return sharedPref.getString(getString(R.string.shared_pref_doc_num), "");
+    }
+
+    private void clearProgress() {
+        Utils.savePassportInfoToPref(getApplicationContext(), "", "", "");
+        MainActivity.setTasksCompleted(0);
+        MainActivity.setVoteCompleted(0);
+
+        docNum.setText("");
+        docNumTag.setText("");
+    }
+
+    private void setTypeFace() {
+        Typeface typeface = getResources().getFont(R.font.quicksand);
+        docNumTag.setTypeface(typeface);
+        docNum.setTypeface(typeface);
     }
 
 }

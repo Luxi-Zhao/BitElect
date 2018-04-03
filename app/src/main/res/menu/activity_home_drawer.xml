@@ -16,6 +16,11 @@
             android:id="@+id/nav_blockchain"
             android:icon="@drawable/blockchain_icon"
             android:title="Blockchain" />
+
+        <item
+            android:id="@+id/nav_clear"
+            android:icon="@drawable/ic_clear_all_black_24dp"
+            android:title="Clear progress" />
     </group>
 
     <item android:title="Administrator">

@@ -99,7 +99,6 @@ public class MainActivity extends NavActivity {
         String nfc_result = getIntent().getStringExtra(Utils.NFC_RESULT);
         if (nfc_result != null) {
             Log.v(TAG, "result of nfc scanning is:" + nfc_result);
-            //myVote.setNfcID(nfc_result);
             setPassportScanTaskCompleted(nfc_result);
         } else {
             Log.v(TAG, "nfc scanning not performed");
@@ -117,6 +116,14 @@ public class MainActivity extends NavActivity {
     //////////////////////////////////////////////////////////////
     //////////////////UI TASK FLOW MANAGEMENT/////////////////////
     //////////////////////////////////////////////////////////////
+
+    public static void setTasksCompleted(int num) {
+        tasksCompleted = num;
+    }
+
+    public static void setVoteCompleted(int bool) {
+        voteCompleted = false;
+    }
 
     private void setPassportScanTaskCompleted(String nfc_result) {
         myVote.setNfcID(nfc_result);
@@ -473,8 +480,9 @@ public class MainActivity extends NavActivity {
                         return;
                     }
 
-                    ((MainActivity) getActivity())
-                            .savePassportInfoToPref(docNumStr, birthDateStr, expiryDateStr);
+                    Utils.savePassportInfoToPref(getContext(), docNumStr, birthDateStr, expiryDateStr);
+//                    ((MainActivity) getActivity())
+//                            .savePassportInfoToPref(docNumStr, birthDateStr, expiryDateStr);
                     infoLayout.setVisibility(View.INVISIBLE);
                     promptLayout.setVisibility(View.VISIBLE);
                 }

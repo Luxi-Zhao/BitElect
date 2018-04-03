@@ -50,7 +50,10 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-
+/**
+ * Scans passport and sends NFCResult back to MainActivity
+ * NFCResult is set to docnum
+ */
 public class NFCActivity extends AppCompatActivity {
     private static final String TAG = NFCActivity.class.getSimpleName();
     // NFC
