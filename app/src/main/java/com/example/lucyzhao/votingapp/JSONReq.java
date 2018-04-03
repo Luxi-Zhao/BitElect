@@ -28,6 +28,15 @@ public class JSONReq {
     private static final String TAG = JSONReq.class.getSimpleName();
     private static final int MAX_RETRY = 5;
 
+    /**
+     *
+     * @param context
+     * @param nfcID
+     * @param blockID
+     * @return null if an exception happened
+     *         empty block if other problems happened
+     *         block with data under normal conditions
+     */
     static Block getBlock(Context context, String nfcID, String blockID) {
         Block block = new Block();
 
@@ -72,7 +81,7 @@ public class JSONReq {
                 }
             }
         } catch (Exception e) {
-            Toast.makeText(context.getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
+            return null;
         }
 
         /* ----------- process result ---------------*/
@@ -101,12 +110,14 @@ public class JSONReq {
                 //todo does BLOCKID mean the sender's block ID?
 
             } catch (Exception e) {
-                Toast.makeText(context.getApplicationContext(), R.string.json_err, Toast.LENGTH_SHORT).show();
+               return null;
             }
         } else {
-            Toast.makeText(context.getApplicationContext(), R.string.json_err, Toast.LENGTH_SHORT).show();
+            return null;
         }
         return block;
 
     }
+
+
 }

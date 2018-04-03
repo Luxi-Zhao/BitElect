@@ -9,7 +9,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,24 +16,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
-import com.google.gson.JsonObject;
-import com.koushikdutta.ion.Ion;
-
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
-import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
-import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
-import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
-import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
-import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
-import static com.example.lucyzhao.votingapp.Utils.checkNationalityEligiblity;
-import static java.lang.Thread.sleep;
+import static com.example.lucyzhao.votingapp.Utils.getDocNum;
 
 public class BlockchainUIActivity extends NavActivity {
     RecyclerView recyclerView;
@@ -52,6 +39,25 @@ public class BlockchainUIActivity extends NavActivity {
         recyclerView = findViewById(R.id.blockchain_recycler);
         llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
+
+        this.blockchainAdapter = new BlockchainAdapter(blockchain);
+
+        recyclerView.setAdapter(this.blockchainAdapter);
+
+        String nfcID = getDocNum(this);
+        if (nfcID.equals("")) {
+            Toast.makeText(this, R.string.navigation_drawer_docnum_none, Toast.LENGTH_LONG).show();
+        } else {
+            // populate the list with data got from wifi
+            new GetBlocksTask(this).execute(nfcID);
+        }
+
+    }
+
+    /**
+     * For testing only
+     */
+    private void initList() {
         for (int i = 0; i < 10; i++) {
             int bgColor = generateRandColor();
             int prevColor;
@@ -63,13 +69,10 @@ public class BlockchainUIActivity extends NavActivity {
             b.setBlockID(Integer.toString(i));
             blockchain.add(b);
         }
-        this.blockchainAdapter = new BlockchainAdapter(blockchain);
-
-        recyclerView.setAdapter(this.blockchainAdapter);
     }
 
 
-    private int generateRandColor() {
+    private static int generateRandColor() {
         Random rnd = new Random();
         int r = rnd.nextInt(200);
         int g = rnd.nextInt(200);
@@ -78,11 +81,6 @@ public class BlockchainUIActivity extends NavActivity {
         return color;
     }
 
-    // todo might fail
-    private List<Block> getBlocks() {
-        List<Block> blocks = new ArrayList<>();
-        return blocks;
-    }
 
     private static class GetBlocksTask extends AsyncTask<String, Void, List<Block>> {
         WeakReference<BlockchainUIActivity> activityRef;
@@ -92,41 +90,63 @@ public class BlockchainUIActivity extends NavActivity {
         }
 
         /**
-         *
          * @param params nfcID
-         * @return
+         * @return null if can't get blockchain size
+         * otherwise, return a list of blocks of blockchain size
+         * if individual block retrieval failed, uses empty blocks as
+         * placeholders
          */
         protected List<Block> doInBackground(String... params) {
             BlockchainUIActivity activity = activityRef.get();
-            if(activity == null || activity.isFinishing()) return null;
+            if (activity == null || activity.isFinishing()) return null;
+
             List<Block> list = new ArrayList<>();
             Context context = activity.getApplicationContext();
             String nfcID = params[0];
 
-            Block b = JSONReq.getBlock(context, nfcID, "0");
-            if(b == null) {
-                return null;
-            }
-            list.add(0, b);
-            int size = b.getNumBlocks();
-
-            list.add(0, b);
-            for(int i = 1; i < size; i++) {
-                Block block = JSONReq.getBlock(context, nfcID, Integer.toString(i));
-                if(block != null) {
-                    list.add(i, block);
-                }
-                else {
-                    list.add(i, new Block());
-                }
-
+            // get blockchain size
+//            Block b = JSONReq.getBlock(context, nfcID, "0");
+//            if (b == null) {
+//                return null;
+//            }
+//            list.add(0, b);
+//            int size = b.getNumBlocks();
+//
+//            // get other blocks
+//            for (int i = 1; i < size; i++) {
+//                Block block = JSONReq.getBlock(context, nfcID, Integer.toString(i));
+//                if (block != null) {
+//                    list.add(i, block);
+//                } else {
+//                    list.add(i, new Block());
+//                }
+//
+//            }
+            for (int i = 0; i < 10; i++) {
+                int bgColor = generateRandColor();
+                int prevColor;
+                if (i == 0) prevColor = INIT_COLOR;
+                else prevColor = list.get(i - 1).getHashColor();
+                Block b = new Block(bgColor, prevColor);
+                b.setHash("asdfadsf");
+                b.setPrevHash("asdfasdfasdf");
+                b.setBlockID(Integer.toString(i));
+                list.add(b);
             }
             return list;
         }
 
 
         protected void onPostExecute(List<Block> blocks) {
-            if(blocks == null) return;
+            BlockchainUIActivity activity = activityRef.get();
+            if (activity == null || activity.isFinishing()) return;
+            if (blocks == null) {
+                Toast.makeText(activity, "Failed to get blockchain", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            activity.blockchain = blocks;
+            activity.blockchainAdapter.updateInnerList(activity.blockchain);
         }
     }
 
@@ -148,11 +168,20 @@ public class BlockchainUIActivity extends NavActivity {
          *             info of each block
          */
         public BlockchainAdapter(List<Block> list) {
+            this.heteroList = createHeteroList(list);
+        }
+
+        private List<Object> createHeteroList(List<Block> list) {
+            List<Object> heteroList = new ArrayList<>();
             for (Block block : list) {
                 heteroList.add(block);
                 heteroList.add(CHAIN_STR);
             }
-            heteroList.remove(heteroList.size() - 1);
+            if (!heteroList.isEmpty()) {
+                heteroList.remove(heteroList.size() - 1);
+            }
+
+            return heteroList;
         }
 
         @Override
@@ -207,11 +236,10 @@ public class BlockchainUIActivity extends NavActivity {
             });
 
             // show prev hash and hash hints for genesis block
-            if(getBlockIndex(position) == 0) {
+            if (getBlockIndex(position) == 0) {
                 vh.prevHash.setText(R.string.block_prevhash_hint);
                 vh.hash.setText(R.string.block_hash_hint);
-            }
-            else{
+            } else {
                 vh.prevHash.setText("");
                 vh.hash.setText("");
             }
@@ -234,6 +262,11 @@ public class BlockchainUIActivity extends NavActivity {
         public int getItemViewType(int position) {
             if (position % 2 == 0) return BLOCK;
             else return CHAIN;
+        }
+
+        public void updateInnerList(List<Block> newBlocks) {
+            this.heteroList = createHeteroList(newBlocks);
+            this.notifyDataSetChanged();
         }
 
         private class BlockViewHolder extends RecyclerView.ViewHolder {

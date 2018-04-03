@@ -39,7 +39,7 @@ public class NavActivity extends AppCompatActivity
         docNumTag = navigationView.getHeaderView(0).findViewById(R.id.nav_doc_number_tag);
         setTypeFace();
 
-        String docNumStr = getDocNum();
+        String docNumStr = Utils.getDocNum(this);
         if (docNumStr.equals("")) {
             docNumTag.setText(R.string.navigation_drawer_docnum_none);
             docNum.setText("");
@@ -86,11 +86,6 @@ public class NavActivity extends AppCompatActivity
         startActivity(new Intent(this, cls));
         overridePendingTransition(R.anim.right_to_left, R.anim.left_to_right);
         finish();
-    }
-
-    private String getDocNum() {
-        SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
-        return sharedPref.getString(getString(R.string.shared_pref_doc_num), "");
     }
 
     private void clearProgress() {

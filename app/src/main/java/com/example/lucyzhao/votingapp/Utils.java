@@ -113,6 +113,11 @@ public class Utils {
         Log.v(TAG, "saved to pref");
     }
 
+    public static String getDocNum(Context context) {
+        SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.pref_file_key), Context.MODE_PRIVATE);
+        return sharedPref.getString(context.getString(R.string.shared_pref_doc_num), "");
+    }
+
     ///////////////////////////////////////////////////////////////////////
     ///////////////////////////IMG/FILE SAVING/////////////////////////////
     ///////////////////////////////////////////////////////////////////////
