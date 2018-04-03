@@ -19,8 +19,13 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_KEY_KEY;
+import static com.example.lucyzhao.votingapp.Utils.COMM_KEY_MSG;
+import static com.example.lucyzhao.votingapp.Utils.COMM_KEY_TYPE;
+import static com.example.lucyzhao.votingapp.Utils.COMM_KEY_VALID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_REQ_CHAIN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_REQ_KEY;
 import static com.example.lucyzhao.votingapp.Utils.COMM_REQ_RESULT;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESPONSE_TYPE;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_CAND1V;
@@ -55,7 +60,7 @@ public class JSONReq {
                 + COMM_NFC_ID + "=" + nfcID + "&"
                 + COMM_BLOCKID + "=" + blockID;
 
-        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + "1234";
+        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + nfcID;
         Log.v(TAG, "url is: " + url);
 
         JsonObject json = getJSON(context, url, cleanurl);
@@ -107,7 +112,7 @@ public class JSONReq {
                 + "REQUESTTYPE=" + COMM_REQ_RESULT + "&"
                 + COMM_NFC_ID + "=" + nfcID;
 
-        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + "1234";
+        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + nfcID;
         Log.v(TAG, "url is: " + url);
 
         JsonObject json = getJSON(context, url, cleanurl);
@@ -139,6 +144,50 @@ public class JSONReq {
                 ret[4] = cand2ln;
                 ret[5] = cand1Votes;
                 ret[6] = cand2Votes;
+
+            } catch (Exception e) {
+                return null;
+            }
+        } else {
+            return null;
+        }
+        return ret;
+    }
+
+    /**
+     *
+     * @param context
+     * @param nfcID doc num
+     * @return valid,
+     */
+    static String[] sendKey(Context context, String nfcID, String key, String keyType) {
+        String[] ret = new String[2];
+
+        /* ------------ prepare url ----------------*/
+        String url = VOTING_URL
+                + "REQUESTTYPE=" + COMM_REQ_KEY + "&"
+                + COMM_NFC_ID + "=" + nfcID + "&"
+                + COMM_KEY_KEY + "=" + key + "&"
+                + COMM_KEY_TYPE + "=" + keyType;
+
+        String cleanurl = VOTING_URL + COMM_NFC_ID + "=" + nfcID;
+        Log.v(TAG, "url is: " + url);
+
+        JsonObject json = getJSON(context, url, cleanurl);
+
+        /* ----------- process result ---------------*/
+        if (json != null) {
+            try {
+                String valid = json.get(COMM_KEY_VALID).toString();
+                Log.v(TAG, "result valid is: " + valid);
+
+                if(valid.equals("\"T\"")) {
+                    ret[0] = Utils.TRUE;
+                }
+                else {
+                    ret[0] = Utils.FALSE;
+                    ret[1] = json.get(COMM_KEY_MSG).toString();
+                }
 
             } catch (Exception e) {
                 return null;

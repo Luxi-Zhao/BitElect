@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorBackground"
+    android:orientation="vertical"
+    android:padding="20dp"
+    tools:context="com.example.lucyzhao.votingapp.KeyActivity">
+
+    <TextView
+        android:id="@+id/key_title_txt"
+        style="@style/CandidateConfigTitle"
+        android:text="Private Key" />
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Private Key (hex): " />
+
+        <EditText
+            android:id="@+id/key_private_4hex"
+            style="@style/CandidateConfigEditText"
+            android:imeOptions="actionDone"
+            android:inputType="text"
+            android:maxLength="4"
+            android:maxLines="1" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Private Key (integer): " />
+
+        <TextView
+            android:id="@+id/key_private_int"
+            style="@style/CandidateConfigTag" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Key Type" />
+    </LinearLayout>
+
+
+    <RadioGroup
+        android:id="@+id/key_type_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:padding="10dp">
+
+        <RadioButton
+            android:id="@+id/key_type_L"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="L" />
+
+        <RadioButton
+            android:id="@+id/key_type_M"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="M" />
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/candidate_config_ok_btn"
+        style="@style/PrimaryButton"
+        android:layout_marginTop="170dp"
+        android:onClick="sendKey"
+        android:text="OK" />
+
+</LinearLayout>

@@ -29,6 +29,11 @@
                 android:id="@+id/nav_config"
                 android:icon="@drawable/ic_action_settings"
                 android:title="Candidate Configuration" />
+
+            <item
+                android:id="@+id/nav_key"
+                android:icon="@drawable/ic_vpn_key_black_24dp"
+                android:title="Key Configuration" />
         </menu>
     </item>
 

@@ -35,4 +35,9 @@
     <string name="poll_result_getting_err">Failed to get poll results</string>
     <string name="poll_result_invalid">Poll still open, do not trust poll results</string>
     <string name="poll_result_valid">Poll closed</string>
+    <string name="key_sending_err">Failed to send private key</string>
+    <string name="key_rejected">Key rejected</string>
+    <string name="key_accepted">Key accepted</string>
+    <string name="key_format_wrong">Key format invalid</string>
+    <string name="empty_fields">Please fill in all fields</string>
 </resources>

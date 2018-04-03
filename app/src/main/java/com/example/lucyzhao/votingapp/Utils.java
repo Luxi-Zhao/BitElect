@@ -31,7 +31,7 @@ public class Utils {
     public static final String NFC_RESULT = "nfc_result";
 
     /*----------- DE1-SOC COMM --------------*/
-    public static final String VOTING_URL = "http://192.168.1.16/?";
+    public static final String VOTING_URL = "http://192.168.1.100/?";
     public static final String COMM_RESPONSE_TYPE = "RESPONSETYPE";
     public static final String COMM_NFC_ID = "NFCID";
     public static final String COMM_QR_CODE = "QRCODE";
@@ -57,6 +57,12 @@ public class Utils {
     public static final String COMM_CAND2_LN = "CAND2LN";
     public static final String COMM_RESULT_CAND1V = "CAND1VOTES";
     public static final String COMM_RESULT_CAND2V = "CAND2VOTES";
+
+    public static final String COMM_REQ_KEY = "KEYREQUEST";
+    public static final String COMM_KEY_MSG = "REJECTIONMESSAGE";
+    public static final String COMM_KEY_VALID = "KEYACCEPTED";
+    public static final String COMM_KEY_KEY = "PRIVVAL";
+    public static final String COMM_KEY_TYPE = "PRIVIDENT";
 
     public static final String TRUE = "True";
     public static final String FALSE = "False";

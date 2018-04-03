@@ -1,8 +1,6 @@
 package com.example.lucyzhao.votingapp;
 
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
@@ -38,18 +36,14 @@ public class NavActivity extends AppCompatActivity
         docNum = navigationView.getHeaderView(0).findViewById(R.id.nav_doc_number);
         docNumTag = navigationView.getHeaderView(0).findViewById(R.id.nav_doc_number_tag);
         setTypeFace();
+        setDocNumTxt();
 
-        String docNumStr = Utils.getDocNum(this);
-        if (docNumStr.equals("")) {
-            docNumTag.setText(R.string.navigation_drawer_docnum_none);
-            docNum.setText("");
-        } else {
-            docNumTag.setText(R.string.navigation_drawer_tag);
-            String sub = docNumStr.substring(0, STR_LEN);
-            sub += "...";
-            docNum.setText(sub);
-        }
+    }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setDocNumTxt();
     }
 
     @Override
@@ -78,6 +72,8 @@ public class NavActivity extends AppCompatActivity
             startActivityWithAnim(CandidateInfoActivity.class);
         } else if (id == R.id.nav_clear) {
             clearProgress();
+        } else if (id == R.id.nav_key) {
+            startActivityWithAnim(KeyActivity.class);
         }
         return true;
     }
@@ -103,4 +99,16 @@ public class NavActivity extends AppCompatActivity
         docNum.setTypeface(typeface);
     }
 
+    private void setDocNumTxt() {
+        String docNumStr = Utils.getDocNum(this);
+        if (docNumStr.equals("")) {
+            docNumTag.setText(R.string.navigation_drawer_docnum_none);
+            docNum.setText("");
+        } else {
+            docNumTag.setText(R.string.navigation_drawer_tag);
+            String sub = docNumStr.substring(0, STR_LEN);
+            sub += "...";
+            docNum.setText(sub);
+        }
+    }
 }
