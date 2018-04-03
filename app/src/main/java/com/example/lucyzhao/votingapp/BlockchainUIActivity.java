@@ -141,7 +141,7 @@ public class BlockchainUIActivity extends NavActivity {
             BlockchainUIActivity activity = activityRef.get();
             if (activity == null || activity.isFinishing()) return;
             if (blocks == null) {
-                Toast.makeText(activity, "Failed to get blockchain", Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity, R.string.block_getting_err, Toast.LENGTH_SHORT).show();
                 return;
             }
 

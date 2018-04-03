@@ -22,8 +22,8 @@ public class BarGraph extends View {
     private Rect bar;
 
     private double w, h;
-    private int result1 = 2, result2 = 1;
-    private String cand1FN = "Luxi", cand1LN = "Zhao", cand2FN="Kanglong", cand2LN="Qiu";
+    private int result1 = 0, result2 = 0;
+    private String cand1FN = "", cand1LN = "", cand2FN = "", cand2LN = "";
     private static final double GRAPH_MARGIN_RATIO = 1.0 / 8.0;
     private double graphMargin;
     private double marginVert, lineY;
@@ -154,7 +154,6 @@ public class BarGraph extends View {
     }
 
     /**
-     *
      * @param num
      * @param canvas
      * @param candID true for cand 1, false for cand 2
@@ -200,18 +199,17 @@ public class BarGraph extends View {
         Rect bounds = new Rect();
         textPaint.getTextBounds("f", 0, 1, bounds);
         int boxH = bounds.height();
-        y = lineY + boxH + TEXT_MARGIN ;
+        y = lineY + boxH + TEXT_MARGIN;
 
-        canvas.drawText(cand1LN, (float)x1, (float)y, textPaint);
-        canvas.drawText(cand2LN, (float)x2, (float)y, textPaint);
-        canvas.drawText(cand1FN, (float)x1, (float)y+boxH+TEXT_MARGIN, textPaint);
-        canvas.drawText(cand2FN, (float)x2, (float)y+boxH+TEXT_MARGIN, textPaint);
+        canvas.drawText(cand1LN, (float) x1, (float) y, textPaint);
+        canvas.drawText(cand2LN, (float) x2, (float) y, textPaint);
+        canvas.drawText(cand1FN, (float) x1, (float) y + boxH + TEXT_MARGIN, textPaint);
+        canvas.drawText(cand2FN, (float) x2, (float) y + boxH + TEXT_MARGIN, textPaint);
     }
 
     private double getBarCenter(boolean candID) {
-        if(candID) {
+        if (candID) {
             return w / 2.0 - graphMargin - barWidth / 2.0;
-        }
-        else return w / 2.0 + graphMargin + barWidth / 2.0;
+        } else return w / 2.0 + graphMargin + barWidth / 2.0;
     }
 }

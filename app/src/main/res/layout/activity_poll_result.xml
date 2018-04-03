@@ -1,19 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/poll_result_layout"
     android:background="@color/colorBackground"
     tools:context="com.example.lucyzhao.votingapp.PollResultActivity">
 
-    <com.example.lucyzhao.votingapp.BarGraph
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+    <!--<com.example.lucyzhao.votingapp.BarGraph-->
+        <!--android:id="@+id/poll_result_bargraph"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent" />-->
 
     <TextView
-        android:text="Poll Results"
         android:id="@+id/poll_result_title_txt"
-        style="@style/MainActivityTitle"/>
+        style="@style/MainActivityTitle"
+        android:text="Poll Results" />
+
+    <TextView
+        android:id="@+id/poll_result_valid"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@id/poll_result_title_txt"
+        android:layout_below="@+id/poll_result_title_txt"
+        android:textSize="18sp" />
 
 </RelativeLayout>

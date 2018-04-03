@@ -37,10 +37,7 @@ public class Utils {
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
 
-    public static final String COMM_CAND1_FN = "CAND1FN";
-    public static final String COMM_CAND1_LN = "CAND1LN";
-    public static final String COMM_CAND2_FN = "CAND2FN";
-    public static final String COMM_CAND2_LN = "CAND2LN";
+
 
     public static final String COMM_BLOCKID = "BLOCKID";
     public static final String COMM_REQ_CHAIN = "CHAINREQUEST";
@@ -50,6 +47,19 @@ public class Utils {
     public static final String COMM_BLOCK_HASH = "HASH";
     public static final String COMM_BLOCK_CUMU_CRYPT = "CUMULATIVECRYPT";
     public static final String COMM_BLOCK_TOTAL_NUM = "TOTALBLOCKS";
+
+    public static final String COMM_REQ_RESULT = "RESULTSREQUEST";
+    public static final String COMM_RESULT_RESPONSE = "RESULTSRESPONSE";
+    public static final String COMM_RESULT_VALID = "RESULTSVALID";
+    public static final String COMM_CAND1_FN = "CAND1FN";
+    public static final String COMM_CAND1_LN = "CAND1LN";
+    public static final String COMM_CAND2_FN = "CAND2FN";
+    public static final String COMM_CAND2_LN = "CAND2LN";
+    public static final String COMM_RESULT_CAND1V = "CAND1VOTES";
+    public static final String COMM_RESULT_CAND2V = "CAND2VOTES";
+
+    public static final String TRUE = "True";
+    public static final String FALSE = "False";
 
     /*----------- GitHub --------------*/
     public static final String AVATAR_URL = "avatar_url";

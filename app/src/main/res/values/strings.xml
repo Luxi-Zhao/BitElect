@@ -30,4 +30,9 @@
     <string name="block_prevhash_hint">PREV HASH</string>
 
     <string name="json_err">"Error getting response from server!"</string>
+
+    <string name="block_getting_err">Failed to get blockchain</string>
+    <string name="poll_result_getting_err">Failed to get poll results</string>
+    <string name="poll_result_invalid">Poll still open, do not trust poll results</string>
+    <string name="poll_result_valid">Poll closed</string>
 </resources>
