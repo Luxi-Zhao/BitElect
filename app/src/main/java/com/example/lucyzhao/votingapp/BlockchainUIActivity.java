@@ -1,5 +1,6 @@
 package com.example.lucyzhao.votingapp;
 
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -47,7 +49,6 @@ public class BlockchainUIActivity extends NavActivity {
         private String data;
         private String hash, prevHash;
         private int hashColor, prevHashColor;
-        private String nonce;
 
         Block(int hashColor, int prevHashColor) {
             this.hashColor = hashColor;
@@ -123,15 +124,17 @@ public class BlockchainUIActivity extends NavActivity {
             int color = blockchain.get(getBlockIndex(position)).hashColor;
             int prevColor = blockchain.get(getBlockIndex(position)).prevHashColor;
             setHashDrawable(vh.hash, color);
-            setPrevHashDrawable(vh.prevHash, prevColor);
+            //setPrevHashDrawable(vh.prevHash, prevColor);
+            setHashDrawable(vh.prevHash, prevColor);
         }
 
         private void setHashDrawable(View hashView, int bgColor) {
-            GradientDrawable shape = new GradientDrawable();
-            shape.setShape(GradientDrawable.RECTANGLE);
-            shape.setCornerRadii(new float[]{0, 0, 0, 0, 16, 16, 0, 0});
-            shape.setColor(bgColor);
-            hashView.setBackground(shape);
+//            GradientDrawable shape = new GradientDrawable();
+//            shape.setShape(GradientDrawable.RECTANGLE);
+//            shape.setCornerRadii(new float[]{0, 0, 0, 0, 16, 16, 0, 0});
+//            shape.setColor(bgColor);
+//            hashView.setBackground(shape);
+            hashView.setBackgroundTintList(ColorStateList.valueOf(bgColor));
         }
 
         private void setPrevHashDrawable(View hashView, int bgColor) {
@@ -143,7 +146,6 @@ public class BlockchainUIActivity extends NavActivity {
         }
 
         private int getBlockIndex(int heteroListPos) {
-            Log.v(TAG, "UI list position is " + heteroListPos + "   blockchain pos is " + heteroListPos/2);
             return heteroListPos / 2;
         }
 
@@ -160,11 +162,19 @@ public class BlockchainUIActivity extends NavActivity {
 
         private class BlockViewHolder extends RecyclerView.ViewHolder {
             TextView hash, prevHash;
+            Button blockBtn;
 
             private BlockViewHolder(View itemView) {
                 super(itemView);
                 hash = itemView.findViewById(R.id.block_hash);
                 prevHash = itemView.findViewById(R.id.block_prev_hash);
+//                blockBtn = itemView.findViewById(R.id.block);
+//                blockBtn.setOnClickListener(new View.OnClickListener() {
+//                    @Override
+//                    public void onClick(View view) {
+//                        Log.v(TAG, "block btn gets clicked");
+//                    }
+//                });
             }
         }
 

@@ -1,30 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="10dp">
 
-    <TextView
-        android:id="@+id/block_prev_hash"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignStart="@+id/block"
-        android:background="@drawable/block_prevhash"
-        android:text="prev hash" />
+    <!--<TextView-->
+        <!--android:id="@+id/block_prev_hash"-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:layout_alignStart="@+id/block"-->
+        <!--android:background="@drawable/block_prevhash"-->
+        <!--android:text="prev hash" />-->
 
-    <Button
-        android:id="@+id/block"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+    <!--<Button-->
+        <!--android:id="@+id/block"-->
+        <!--android:layout_width="100dp"-->
+        <!--android:layout_height="100dp"-->
+        <!--android:layout_centerHorizontal="true"-->
+        <!--android:background="@drawable/accent_button" />-->
+
+    <!--<TextView-->
+        <!--android:layout_width="50dp"-->
+        <!--android:layout_height="50dp"-->
+        <!--android:id="@+id/block_hash"-->
+        <!--android:layout_alignBottom="@+id/block"-->
+        <!--android:layout_toEndOf="@id/block_prev_hash"-->
+        <!--android:background="@drawable/block_hash"-->
+        <!--android:text="hash" />-->
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/button_default_accent" />
+        android:clickable="true"
+        android:layout_height="wrap_content">
+        <TextView
+            android:layout_width="87dp"
+            android:layout_height="50dp"
+            android:id="@+id/block_prev_hash"
+            android:text="prev hash"
+            android:backgroundTint="@color/colorPrimary"
+            android:background="@drawable/block_top"/>
+        <TextView
+            android:layout_width="87dp"
+            android:layout_height="75dp"
+            android:layout_marginTop="25dp"
+            android:text="hash"
+            android:id="@+id/block_hash"
+            android:backgroundTint="@color/colorAccent"
+            android:background="@drawable/block_bot"/>
+        <View
+            android:layout_width="1dp"
+            android:layout_height="50dp"
+            android:layout_centerHorizontal="true"
+            android:background="@color/colorPrimaryDark"
+            android:layout_marginTop="50dp"/>
+    </RelativeLayout>
 
-    <TextView
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:id="@+id/block_hash"
-        android:layout_alignBottom="@+id/block"
-        android:layout_toEndOf="@id/block_prev_hash"
-        android:background="@drawable/block_hash"
-        android:text="hash" />
+
 
 </RelativeLayout>
