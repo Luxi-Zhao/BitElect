@@ -28,4 +28,6 @@
 
     <string name="block_hash_hint">HASH</string>
     <string name="block_prevhash_hint">PREV HASH</string>
+
+    <string name="json_err">"Error getting response from server!"</string>
 </resources>

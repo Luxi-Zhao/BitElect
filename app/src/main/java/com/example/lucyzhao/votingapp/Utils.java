@@ -32,6 +32,7 @@ public class Utils {
 
     /*----------- DE1-SOC COMM --------------*/
     public static final String VOTING_URL = "http://192.168.1.16/?";
+    public static final String COMM_RESPONSE_TYPE = "RESPONSETYPE";
     public static final String COMM_NFC_ID = "NFCID";
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
@@ -40,6 +41,15 @@ public class Utils {
     public static final String COMM_CAND1_LN = "CAND1LN";
     public static final String COMM_CAND2_FN = "CAND2FN";
     public static final String COMM_CAND2_LN = "CAND2LN";
+
+    public static final String COMM_BLOCKID = "BLOCKID";
+    public static final String COMM_REQ_CHAIN = "CHAINREQUEST";
+    public static final String COMM_BLOCK_RESPONSE = "BLOCKRESPONSE";
+    public static final String COMM_BLOCK_VALID = "BLOCKVALID";
+    public static final String COMM_BLOCK_PREV_HASH= "PREVHASH";
+    public static final String COMM_BLOCK_HASH = "HASH";
+    public static final String COMM_BLOCK_CUMU_CRYPT = "CUMULATIVECRYPT";
+    public static final String COMM_BLOCK_TOTAL_NUM = "TOTALBLOCKS";
 
     /*----------- GitHub --------------*/
     public static final String AVATAR_URL = "avatar_url";

@@ -1,21 +1,40 @@
 package com.example.lucyzhao.votingapp;
 
 import android.app.DialogFragment;
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+import com.google.gson.JsonObject;
+import com.koushikdutta.ion.Ion;
+
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_FN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_CAND2_LN;
+import static com.example.lucyzhao.votingapp.Utils.COMM_NFC_ID;
+import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
+import static com.example.lucyzhao.votingapp.Utils.checkNationalityEligiblity;
+import static java.lang.Thread.sleep;
 
 public class BlockchainUIActivity extends NavActivity {
     RecyclerView recyclerView;
@@ -37,11 +56,11 @@ public class BlockchainUIActivity extends NavActivity {
             int bgColor = generateRandColor();
             int prevColor;
             if (i == 0) prevColor = INIT_COLOR;
-            else prevColor = blockchain.get(i - 1).hashColor;
+            else prevColor = blockchain.get(i - 1).getHashColor();
             Block b = new Block(bgColor, prevColor);
-            b.hash = "asdfasdf";
-            b.prevHash = "prefvpadsfasd";
-            b.blockID = Integer.toString(i);
+            b.setHash("asdfadsf");
+            b.setPrevHash("asdfasdfasdf");
+            b.setBlockID(Integer.toString(i));
             blockchain.add(b);
         }
         this.blockchainAdapter = new BlockchainAdapter(blockchain);
@@ -49,19 +68,6 @@ public class BlockchainUIActivity extends NavActivity {
         recyclerView.setAdapter(this.blockchainAdapter);
     }
 
-    public class Block {
-        private String data;
-        private String hash, prevHash;
-        private String blockID;
-
-        // UI colors
-        private int hashColor, prevHashColor;
-
-        Block(int hashColor, int prevHashColor) {
-            this.hashColor = hashColor;
-            this.prevHashColor = prevHashColor;
-        }
-    }
 
     private int generateRandColor() {
         Random rnd = new Random();
@@ -72,6 +78,61 @@ public class BlockchainUIActivity extends NavActivity {
         return color;
     }
 
+    // todo might fail
+    private List<Block> getBlocks() {
+        List<Block> blocks = new ArrayList<>();
+        return blocks;
+    }
+
+    private static class GetBlocksTask extends AsyncTask<String, Void, List<Block>> {
+        WeakReference<BlockchainUIActivity> activityRef;
+
+        GetBlocksTask(BlockchainUIActivity activity) {
+            this.activityRef = new WeakReference<>(activity);
+        }
+
+        /**
+         *
+         * @param params nfcID
+         * @return
+         */
+        protected List<Block> doInBackground(String... params) {
+            BlockchainUIActivity activity = activityRef.get();
+            if(activity == null || activity.isFinishing()) return null;
+            List<Block> list = new ArrayList<>();
+            Context context = activity.getApplicationContext();
+            String nfcID = params[0];
+
+            Block b = JSONReq.getBlock(context, nfcID, "0");
+            if(b == null) {
+                return null;
+            }
+            list.add(0, b);
+            int size = b.getNumBlocks();
+
+            list.add(0, b);
+            for(int i = 1; i < size; i++) {
+                Block block = JSONReq.getBlock(context, nfcID, Integer.toString(i));
+                if(block != null) {
+                    list.add(i, block);
+                }
+                else {
+                    list.add(i, new Block());
+                }
+
+            }
+            return list;
+        }
+
+
+        protected void onPostExecute(List<Block> blocks) {
+            if(blocks == null) return;
+        }
+    }
+
+    //////////////////////////////////////////////////////
+    //////////////////RECYCLER VIEW UI////////////////////
+    //////////////////////////////////////////////////////
 
     /**
      * Cannot update list for now
@@ -134,8 +195,8 @@ public class BlockchainUIActivity extends NavActivity {
 
         private void configureBlockViewHolder(BlockViewHolder vh, int position) {
             final Block b = blockchain.get(getBlockIndex(position));
-            int color = b.hashColor;
-            int prevColor = b.prevHashColor;
+            int color = b.getHashColor();
+            int prevColor = b.getPrevHashColor();
             setCubeColor(vh.hash, color);
             setCubeColor(vh.prevHash, prevColor);
             vh.blockItem.setOnClickListener(new View.OnClickListener() {
@@ -203,9 +264,9 @@ public class BlockchainUIActivity extends NavActivity {
 
             // Supply index input as an argument.
             Bundle args = new Bundle();
-            args.putString("hash", block.hash);
-            args.putString("prevHash", block.prevHash);
-            args.putString("blockID", block.blockID);
+            args.putString("hash", block.getHash());
+            args.putString("prevHash", block.getPrevHash());
+            args.putString("blockID", block.getBlockID());
 
             f.setArguments(args);
 
