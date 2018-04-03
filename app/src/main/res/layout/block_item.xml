@@ -4,57 +4,41 @@
     android:layout_height="wrap_content"
     android:padding="10dp">
 
-    <!--<TextView-->
-        <!--android:id="@+id/block_prev_hash"-->
-        <!--android:layout_width="50dp"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:layout_alignStart="@+id/block"-->
-        <!--android:background="@drawable/block_prevhash"-->
-        <!--android:text="prev hash" />-->
-
-    <!--<Button-->
-        <!--android:id="@+id/block"-->
-        <!--android:layout_width="100dp"-->
-        <!--android:layout_height="100dp"-->
-        <!--android:layout_centerHorizontal="true"-->
-        <!--android:background="@drawable/accent_button" />-->
-
-    <!--<TextView-->
-        <!--android:layout_width="50dp"-->
-        <!--android:layout_height="50dp"-->
-        <!--android:id="@+id/block_hash"-->
-        <!--android:layout_alignBottom="@+id/block"-->
-        <!--android:layout_toEndOf="@id/block_prev_hash"-->
-        <!--android:background="@drawable/block_hash"-->
-        <!--android:text="hash" />-->
     <RelativeLayout
+        android:id="@+id/block_item_layout"
         android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        android:clickable="true"
-        android:layout_height="wrap_content">
+        android:clickable="true">
+
         <TextView
+            android:id="@+id/block_prev_hash"
             android:layout_width="87dp"
             android:layout_height="50dp"
-            android:id="@+id/block_prev_hash"
-            android:text="prev hash"
+            android:background="@drawable/block_top"
             android:backgroundTint="@color/colorPrimary"
-            android:background="@drawable/block_top"/>
+            android:gravity="center"
+            android:textColor="@color/colorBackground"
+            android:textSize="15sp" />
+
         <TextView
+            android:id="@+id/block_hash"
             android:layout_width="87dp"
             android:layout_height="75dp"
             android:layout_marginTop="25dp"
-            android:text="hash"
-            android:id="@+id/block_hash"
+            android:background="@drawable/block_bot"
             android:backgroundTint="@color/colorAccent"
-            android:background="@drawable/block_bot"/>
+            android:gravity="center"
+            android:textColor="@color/colorBackground"
+            android:textSize="20sp" />
+
         <View
             android:layout_width="1dp"
             android:layout_height="50dp"
             android:layout_centerHorizontal="true"
-            android:background="@color/colorPrimaryDark"
-            android:layout_marginTop="50dp"/>
+            android:layout_marginTop="50dp"
+            android:background="@color/colorPrimaryDark" />
     </RelativeLayout>
-
 
 
 </RelativeLayout>

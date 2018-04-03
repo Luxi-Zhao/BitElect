@@ -49,7 +49,7 @@ public class CandidateInfoActivity extends NavActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_candidate_info);
-        setTypeFace();
+        Utils.setTypeFace(this, R.id.cand_config_title_txt);
 
         okBtn = findViewById(R.id.candidate_config_ok_btn);
 
@@ -75,14 +75,6 @@ public class CandidateInfoActivity extends NavActivity {
             }
         });
     }
-
-    private void setTypeFace() {
-        Typeface typeface = getResources().getFont(R.font.quicksand);
-
-        TextView txt = findViewById(R.id.cand_config_title_txt);
-        txt.setTypeface(typeface);
-    }
-
 
     private void sendConfig(String cand1LN, String cand1FN, String cand2LN, String cand2FN) {
         RequestQueue queue = Volley.newRequestQueue(this);

@@ -23,4 +23,7 @@
     <string name="vote_btn_pos_str">Yes, VOTE!</string>
     <string name="vote_btn_neg_str">Cancel</string>
     <string name="vote_done_str">You have voted.</string>
+
+    <string name="block_hash_hint">HASH</string>
+    <string name="block_prevhash_hint">PREV HASH</string>
 </resources>

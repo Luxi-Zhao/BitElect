@@ -1,17 +1,16 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.DialogFragment;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.GradientDrawable;
+import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -25,6 +24,7 @@ public class BlockchainUIActivity extends NavActivity {
     LinearLayoutManager llm;
     private static final int INIT_COLOR = Color.RED;
     private static final String TAG = BlockchainUIActivity.class.getSimpleName();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +33,16 @@ public class BlockchainUIActivity extends NavActivity {
         recyclerView = findViewById(R.id.blockchain_recycler);
         llm = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(llm);
-        for(int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             int bgColor = generateRandColor();
             int prevColor;
-            if(i == 0) prevColor = INIT_COLOR;
-            else prevColor = blockchain.get(i-1).hashColor;
-            blockchain.add(new Block(bgColor, prevColor));
+            if (i == 0) prevColor = INIT_COLOR;
+            else prevColor = blockchain.get(i - 1).hashColor;
+            Block b = new Block(bgColor, prevColor);
+            b.hash = "asdfasdf";
+            b.prevHash = "prefvpadsfasd";
+            b.blockID = Integer.toString(i);
+            blockchain.add(b);
         }
         this.blockchainAdapter = new BlockchainAdapter(blockchain);
 
@@ -48,6 +52,9 @@ public class BlockchainUIActivity extends NavActivity {
     public class Block {
         private String data;
         private String hash, prevHash;
+        private String blockID;
+
+        // UI colors
         private int hashColor, prevHashColor;
 
         Block(int hashColor, int prevHashColor) {
@@ -65,6 +72,7 @@ public class BlockchainUIActivity extends NavActivity {
         return color;
     }
 
+
     /**
      * Cannot update list for now
      */
@@ -74,6 +82,10 @@ public class BlockchainUIActivity extends NavActivity {
         private static final String CHAIN_STR = "chain";
         private static final int BLOCK = 1, CHAIN = 0;
 
+        /**
+         * @param list a list of data holders containing
+         *             info of each block
+         */
         public BlockchainAdapter(List<Block> list) {
             for (Block block : list) {
                 heteroList.add(block);
@@ -84,7 +96,7 @@ public class BlockchainUIActivity extends NavActivity {
 
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            RecyclerView.ViewHolder viewHolder = null;
+            RecyclerView.ViewHolder viewHolder;
             LayoutInflater inflater = LayoutInflater.from(parent.getContext());
 
             switch (viewType) {
@@ -112,37 +124,40 @@ public class BlockchainUIActivity extends NavActivity {
                     configureBlockViewHolder(vh1, position);
                     break;
                 case CHAIN:
-                    // do nothing for now
+                    // do nothing
                     break;
                 default:
-                    // do nothing for now
+                    // do nothing
                     break;
             }
         }
 
         private void configureBlockViewHolder(BlockViewHolder vh, int position) {
-            int color = blockchain.get(getBlockIndex(position)).hashColor;
-            int prevColor = blockchain.get(getBlockIndex(position)).prevHashColor;
-            setHashDrawable(vh.hash, color);
-            //setPrevHashDrawable(vh.prevHash, prevColor);
-            setHashDrawable(vh.prevHash, prevColor);
+            final Block b = blockchain.get(getBlockIndex(position));
+            int color = b.hashColor;
+            int prevColor = b.prevHashColor;
+            setCubeColor(vh.hash, color);
+            setCubeColor(vh.prevHash, prevColor);
+            vh.blockItem.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    BlockInfoFragment.newInstance(b).show(getFragmentManager(), "blockInfoFrag");
+                }
+            });
+
+            // show prev hash and hash hints for genesis block
+            if(getBlockIndex(position) == 0) {
+                vh.prevHash.setText(R.string.block_prevhash_hint);
+                vh.hash.setText(R.string.block_hash_hint);
+            }
+            else{
+                vh.prevHash.setText("");
+                vh.hash.setText("");
+            }
         }
 
-        private void setHashDrawable(View hashView, int bgColor) {
-//            GradientDrawable shape = new GradientDrawable();
-//            shape.setShape(GradientDrawable.RECTANGLE);
-//            shape.setCornerRadii(new float[]{0, 0, 0, 0, 16, 16, 0, 0});
-//            shape.setColor(bgColor);
-//            hashView.setBackground(shape);
+        private void setCubeColor(View hashView, int bgColor) {
             hashView.setBackgroundTintList(ColorStateList.valueOf(bgColor));
-        }
-
-        private void setPrevHashDrawable(View hashView, int bgColor) {
-            GradientDrawable shape = new GradientDrawable();
-            shape.setShape(GradientDrawable.RECTANGLE);
-            shape.setCornerRadii(new float[]{16, 16, 0, 0, 0, 0, 0, 0});
-            shape.setColor(bgColor);
-            hashView.setBackground(shape);
         }
 
         private int getBlockIndex(int heteroListPos) {
@@ -162,19 +177,13 @@ public class BlockchainUIActivity extends NavActivity {
 
         private class BlockViewHolder extends RecyclerView.ViewHolder {
             TextView hash, prevHash;
-            Button blockBtn;
+            RelativeLayout blockItem;
 
             private BlockViewHolder(View itemView) {
                 super(itemView);
                 hash = itemView.findViewById(R.id.block_hash);
                 prevHash = itemView.findViewById(R.id.block_prev_hash);
-//                blockBtn = itemView.findViewById(R.id.block);
-//                blockBtn.setOnClickListener(new View.OnClickListener() {
-//                    @Override
-//                    public void onClick(View view) {
-//                        Log.v(TAG, "block btn gets clicked");
-//                    }
-//                });
+                blockItem = itemView.findViewById(R.id.block_item_layout);
             }
         }
 
@@ -184,4 +193,54 @@ public class BlockchainUIActivity extends NavActivity {
             }
         }
     }
+
+    public static class BlockInfoFragment extends DialogFragment {
+        String prevHashStr, hashStr, blockIDStr;
+        TextView validity, prevHash, hash, blockID, cumuCrypt;
+
+        public static BlockInfoFragment newInstance(Block block) {
+            BlockInfoFragment f = new BlockInfoFragment();
+
+            // Supply index input as an argument.
+            Bundle args = new Bundle();
+            args.putString("hash", block.hash);
+            args.putString("prevHash", block.prevHash);
+            args.putString("blockID", block.blockID);
+
+            f.setArguments(args);
+
+            return f;
+        }
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            Bundle bundle = getArguments();
+            if (bundle == null) return;
+            prevHashStr = bundle.getString("prevHash");
+            hashStr = bundle.getString("hash");
+            blockIDStr = bundle.getString("blockID");
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View fragment = inflater.inflate(R.layout.fragment_block_info, container, false);
+            validity = fragment.findViewById(R.id.block_validity_txt);
+            prevHash = fragment.findViewById(R.id.prev_hash_txt);
+            hash = fragment.findViewById(R.id.hash_txt);
+            blockID = fragment.findViewById(R.id.block_id_title_txt);
+            cumuCrypt = fragment.findViewById(R.id.crypt_txt);
+
+            Typeface typeface = getActivity().getResources().getFont(R.font.quicksand);
+            blockID.setTypeface(typeface);
+
+            prevHash.setText(prevHashStr);
+            hash.setText(hashStr);
+            String blockStr = "Block ID " + blockIDStr;
+            blockID.setText(blockStr);
+            return fragment;
+        }
+    }
+
 }

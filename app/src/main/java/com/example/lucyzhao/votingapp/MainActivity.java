@@ -65,7 +65,7 @@ public class MainActivity extends NavActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         super.onCreateDrawer(R.layout.activity_main);
-        setTypeFace();
+        Utils.setTypeFace(this, R.id.main_title_txt, R.id.main_title_txt2);
         Log.v(TAG, "in onCreate");
 
         // UI elements
@@ -112,15 +112,6 @@ public class MainActivity extends NavActivity {
     protected void onResume() {
         super.onResume();
         taskManager.onTaskCompleted(tasksCompleted);
-    }
-
-    private void setTypeFace() {
-        Typeface typeface = getResources().getFont(R.font.quicksand);
-
-        TextView txt = findViewById(R.id.main_title_txt);
-        TextView txt2 = findViewById(R.id.main_title_txt2);
-        txt.setTypeface(typeface);
-        txt2.setTypeface(typeface);
     }
 
     //////////////////////////////////////////////////////////////

@@ -1,10 +1,13 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.util.SparseArray;
+import android.widget.TextView;
 
 import com.google.android.gms.vision.Frame;
 import com.google.android.gms.vision.face.Face;
@@ -225,6 +228,19 @@ public class Utils {
         BigInteger cipher = publicKey.add(BigInteger.valueOf(1)).modPow(plainText, publicKeysq).multiply(temp).mod(publicKeysq);
 
         return Integer.toString(cipher.intValue());
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////UI//////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////
+
+    public static void setTypeFace(Activity activity, int... ids) {
+        Typeface typeface = activity.getResources().getFont(R.font.quicksand);
+        for(int id : ids) {
+            TextView textView = activity.findViewById(id);
+            textView.setTypeface(typeface);
+        }
     }
 
 }

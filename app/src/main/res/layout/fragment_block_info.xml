@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <TextView
+        android:id="@+id/block_id_title_txt"
+        style="@style/CandidateConfigTitle"
+        android:text="Block ID" />
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Block Validity: " />
+
+        <TextView
+            android:id="@+id/block_validity_txt"
+            style="@style/CandidateConfigEditText" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Previous Hash: " />
+
+        <TextView
+            android:id="@+id/prev_hash_txt"
+            style="@style/CandidateConfigEditText" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Hash: " />
+
+        <TextView
+            android:id="@+id/hash_txt"
+            style="@style/CandidateConfigEditText" />
+    </LinearLayout>
+
+    <LinearLayout style="@style/CandidateConfigInfoBox">
+
+        <TextView
+            style="@style/CandidateConfigTag"
+            android:text="Cumulative Crypt: " />
+
+        <TextView
+            android:id="@+id/crypt_txt"
+            style="@style/CandidateConfigEditText" />
+    </LinearLayout>
+
+</LinearLayout>
