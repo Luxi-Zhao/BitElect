@@ -2,10 +2,9 @@ package com.example.lucyzhao.votingapp;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.support.v4.content.ContextCompat;
 import android.util.Log;
-import android.widget.Toast;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.ion.Ion;
 
@@ -13,7 +12,6 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCKID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_CUMU_CRYPT;
 import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_HASH;
 import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_PREV_HASH;
-import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_RESPONSE;
 import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_TOTAL_NUM;
 import static com.example.lucyzhao.votingapp.Utils.COMM_BLOCK_VALID;
 import static com.example.lucyzhao.votingapp.Utils.COMM_CAND1_FN;
@@ -33,7 +31,6 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_CAND1V;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_CAND2V;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_VALID;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
-import static com.example.lucyzhao.votingapp.Utils.savePassportInfoToPref;
 import static java.lang.Thread.sleep;
 
 /**
@@ -45,13 +42,12 @@ public class JSONReq {
     private static final int MAX_RETRY = 5;
 
     /**
-     *
      * @param context
-     * @param nfcID doc num
+     * @param nfcID   doc num
      * @param blockID
      * @return null if an exception happened
-     *         empty block if other problems happened
-     *         block with data under normal conditions
+     * empty block if other problems happened
+     * block with data under normal conditions
      */
     static Block getBlock(Context context, String nfcID, String blockID) {
         Block block = new Block();
@@ -73,23 +69,37 @@ public class JSONReq {
                 String valid = json.get(COMM_BLOCK_VALID).toString();
                 Log.v(TAG, "valid is: " + valid);
 
-                if(valid.equals("\"T\"")) {
+                if (valid.equals("\"T\"")) {
                     block.setValid(Utils.TRUE);
-                }
-                else {
+                } else {
                     block.setValid(Utils.FALSE);
                 }
 
-                String hash = json.get(COMM_BLOCK_HASH).toString();
+                // hash
+                JsonElement hashJ = json.get(COMM_BLOCK_HASH);
+                String hash = "0";
+                if(hashJ != null) {
+                    hash = hashJ.toString().replaceAll("[\"]", "");
+                }
                 block.setHash(hash);
                 Log.v(TAG, "hash is " + hash);
                 int hashInt = Integer.parseInt(hash);
 
-                String prevHash = json.get(COMM_BLOCK_PREV_HASH).toString();
+                // prev hash
+                JsonElement prevHJ = json.get(COMM_BLOCK_PREV_HASH);
+                String prevHash = "0";
+                if(prevHJ != null) {
+                    prevHash = prevHJ.toString().replaceAll("[\"]", "");
+                }
                 block.setPrevHash(prevHash);
                 int prevHashInt = Integer.parseInt(prevHash);
 
-                String crypt = json.get(COMM_BLOCK_CUMU_CRYPT).toString().replaceAll("[\"]", "");
+                // cumulative crypt
+                JsonElement cryptJ = json.get(COMM_BLOCK_CUMU_CRYPT);
+                String crypt = "0";
+                if(cryptJ != null) {
+                    crypt = cryptJ.toString().replaceAll("[\"]", "");
+                }
                 block.setCrypt(crypt);
 
                 String numBlocks = json.get(COMM_BLOCK_TOTAL_NUM).toString();
@@ -103,7 +113,7 @@ public class JSONReq {
                 block.setPrevHashColor(colors[1]);
 
             } catch (Exception e) {
-               return null;
+                return null;
             }
         } else {
             return null;
@@ -112,7 +122,6 @@ public class JSONReq {
     }
 
     /**
-     *
      * @param hash
      * @param prevHash
      * @return hashColor, prevHashColor
@@ -132,13 +141,12 @@ public class JSONReq {
         int prevHC = Color.rgb(prevR, prevG, prevB);
         ret[0] = hashC;
         ret[1] = prevHC;
-        return  ret;
+        return ret;
     }
 
     /**
-     *
      * @param context
-     * @param nfcID doc num
+     * @param nfcID   doc num
      * @return valid, cand1fn, cand1ln, cand2fn, cand2ln, cand1votes, cand2votes
      */
     static String[] getPollResult(Context context, String nfcID) {
@@ -157,13 +165,13 @@ public class JSONReq {
         /* ----------- process result ---------------*/
         if (json != null) {
             try {
+
                 String valid = json.get(COMM_RESULT_VALID).toString();
                 Log.v(TAG, "result valid is: " + valid);
 
-                if(valid.equals("\"T\"")) {
+                if (valid.equals("\"T\"")) {
                     ret[0] = Utils.TRUE;
-                }
-                else {
+                } else {
                     ret[0] = Utils.FALSE;
                 }
 
@@ -172,8 +180,17 @@ public class JSONReq {
                 String cand2fn = json.get(COMM_CAND2_FN).toString().replaceAll("[\"]", "");
                 String cand2ln = json.get(COMM_CAND2_LN).toString().replaceAll("[\"]", "");
 
-                String cand1Votes = json.get(COMM_RESULT_CAND1V).toString();
-                String cand2Votes = json.get(COMM_RESULT_CAND2V).toString();
+                // cand1 votes and cand2 votes might not be returned
+                JsonElement cand1v = json.get(COMM_RESULT_CAND1V);
+                JsonElement cand2v = json.get(COMM_RESULT_CAND2V);
+                String cand1Votes, cand2Votes;
+                if (cand1v != null && cand2v != null) {
+                    cand1Votes = cand1v.toString();
+                    cand2Votes = cand2v.toString();
+                } else {
+                    cand1Votes = "0";
+                    cand2Votes = "0";
+                }
 
                 ret[1] = cand1fn;
                 ret[2] = cand1ln;
@@ -183,18 +200,20 @@ public class JSONReq {
                 ret[6] = cand2Votes;
 
             } catch (Exception e) {
+                Log.v(TAG, "in exception");
+                Log.v(TAG, e.toString());
                 return null;
             }
         } else {
+            Log.v(TAG, "json is null!!!");
             return null;
         }
         return ret;
     }
 
     /**
-     *
      * @param context
-     * @param nfcID doc num
+     * @param nfcID   doc num
      * @return valid,
      */
     static String[] sendKey(Context context, String nfcID, String key, String keyType) {
@@ -218,10 +237,9 @@ public class JSONReq {
                 String valid = json.get(COMM_KEY_VALID).toString();
                 Log.v(TAG, "result valid is: " + valid);
 
-                if(valid.equals("\"T\"")) {
+                if (valid.equals("\"T\"")) {
                     ret[0] = Utils.TRUE;
-                }
-                else {
+                } else {
                     ret[0] = Utils.FALSE;
                     ret[1] = json.get(COMM_KEY_MSG).toString();
                 }

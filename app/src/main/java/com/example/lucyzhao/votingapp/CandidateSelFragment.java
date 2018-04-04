@@ -1,13 +1,13 @@
 package com.example.lucyzhao.votingapp;
 
 
-import android.app.DialogFragment;
 import android.app.Fragment;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +42,7 @@ public class CandidateSelFragment extends Fragment {
 
     private RadioGroup radioGroup;
     private Button okBtn;
+    private RadioButton radioCand1, radioCand2;
 
     private List<ImageView> candImgs = new ArrayList<>();
     private List<TextView> candBios = new ArrayList<>();
@@ -55,6 +56,8 @@ public class CandidateSelFragment extends Fragment {
         TextView cand1Bio = fragment.findViewById(R.id.cand1Info);
         ImageView cand2Img = fragment.findViewById(R.id.cand2Img);
         TextView cand2Bio = fragment.findViewById(R.id.cand2Info);
+        radioCand1 = fragment.findViewById(R.id.radio_cand1);
+        radioCand2 = fragment.findViewById(R.id.radio_cand2);
 
         candImgs.add(cand1Img);
         candImgs.add(cand2Img);
@@ -99,13 +102,19 @@ public class CandidateSelFragment extends Fragment {
             }
 
             String nfcID = params[0];
-            return JSONReq.getPollResult(fragment.getContext(), nfcID);
+            String[] results = JSONReq.getPollResult(fragment.getContext(), nfcID);
+            return results;
         }
 
         @Override
         protected void onPostExecute(String[] pollResults) {
-            CandidateSelFragment fragment = fragmentRef.get();
+            final CandidateSelFragment fragment = fragmentRef.get();
             if(fragment == null || fragment.isDetached() || fragment.isRemoving()) {
+                return;
+            }
+
+            if(pollResults == null) {
+                Toast.makeText(fragment.getContext(), R.string.cand_names_getting_err, Toast.LENGTH_SHORT).show();
                 return;
             }
 
@@ -113,9 +122,16 @@ public class CandidateSelFragment extends Fragment {
             String cand1ln = pollResults[2];
             String cand2fn = pollResults[3];
             String cand2ln = pollResults[4];
+            String cand1Name = cand1fn + " " + cand1ln;
+            String cand2Name = cand2fn + " " + cand2ln;
 
-            fragment.getCandidateProfile(cand1fn + " " + cand1ln, 1);
-            fragment.getCandidateProfile(cand2fn + " " + cand2ln, 2);
+            Log.v(TAG, "cand1 name "  + cand1Name + " cand2 name is " + cand2Name);
+
+            fragment.radioCand1.setText(cand1Name);
+            fragment.radioCand2.setText(cand2Name);
+
+            fragment.getCandidateProfile("peterdeutsch", 1);
+            fragment.getCandidateProfile("Luxi-Zhao", 2);
         }
     }
 
@@ -136,11 +152,11 @@ public class CandidateSelFragment extends Fragment {
         int id = radioGroup.getCheckedRadioButtonId();
         // Check which radio button was clicked
         switch (id) {
-            case R.id.radio_clinton:
+            case R.id.radio_cand1:
                 candidateID = "1";
                 break;
 
-            case R.id.radio_trump:
+            case R.id.radio_cand2:
                 candidateID = "2";
                 break;
         }
