@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +52,8 @@ public class BlockchainUIActivity extends NavActivity {
             // populate the list with data got from wifi
             new GetBlocksTask(this).execute(nfcID);
         }
+
+        Log.v(TAG, "test str abc\"\"".replaceAll("[\"]", ""));
 
     }
 
@@ -122,17 +125,6 @@ public class BlockchainUIActivity extends NavActivity {
                 }
 
             }
-//            for (int i = 0; i < 10; i++) {
-//                int bgColor = generateRandColor();
-//                int prevColor;
-//                if (i == 0) prevColor = INIT_COLOR;
-//                else prevColor = list.get(i - 1).getHashColor();
-//                Block b = new Block(bgColor, prevColor);
-//                b.setHash("asdfadsf");
-//                b.setPrevHash("asdfasdfasdf");
-//                b.setBlockID(Integer.toString(i));
-//                list.add(b);
-//            }
             return list;
         }
 
@@ -289,7 +281,7 @@ public class BlockchainUIActivity extends NavActivity {
     }
 
     public static class BlockInfoFragment extends DialogFragment {
-        String prevHashStr, hashStr, blockIDStr;
+        String prevHashStr, hashStr, blockIDStr, cryptStr, validityStr;
         TextView validity, prevHash, hash, blockID, cumuCrypt;
 
         public static BlockInfoFragment newInstance(Block block) {
@@ -300,7 +292,8 @@ public class BlockchainUIActivity extends NavActivity {
             args.putString("hash", block.getHash());
             args.putString("prevHash", block.getPrevHash());
             args.putString("blockID", block.getBlockID());
-
+            args.putString("crypt", block.getCrypt());
+            args.putString("valid", block.getValid());
             f.setArguments(args);
 
             return f;
@@ -314,6 +307,8 @@ public class BlockchainUIActivity extends NavActivity {
             prevHashStr = bundle.getString("prevHash");
             hashStr = bundle.getString("hash");
             blockIDStr = bundle.getString("blockID");
+            cryptStr = bundle.getString("crypt");
+            validityStr = bundle.getString("valid");
         }
 
         @Override
@@ -333,6 +328,9 @@ public class BlockchainUIActivity extends NavActivity {
             hash.setText(hashStr);
             String blockStr = "Block ID " + blockIDStr;
             blockID.setText(blockStr);
+            cumuCrypt.setText(cryptStr);
+            validity.setText(validityStr);
+
             return fragment;
         }
     }

@@ -33,6 +33,7 @@ import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_CAND1V;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_CAND2V;
 import static com.example.lucyzhao.votingapp.Utils.COMM_RESULT_VALID;
 import static com.example.lucyzhao.votingapp.Utils.VOTING_URL;
+import static com.example.lucyzhao.votingapp.Utils.savePassportInfoToPref;
 import static java.lang.Thread.sleep;
 
 /**
@@ -82,16 +83,24 @@ public class JSONReq {
                 String hash = json.get(COMM_BLOCK_HASH).toString();
                 block.setHash(hash);
                 Log.v(TAG, "hash is " + hash);
+                int hashInt = Integer.parseInt(hash);
+
                 String prevHash = json.get(COMM_BLOCK_PREV_HASH).toString();
                 block.setPrevHash(prevHash);
-                String crypt = json.get(COMM_BLOCK_CUMU_CRYPT).toString();
+                int prevHashInt = Integer.parseInt(prevHash);
+
+                String crypt = json.get(COMM_BLOCK_CUMU_CRYPT).toString().replaceAll("[\"]", "");
                 block.setCrypt(crypt);
+
                 String numBlocks = json.get(COMM_BLOCK_TOTAL_NUM).toString();
                 int num = Integer.parseInt(numBlocks);
                 block.setNumBlocks(num);
 
-                block.setHashColor(Color.RED);
-                block.setPrevHashColor(Color.GREEN);
+                block.setBlockID(blockID);
+
+                int[] colors = getColorsFromHash(hashInt, prevHashInt);
+                block.setHashColor(colors[0]);
+                block.setPrevHashColor(colors[1]);
 
             } catch (Exception e) {
                return null;
@@ -100,6 +109,30 @@ public class JSONReq {
             return null;
         }
         return block;
+    }
+
+    /**
+     *
+     * @param hash
+     * @param prevHash
+     * @return hashColor, prevHashColor
+     */
+    private static int[] getColorsFromHash(int hash, int prevHash) {
+        int[] ret = new int[2];
+        int hashR = hash % 256;
+        int hashG = (hash * 13) % 256;
+        int hashB = (hash * 21) % 256;
+
+        int hashC = Color.rgb(hashR, hashG, hashB);
+
+        int prevR = prevHash % 256;
+        int prevG = (prevHash * 13) % 256;
+        int prevB = (prevHash * 21) % 256;
+
+        int prevHC = Color.rgb(prevR, prevG, prevB);
+        ret[0] = hashC;
+        ret[1] = prevHC;
+        return  ret;
     }
 
     /**
@@ -134,10 +167,10 @@ public class JSONReq {
                     ret[0] = Utils.FALSE;
                 }
 
-                String cand1fn = json.get(COMM_CAND1_FN).toString();
-                String cand1ln = json.get(COMM_CAND1_LN).toString();
-                String cand2fn = json.get(COMM_CAND2_FN).toString();
-                String cand2ln = json.get(COMM_CAND2_LN).toString();
+                String cand1fn = json.get(COMM_CAND1_FN).toString().replaceAll("[\"]", "");
+                String cand1ln = json.get(COMM_CAND1_LN).toString().replaceAll("[\"]", "");
+                String cand2fn = json.get(COMM_CAND2_FN).toString().replaceAll("[\"]", "");
+                String cand2ln = json.get(COMM_CAND2_LN).toString().replaceAll("[\"]", "");
 
                 String cand1Votes = json.get(COMM_RESULT_CAND1V).toString();
                 String cand2Votes = json.get(COMM_RESULT_CAND2V).toString();
