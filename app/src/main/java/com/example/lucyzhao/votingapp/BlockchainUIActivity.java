@@ -105,34 +105,34 @@ public class BlockchainUIActivity extends NavActivity {
             String nfcID = params[0];
 
             // get blockchain size
-//            Block b = JSONReq.getBlock(context, nfcID, "0");
-//            if (b == null) {
-//                return null;
-//            }
-//            list.add(0, b);
-//            int size = b.getNumBlocks();
-//
-//            // get other blocks
-//            for (int i = 1; i < size; i++) {
-//                Block block = JSONReq.getBlock(context, nfcID, Integer.toString(i));
-//                if (block != null) {
-//                    list.add(i, block);
-//                } else {
-//                    list.add(i, new Block());
-//                }
-//
-//            }
-            for (int i = 0; i < 10; i++) {
-                int bgColor = generateRandColor();
-                int prevColor;
-                if (i == 0) prevColor = INIT_COLOR;
-                else prevColor = list.get(i - 1).getHashColor();
-                Block b = new Block(bgColor, prevColor);
-                b.setHash("asdfadsf");
-                b.setPrevHash("asdfasdfasdf");
-                b.setBlockID(Integer.toString(i));
-                list.add(b);
+            Block b = JSONReq.getBlock(context, nfcID, "0");
+            if (b == null) {
+                return null;
             }
+            list.add(0, b);
+            int size = b.getNumBlocks();
+
+            // get other blocks
+            for (int i = 1; i < size; i++) {
+                Block block = JSONReq.getBlock(context, nfcID, Integer.toString(i));
+                if (block != null) {
+                    list.add(i, block);
+                } else {
+                    list.add(i, new Block());
+                }
+
+            }
+//            for (int i = 0; i < 10; i++) {
+//                int bgColor = generateRandColor();
+//                int prevColor;
+//                if (i == 0) prevColor = INIT_COLOR;
+//                else prevColor = list.get(i - 1).getHashColor();
+//                Block b = new Block(bgColor, prevColor);
+//                b.setHash("asdfadsf");
+//                b.setPrevHash("asdfasdfasdf");
+//                b.setBlockID(Integer.toString(i));
+//                list.add(b);
+//            }
             return list;
         }
 

@@ -31,7 +31,7 @@ public class Utils {
     public static final String NFC_RESULT = "nfc_result";
 
     /*----------- DE1-SOC COMM --------------*/
-    public static final String VOTING_URL = "http://192.168.1.100/?";
+    public static final String VOTING_URL = "http://192.168.43.27/?";
     public static final String COMM_RESPONSE_TYPE = "RESPONSETYPE";
     public static final String COMM_NFC_ID = "NFCID";
     public static final String COMM_QR_CODE = "QRCODE";

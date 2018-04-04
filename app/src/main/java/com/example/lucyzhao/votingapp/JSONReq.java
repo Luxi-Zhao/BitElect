@@ -1,6 +1,7 @@
 package com.example.lucyzhao.votingapp;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -88,6 +89,9 @@ public class JSONReq {
                 String numBlocks = json.get(COMM_BLOCK_TOTAL_NUM).toString();
                 int num = Integer.parseInt(numBlocks);
                 block.setNumBlocks(num);
+
+                block.setHashColor(Color.RED);
+                block.setPrevHashColor(Color.GREEN);
 
             } catch (Exception e) {
                return null;
