@@ -152,6 +152,8 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                 PASSPORT_SAMPLE_NUM,
                 context);
 
+        if(passportPhoto == null) return 0;
+
         float maxRatio = 0;
 
         for (int i = 0; i < NUM_CAPTURES; i++) {
@@ -159,6 +161,7 @@ public class FaceRecognitionActivity extends AppCompatActivity {
                     YOUR_FACE_ID,
                     Integer.toString(i),
                     context);
+            if(cameraCapture == null) continue;
             float ratio = FaceComparer.compareImgs(passportPhoto, cameraCapture);
             if (ratio > maxRatio) {
                 maxRatio = ratio;

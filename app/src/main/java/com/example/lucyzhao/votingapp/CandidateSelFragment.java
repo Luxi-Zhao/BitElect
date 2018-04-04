@@ -61,7 +61,6 @@ public class CandidateSelFragment extends Fragment {
         candBios.add(cand1Bio);
         candBios.add(cand2Bio);
 
-        //testRadioBtn = fragment.findViewById(R.id.radio_clinton);
 
         okBtn = fragment.findViewById(R.id.candidate_sel_ok_btn);
         okBtn.setOnClickListener(new View.OnClickListener() {
@@ -71,10 +70,53 @@ public class CandidateSelFragment extends Fragment {
             }
         });
 
-        getCandidateProfile("peterdeutsch", 1);
-        getCandidateProfile("Luxi-Zhao", 2);
+        String nfcID = Utils.getDocNum(getContext());
+        if(nfcID.equals("")) {
+            Toast.makeText(getContext(), R.string.navigation_drawer_docnum_none, Toast.LENGTH_SHORT).show();
+        }
+        else {
+            new GetCandNamesTask(this).execute(nfcID);
+        }
+
+//        getCandidateProfile("peterdeutsch", 1);
+//        getCandidateProfile("Luxi-Zhao", 2);
 
         return fragment;
+    }
+
+    private static class GetCandNamesTask extends AsyncTask<String, Void, String[]> {
+        WeakReference<CandidateSelFragment> fragmentRef;
+
+        GetCandNamesTask(CandidateSelFragment fragment) {
+            fragmentRef = new WeakReference<>(fragment);
+        }
+
+        @Override
+        protected String[] doInBackground(String... params) {
+            CandidateSelFragment fragment = fragmentRef.get();
+            if(fragment == null || fragment.isDetached() || fragment.isRemoving()) {
+                return null;
+            }
+
+            String nfcID = params[0];
+            return JSONReq.getPollResult(fragment.getContext(), nfcID);
+        }
+
+        @Override
+        protected void onPostExecute(String[] pollResults) {
+            CandidateSelFragment fragment = fragmentRef.get();
+            if(fragment == null || fragment.isDetached() || fragment.isRemoving()) {
+                return;
+            }
+
+            String cand1fn = pollResults[1];
+            String cand1ln = pollResults[2];
+            String cand2fn = pollResults[3];
+            String cand2ln = pollResults[4];
+
+            fragment.getCandidateProfile(cand1fn + " " + cand1ln, 1);
+            fragment.getCandidateProfile(cand2fn + " " + cand2ln, 2);
+        }
     }
 
     private void finishCandSelTask(View fragment) {

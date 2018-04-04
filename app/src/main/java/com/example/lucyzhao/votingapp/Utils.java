@@ -201,8 +201,16 @@ public class Utils {
             folder = TEST_DIR;
         }
         String filename = "/" + folder + "/" + faceID + "-face_" + num + ".png";
+        filename = context.getFilesDir().getAbsolutePath() + filename;
+        File file = new File(filename);
+        if(!file.exists()) {
+            Log.v(TAG, "FILE DOES NOT EXIST");
+            //return null;
+        }
+
         Log.v(TAG, "image " + filename + " retrieved!");
-        Bitmap b = BitmapFactory.decodeFile(context.getFilesDir().getAbsolutePath() + filename);
+
+        Bitmap b = BitmapFactory.decodeFile(file.getAbsolutePath());
         if (b == null) {
             Log.v(TAG, "retrieved b is null!");
         }

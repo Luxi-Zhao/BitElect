@@ -72,11 +72,7 @@ public class CustomFaceDetector extends Detector<Face> {
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
-//        if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTURES && initialTimeout <= 0) {
-//            Face face = detectedFaces.valueAt(0);
-//            retrieveFaceFromCapture(face, frame);
-//        }
-//        else if(initialTimeout > 0) initialTimeout--;
+
         if(detectedFaces.size() > 0 && getImgNum() < Utils.NUM_CAPTURES) {
             int imgNum = getImgNum();
             if(imgNum == 0 && initialTimeout > 0) {
