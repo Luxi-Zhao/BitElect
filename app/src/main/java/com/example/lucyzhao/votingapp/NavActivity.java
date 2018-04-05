@@ -1,13 +1,20 @@
 package com.example.lucyzhao.votingapp;
 
+import android.app.DialogFragment;
 import android.content.Intent;
 import android.graphics.Typeface;
+import android.os.Bundle;
 import android.support.annotation.LayoutRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -69,11 +76,13 @@ public class NavActivity extends AppCompatActivity
         } else if (id == R.id.nav_blockchain) {
             startActivityWithAnim(BlockchainUIActivity.class);
         } else if (id == R.id.nav_config) {
-            startActivityWithAnim(CandidateInfoActivity.class);
+            //startActivityWithAnim(CandidateInfoActivity.class);
+            new ConfigAccessFragment().show(getFragmentManager(), "configaccessfrag");
         } else if (id == R.id.nav_clear) {
             clearProgress();
         } else if (id == R.id.nav_key) {
-            startActivityWithAnim(KeyActivity.class);
+            //startActivityWithAnim(KeyActivity.class);
+            new ConfigAccessFragment().show(getFragmentManager(), "configaccessfrag");
         }
         return true;
     }
@@ -110,5 +119,35 @@ public class NavActivity extends AppCompatActivity
             sub += "...";
             docNum.setText(sub);
         }
+    }
+
+    public static class ConfigAccessFragment extends DialogFragment  {
+
+        private EditText password;
+        private TextView title;
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            final View fragment = inflater.inflate(R.layout.fragment_config_access, container, false);
+
+            title = fragment.findViewById(R.id.config_access_title);
+            password = fragment.findViewById(R.id.config_access_pass);
+
+            Typeface typeface = fragment.getResources().getFont(R.font.quicksand);
+            title.setTypeface(typeface);
+
+            password.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String pass = password.getText().toString();
+                    if(pass.equals("abc")) {
+                        ((NavActivity) getActivity()).startActivityWithAnim(getClass());
+                    }
+                }
+            });
+            return fragment;
+        }
+
     }
 }

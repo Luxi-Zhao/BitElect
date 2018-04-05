@@ -481,8 +481,6 @@ public class MainActivity extends NavActivity {
                     }
 
                     Utils.savePassportInfoToPref(getContext(), docNumStr, birthDateStr, expiryDateStr);
-//                    ((MainActivity) getActivity())
-//                            .savePassportInfoToPref(docNumStr, birthDateStr, expiryDateStr);
                     infoLayout.setVisibility(View.INVISIBLE);
                     promptLayout.setVisibility(View.VISIBLE);
                 }

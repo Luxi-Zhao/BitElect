@@ -41,4 +41,6 @@
     <string name="key_format_wrong">Key format invalid</string>
     <string name="cand_names_getting_err">Failed to get candidate names</string>
     <string name="empty_fields">Please fill in all fields</string>
+
+    <string name="config_access_title">An administrator? Please enter your password.</string>
 </resources>
