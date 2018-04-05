@@ -263,6 +263,7 @@ public class NFCActivity extends AppCompatActivity {
             String nationality = mrzInfo.getNationality();
             String personalNumber = mrzInfo.getPersonalNumber();
             String docNumber = mrzInfo.getDocumentNumber();
+            String gender = mrzInfo.getGender().name();
 
             // update info list UI
             enableVoting(String.valueOf(Math.abs(docNumber.hashCode())), mrzInfo);
@@ -282,8 +283,9 @@ public class NFCActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            activity.infoList.add(activity.new BioInfo("Personal Number", personalNumber));
+            //activity.infoList.add(activity.new BioInfo("Personal Number", personalNumber));
             //activity.infoList.add(activity.new BioInfo("Document Number", docNumber));
+            activity.infoList.add(activity.new BioInfo("Gender", gender));
             activity.infoAdapter.notifyDataSetChanged();
 
             // handle bitmap

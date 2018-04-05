@@ -19,7 +19,7 @@ public class FaceComparer {
     public static float compareImgs(Bitmap target, Bitmap source) {
         Bitmap croppedTarget = cropHair(target);
         Bitmap croppedSource = cropHair(source);
-        return compareImgsRec(croppedTarget, croppedSource);
+        return compareImgsRec(croppedTarget, croppedSource, 0);
     }
     /**
      *
@@ -27,7 +27,10 @@ public class FaceComparer {
      * @param source picture taken by camera
      * @return similarity ratio
      */
-    public static float compareImgsRec(Bitmap target, Bitmap source) {
+    public static float compareImgsRec(Bitmap target, Bitmap source, int countRecs) {
+        if(countRecs > 10) {
+            return (float)1.3;
+        }
         int smallH = Math.min(target.getHeight(), source.getHeight());
         int smallW = Math.min(target.getWidth(), source.getWidth());
 
@@ -70,7 +73,7 @@ public class FaceComparer {
             Log.v(TAG, "picture too dark");
             greySource = brightenImg(greySource, tooDarkRatio);
             Log.v(TAG, "enter recursion");
-            compareResult = compareImgsRec(greyTarget, greySource);
+            compareResult = compareImgsRec(greyTarget, greySource, countRecs+1);
         }
         else {
             Log.v(TAG, "picture not too dark");

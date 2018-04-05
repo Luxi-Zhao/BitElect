@@ -20,4 +20,10 @@
         android:inputType="textPassword"
         style="@style/CandidateConfigEditText"/>
 
+    <Button
+        style="@style/PrimaryButton"
+        android:id="@+id/config_access_btn"
+        android:layout_marginTop="20dp"
+        android:text="OK"/>
+
 </LinearLayout>

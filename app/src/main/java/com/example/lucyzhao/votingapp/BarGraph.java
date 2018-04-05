@@ -34,7 +34,7 @@ public class BarGraph extends View {
     private static final int LINE_STROKE_WIDTH = 5;
 
     private int[] barAnimHeights = {0, 0};
-    private static final int BAR_GRAPH_SPD = 5;
+    private static final int BAR_GRAPH_SPD = 15;
     private static final int REFRESH_DELAY = 10;
 
     private static final int TEXT_MARGIN = 20;
