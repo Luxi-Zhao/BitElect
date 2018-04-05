@@ -35,6 +35,8 @@ import static java.lang.Thread.sleep;
 
 /**
  * Created by LucyZhao on 2018/4/2.
+ *
+ * Class that handles communication with the WIFI module
  */
 
 public class JSONReq {
@@ -42,9 +44,7 @@ public class JSONReq {
     private static final int MAX_RETRY = 5;
 
     /**
-     * @param context
      * @param nfcID   doc num
-     * @param blockID
      * @return null if an exception happened
      * empty block if other problems happened
      * block with data under normal conditions
@@ -122,8 +122,8 @@ public class JSONReq {
     }
 
     /**
-     * @param hash
-     * @param prevHash
+     * Convert hash and prevHash values to colors to display
+     * on the blockchain UI
      * @return hashColor, prevHashColor
      */
     private static int[] getColorsFromHash(int hash, int prevHash) {
@@ -145,9 +145,11 @@ public class JSONReq {
     }
 
     /**
-     * @param context
      * @param nfcID   doc num
-     * @return valid, cand1fn, cand1ln, cand2fn, cand2ln, cand1votes, cand2votes
+     * @return valid, cand1fn, cand1ln, cand2fn, cand2ln,
+     *         cand1votes, cand2votes are optionally returned
+     *         when they are not returned, their values are set to
+     *         0
      */
     static String[] getPollResult(Context context, String nfcID) {
         String[] ret = new String[7];
@@ -212,9 +214,9 @@ public class JSONReq {
     }
 
     /**
-     * @param context
      * @param nfcID   doc num
-     * @return valid,
+     * @return valid
+     *         rejection msg if key is not valid
      */
     static String[] sendKey(Context context, String nfcID, String key, String keyType) {
         String[] ret = new String[2];
@@ -253,6 +255,10 @@ public class JSONReq {
         return ret;
     }
 
+    /**
+     * Makes a synchronous request to the WIFI module
+     * @return JSON object containing the response
+     */
     private static JsonObject getJSON(Context context, String url, String cleanurl) {
         JsonObject json = null;
 

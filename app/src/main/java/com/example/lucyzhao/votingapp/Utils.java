@@ -37,8 +37,7 @@ public class Utils {
     public static final String COMM_QR_CODE = "QRCODE";
     public static final String COMM_CANDIDATE_ID = "CANDIDATEID";
 
-
-
+    // BLOCK COMM
     public static final String COMM_BLOCKID = "BLOCKID";
     public static final String COMM_REQ_CHAIN = "CHAINREQUEST";
     public static final String COMM_BLOCK_RESPONSE = "BLOCKRESPONSE";
@@ -48,6 +47,7 @@ public class Utils {
     public static final String COMM_BLOCK_CUMU_CRYPT = "CUMULATIVECRYPT";
     public static final String COMM_BLOCK_TOTAL_NUM = "TOTALBLOCKS";
 
+    // POLL RESULT COMM
     public static final String COMM_REQ_RESULT = "RESULTSREQUEST";
     public static final String COMM_RESULT_RESPONSE = "RESULTSRESPONSE";
     public static final String COMM_RESULT_VALID = "RESULTSVALID";
@@ -58,12 +58,14 @@ public class Utils {
     public static final String COMM_RESULT_CAND1V = "CAND1VOTES";
     public static final String COMM_RESULT_CAND2V = "CAND2VOTES";
 
+    // PRIVATE KEY REQUEST COMM
     public static final String COMM_REQ_KEY = "KEYREQUEST";
     public static final String COMM_KEY_MSG = "REJECTIONMESSAGE";
     public static final String COMM_KEY_VALID = "KEYACCEPTED";
     public static final String COMM_KEY_KEY = "PRIVVAL";
     public static final String COMM_KEY_TYPE = "PRIVIDENT";
 
+    // RESPONSES
     public static final String TRUE = "True";
     public static final String FALSE = "False";
 
@@ -72,6 +74,7 @@ public class Utils {
     public static final String NAME = "name";
     public static final String BIO = "bio";
 
+    /*----------- Passport --------------*/
     public static final String PASSPORT_BIRTHDATE_STR = "Birthdate";
     public static final String PASSPORT_NATIONALITY_STR = "Nationality";
     public static final String ALLOWABLE_NATIONALITY = "CHN";
@@ -97,9 +100,7 @@ public class Utils {
     }
 
     /**
-     * Birthday in the format yymmdd
-     *
-     * @param birthDate
+     * @param birthDate in the format yymmdd
      * @return
      */
     public static boolean checkAgeEligibility(String birthDate) {
@@ -129,6 +130,10 @@ public class Utils {
         Log.v(TAG, "saved to pref");
     }
 
+    /**
+     * Retrieve passport number from share preferences
+     * @return passport number
+     */
     public static String getDocNum(Context context) {
         SharedPreferences sharedPref = context.getSharedPreferences(context.getString(R.string.pref_file_key), Context.MODE_PRIVATE);
         return sharedPref.getString(context.getString(R.string.shared_pref_doc_num), "");
@@ -138,6 +143,9 @@ public class Utils {
     ///////////////////////////IMG/FILE SAVING/////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
+    /**
+     * Delete all files in training directory
+     */
     public static void clearFiles(Context context) {
         Log.v(TAG, "-------------deleting all files in training dir");
         File dir = new File(context.getFilesDir(), Utils.TRAIN_DIR);
@@ -162,9 +170,12 @@ public class Utils {
     }
 
     /**
+     * @param training whether to save the image to training directory
+     *                 or testing directory
+     *                 passport photo -- save to testing dir
+     *                 camera captures -- save to training dir
      * @param sampleNumber in the form of 1,2,3
      * @param bitmap
-     * @param context
      * @throws IOException
      */
     public static void saveImg(boolean training, String faceID, String sampleNumber, Bitmap bitmap, Context context) throws IOException {
@@ -193,6 +204,14 @@ public class Utils {
 
     }
 
+    /**
+     * @param training whether to retrieve the image from training directory
+     *                 or testing directory
+     *                 passport photo -- retrieve from testing dir
+     *                 camera captures -- retrieve from training dir
+     * @param faceID   either "0" for passport or "1" for img capture
+     * @param num      either "0" for passport or "0", "1", "2", "3" for img capture
+     */
     public static Bitmap retrieveImg(boolean training, String faceID, String num, Context context) {
         String folder;
         if (training) {
@@ -221,6 +240,12 @@ public class Utils {
     ///////////////////////////IMG MANIPULATION////////////////////////////
     ///////////////////////////////////////////////////////////////////////
 
+    /**
+     * Requires the original image contains the face
+     * This does another crop to ensure we are getting only the face area.
+     * @param origB original bitmap with face detected by the face detector
+     * @return cropped face
+     */
     public static Bitmap cropFace(Bitmap origB, Context context) {
         FaceDetector faceDetector = new
                 FaceDetector.Builder(context).setTrackingEnabled(false)
@@ -287,9 +312,9 @@ public class Utils {
     ///////////////////////////////////////////////////////////////////////
 
     /**
+     * Sets font to quicksand
      * Only usable for activities with layouts directly associated with them
      * Does not apply to fragments, navigation drawers, etc.
-     * @param activity
      * @param ids TextView ids
      */
     public static void setTypeFace(Activity activity, int... ids) {

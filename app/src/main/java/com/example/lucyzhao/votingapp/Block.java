@@ -2,14 +2,17 @@ package com.example.lucyzhao.votingapp;
 
 /**
  * Created by LucyZhao on 2018/4/3.
+ *
+ * Data class
+ * Represents a block in a blockchain
  */
 
 public class Block {
     private String hash, prevHash;
-    private String blockID;
-    private String crypt;
-    private String valid;
-    private int numBlocks;
+    private String blockID; //location of the block in the chain
+    private String crypt;   //cumulative encryption
+    private String valid;   //whether the block is valid
+    private int numBlocks;  //number of blocks in the chain
 
     // UI colors
     private int hashColor, prevHashColor;

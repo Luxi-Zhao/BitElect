@@ -31,12 +31,13 @@ public class CustomFaceDetector extends Detector<Face> {
     private Context context;
 
     // fields used to communicate with calling activity
-    private int imgNum = 0;
+    private int imgNum = 0; //which image is currently being saved
 
+    // time out fields
     private static final int INITIAL_TIMEOUT = 30;
     private static final int TIMEOUT = 10;
     private int initialTimeout = INITIAL_TIMEOUT; //number of detections before starting capture
-    private int timeout = TIMEOUT;
+    private int timeout = TIMEOUT;  //number of detections between captures
 
 
     public CustomFaceDetector(Detector<Face> detector, Context context) {
@@ -68,7 +69,6 @@ public class CustomFaceDetector extends Detector<Face> {
         Log.v(TAG, "bitmap w " + bw + " bitmap h" + bh);
     }
 
-    //todo slow down face detection rate
     @Override
     public SparseArray<Face> detect(Frame frame) {
         SparseArray<Face> detectedFaces = detector.detect(frame);
@@ -93,6 +93,12 @@ public class CustomFaceDetector extends Detector<Face> {
         return detectedFaces;
     }
 
+    /**
+     * Save the frame received to local storage for later
+     * face comparison
+     * @param frame the whole picture containing the face
+     * @param face face data
+     */
     private void retrieveFaceFromCapture(Face face, Frame frame) {
         int width = frame.getMetadata().getWidth();
         int height = frame.getMetadata().getHeight();
