@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    tools:context="com.example.lucyzhao.votingapp.StepperFragment">
+    tools:context="com.example.lucyzhao.votingapp.nfc.StepperFragment">
 
     <LinearLayout
         android:id="@+id/stepper_circle_ll"

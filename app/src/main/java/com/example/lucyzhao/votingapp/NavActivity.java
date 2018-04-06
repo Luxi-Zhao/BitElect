@@ -1,6 +1,5 @@
 package com.example.lucyzhao.votingapp;
 
-import android.app.Activity;
 import android.app.DialogFragment;
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -10,7 +9,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +17,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
+
+import com.example.lucyzhao.votingapp.blockchain_ui.BlockchainUIActivity;
+import com.example.lucyzhao.votingapp.poll_results.PollResultActivity;
 
 /**
  * Base activity that provides the Navigation Drawer

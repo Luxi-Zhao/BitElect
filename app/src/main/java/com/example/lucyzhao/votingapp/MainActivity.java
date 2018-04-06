@@ -5,14 +5,10 @@ import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,16 +19,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
+import com.example.lucyzhao.votingapp.face_recog.FaceRecognitionActivity;
+import com.example.lucyzhao.votingapp.face_recog.TestActivity;
+import com.example.lucyzhao.votingapp.qr_code.QRCodeActivity;
 import com.google.gson.JsonObject;
 import com.koushikdutta.ion.Ion;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -131,7 +123,7 @@ public class MainActivity extends NavActivity {
     }
 
     private void setFaceTaskCompleted(boolean match) {
-        if(match) {
+        if (match) {
             taskManager.onTaskCompleted(2);
         }
     }
@@ -188,15 +180,13 @@ public class MainActivity extends NavActivity {
         }
 
         void initUI() {
-            if(tasksCompleted == numTasks) {
-                if(voteCompleted) {
+            if (tasksCompleted == numTasks) {
+                if (voteCompleted) {
                     onVoteCompleted();
-                }
-                else {
+                } else {
                     showSelectCandFrag();
                 }
-            }
-            else {
+            } else {
                 VoteUncomplFragment fragment = new VoteUncomplFragment();
                 showFrag(fragment);
             }
@@ -219,17 +209,6 @@ public class MainActivity extends NavActivity {
                 allLines.get(i)
                         .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorBtnCompleted));
             }
-
-            // ---------- for debug only
-//            for (int i = taskNum + 1; i < allBtns.size(); i++) {
-//                allBtns.get(i).setUncompleted();
-//            }
-//
-//            for (int i = taskNum - 1; i < allLines.size(); i++) {
-//                allLines.get(i)
-//                        .setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
-//            }
-            // ----------
 
             if (taskNum < allBtns.size()) {
                 allBtns.get(taskNum).enablePulsingButton();
@@ -255,7 +234,6 @@ public class MainActivity extends NavActivity {
 
         startActivityForResult(intent, QR_ACTIVITY_REQ_CODE);
     }
-
 
 
     //////////////////////////////////////////////////////////////
@@ -293,6 +271,7 @@ public class MainActivity extends NavActivity {
         Button cancel;
         TextView confirmation;
         MainActivity myActivity;
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -321,13 +300,14 @@ public class MainActivity extends NavActivity {
         }
     }
 
+    /**
+     * Send vote to WIFI module
+     */
     private void submitVote() {
         if (!myVote.checkAllFieldsExist()) {
             Toast.makeText(getApplicationContext(), "please complete all steps", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        RequestQueue queue = Volley.newRequestQueue(this);
 
         String encryptedCandidateID = Utils.encryptVote(Integer.valueOf(myVote.getCandidateID()));
 
@@ -341,11 +321,11 @@ public class MainActivity extends NavActivity {
         JsonObject json = null;
         int retryCounter = 0;
 
-        try{
+        try {
             json = Ion.with(getApplicationContext()).load(url).asJsonObject().get();
             Log.v(TAG, "output is: " + json.toString());
 
-            while(json.get("RESPONSETYPE").toString().equals("\"NULL\"")){
+            while (json.get("RESPONSETYPE").toString().equals("\"NULL\"")) {
                 sleep(100);
                 json = Ion.with(getApplicationContext()).load(cleanurl).asJsonObject().get();
                 Log.v(TAG, "output is: " + json.toString());
@@ -353,16 +333,16 @@ public class MainActivity extends NavActivity {
                 retryCounter++;
                 Log.v(TAG, "count:" + retryCounter);
 
-                if(retryCounter > 5){
+                if (retryCounter > 5) {
                     Log.v(TAG, "Retried 5 times!");
                     throw new RuntimeException();
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
         }
 
-        if(json != null){
+        if (json != null) {
             try {
                 String configResponse = json.get("VOTEACCEPTED").toString();
                 Log.v(TAG, "acceptstring is: " + configResponse);
@@ -375,15 +355,13 @@ public class MainActivity extends NavActivity {
                     String rejectionReason = json.get("REJECTIONMESSAGE").toString();
                     Toast.makeText(getApplicationContext(), "Vote Denied! " + rejectionReason, Toast.LENGTH_SHORT).show();
                 }
-            }
-            catch(Exception e){
+            } catch (Exception e) {
                 Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
             }
-        } else{
+        } else {
             Toast.makeText(getApplicationContext(), "Error getting response from server!", Toast.LENGTH_SHORT).show();
         }
     }
-
 
 
     private static class Vote {
@@ -436,16 +414,6 @@ public class MainActivity extends NavActivity {
         new PassportInfoPromptFragment().show(getFragmentManager(), "enterPassportInfo");
     }
 
-    private void savePassportInfoToPref(String docNumStr, String birthDateStr, String expiryDateStr) {
-        SharedPreferences sharedPref = this
-                .getSharedPreferences(getString(R.string.pref_file_key), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(getString(R.string.shared_pref_doc_num), docNumStr);
-        editor.putString(getString(R.string.shared_pref_birthdate), birthDateStr);
-        editor.putString(getString(R.string.shared_pref_expirydate), expiryDateStr);
-        editor.apply(); //asynchronously save to pref
-        Log.v(TAG, "saved to pref");
-    }
 
     public static class PassportInfoPromptFragment extends DialogFragment implements View.OnClickListener {
         private EditText birthDate;
@@ -524,10 +492,8 @@ public class MainActivity extends NavActivity {
 
             case (FACE_ACTIVITY_REQ_CODE): {
                 if (resultCode == Activity.RESULT_OK) {
-
                     setFaceTaskCompleted(true);
-                }
-                else {
+                } else {
                     setFaceTaskCompleted(false);
                 }
                 break;

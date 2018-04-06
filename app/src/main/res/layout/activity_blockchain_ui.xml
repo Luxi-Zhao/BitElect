@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="@color/colorBackground"
-    tools:context="com.example.lucyzhao.votingapp.BlockchainUIActivity">
+    tools:context="com.example.lucyzhao.votingapp.blockchain_ui.BlockchainUIActivity">
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/blockchain_recycler"

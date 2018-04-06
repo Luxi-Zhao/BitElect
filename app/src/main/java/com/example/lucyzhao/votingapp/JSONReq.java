@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 
+import com.example.lucyzhao.votingapp.blockchain_ui.Block;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.koushikdutta.ion.Ion;
@@ -49,7 +50,7 @@ public class JSONReq {
      * empty block if other problems happened
      * block with data under normal conditions
      */
-    static Block getBlock(Context context, String nfcID, String blockID) {
+    public static Block getBlock(Context context, String nfcID, String blockID) {
         Block block = new Block();
 
         /* ------------ prepare url ----------------*/
@@ -151,7 +152,7 @@ public class JSONReq {
      *         when they are not returned, their values are set to
      *         0
      */
-    static String[] getPollResult(Context context, String nfcID) {
+    public static String[] getPollResult(Context context, String nfcID) {
         String[] ret = new String[7];
 
         /* ------------ prepare url ----------------*/
@@ -218,7 +219,7 @@ public class JSONReq {
      * @return valid
      *         rejection msg if key is not valid
      */
-    static String[] sendKey(Context context, String nfcID, String key, String keyType) {
+    public static String[] sendKey(Context context, String nfcID, String key, String keyType) {
         String[] ret = new String[2];
 
         /* ------------ prepare url ----------------*/

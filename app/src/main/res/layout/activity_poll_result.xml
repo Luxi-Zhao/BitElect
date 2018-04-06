@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:id="@+id/poll_result_layout"
     android:background="@color/colorBackground"
-    tools:context="com.example.lucyzhao.votingapp.PollResultActivity">
+    tools:context="com.example.lucyzhao.votingapp.poll_results.PollResultActivity">
 
 
     <TextView

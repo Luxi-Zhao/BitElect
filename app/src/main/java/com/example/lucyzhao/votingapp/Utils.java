@@ -82,7 +82,6 @@ public class Utils {
 
     public static final int NUM_CAPTURES = 4;
 
-    public static final String INTERNET_FACES_PATH = "internet_faces";
     public static final String YOUR_FACE_ID = "1";
     public static final String PASSPORT_FACE_ID = "0";
     public static final String PASSPORT_SAMPLE_NUM = "0";

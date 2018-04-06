@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.lucyzhao.votingapp.NFCActivity">
+    tools:context="com.example.lucyzhao.votingapp.nfc.NFCActivity">
 
     <LinearLayout
         android:id="@+id/nfc_mrz_info"

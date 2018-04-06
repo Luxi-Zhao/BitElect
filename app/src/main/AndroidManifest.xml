@@ -24,9 +24,9 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".QRCodeActivity" />
+        <activity android:name=".qr_code.QRCodeActivity" />
         <activity
-            android:name=".NFCActivity"
+            android:name=".nfc.NFCActivity"
             android:launchMode="singleTop">
             <intent-filter>
                 <action android:name="android.nfc.action.TECH_DISCOVERED" />
@@ -40,17 +40,17 @@
                 <action android:name="android.nfc.action.TAG_DISCOVERED" />
             </intent-filter>
         </activity>
-        <activity android:name=".FaceRecognitionActivity" />
-        <activity android:name=".TestActivity" />
+        <activity android:name=".face_recog.FaceRecognitionActivity" />
+        <activity android:name=".face_recog.TestActivity" />
         <activity android:name=".NavActivity" />
         <activity android:name=".CandidateInfoActivity" />
-        <activity android:name=".PollResultActivity" />
+        <activity android:name=".poll_results.PollResultActivity" />
 
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".BlockchainUIActivity" />
+        <activity android:name=".blockchain_ui.BlockchainUIActivity" />
         <activity android:name=".KeyActivity"></activity>
     </application>
 

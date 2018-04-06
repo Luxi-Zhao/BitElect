@@ -3,19 +3,19 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.lucyzhao.votingapp.QRCodeActivity">
+    tools:context="com.example.lucyzhao.votingapp.qr_code.QRCodeActivity">
 
     <SurfaceView
         android:id="@+id/surface_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.example.lucyzhao.votingapp.QRCodeOverlay
+    <com.example.lucyzhao.votingapp.qr_code.QRCodeOverlay
         android:id="@+id/overlay"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.example.lucyzhao.votingapp.MovingLine
+    <com.example.lucyzhao.votingapp.qr_code.MovingLine
         android:id="@+id/line_indicator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="com.example.lucyzhao.votingapp.FaceRecognitionActivity">
+    tools:context="com.example.lucyzhao.votingapp.face_recog.FaceRecognitionActivity">
 
     <SurfaceView
         android:id="@+id/face_surface_view"
@@ -13,7 +13,7 @@
         android:layout_centerVertical="true"
         android:layout_height="400dp" />
 
-    <com.example.lucyzhao.votingapp.FaceOverlay
+    <com.example.lucyzhao.votingapp.face_recog.FaceOverlay
         android:layout_width="match_parent"
         android:layout_height="400dp"
         android:id="@+id/face_overlay"
